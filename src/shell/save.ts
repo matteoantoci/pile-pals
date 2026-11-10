@@ -40,3 +40,13 @@ export const loadGame = (): RestoredGame | undefined => {
     return undefined;
   }
 };
+
+/** Deletes the save (the reset of the parent area). False when localStorage refused the change. */
+export const clearSave = (): boolean => {
+  try {
+    localStorage.removeItem(SAVE_KEY);
+    return true;
+  } catch {
+    return false;
+  }
+};

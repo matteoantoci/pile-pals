@@ -5,7 +5,7 @@ import { SHIPPED } from './levels';
 import palSizes from './pal-sizes.json';
 import type { Clip } from './levels';
 
-export { loadClip, playClip } from './engine';
+export { isSoundOn, loadClip, playClip, setSoundOn } from './engine';
 export { CLIPS } from './levels';
 export type { Clip, ClipLevel } from './levels';
 
