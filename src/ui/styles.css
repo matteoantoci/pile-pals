@@ -46,6 +46,12 @@ img {
   pointer-events: none;
 }
 
+/* The first frame after a restore shows the saved table, with no motion of any kind (shell.md §3). */
+html[data-restoring] * {
+  transition: none !important;
+  animation: none !important;
+}
+
 .board {
   display: flex;
   flex-direction: column;
