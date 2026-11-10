@@ -6,7 +6,7 @@ Spec: [spec.md](../spec.md)
 
 **Blocked by:** 01 (Tracer bullet: one level on the iPhone)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 ## Sound slots and sources
 

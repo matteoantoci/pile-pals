@@ -6,7 +6,7 @@ Spec: [spec.md](../spec.md)
 
 **Blocked by:** 05 (Card sound effects), 08 (Group and level celebrations)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 - [x] Animated pals hop and fall into 3 small piles in a loop.
 - [x] The logo is a card pile with eyes, with no text.

@@ -6,7 +6,7 @@ Spec: [spec.md](../spec.md)
 
 **Blocked by:** 01 (Tracer bullet: one level on the iPhone)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 - [x] The pipeline uses Noto 2D pictures for all cards. The Fluent pictures are not used.
 - [x] For each card with a Noto animated twin, the pipeline reads the Lottie `rest` marker and encodes the loop again so that it starts at the rest frame. The still picture of that card is the rest frame.

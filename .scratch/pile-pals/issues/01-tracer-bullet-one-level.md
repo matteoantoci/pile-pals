@@ -6,7 +6,7 @@ Spec: [spec.md](../spec.md)
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 - [x] The project uses Vite, TypeScript 7 with all strict checks, Solid, vite-plugin-pwa, and Vitest.
 - [x] oxlint and oxfmt use `oxc-config-ai-guardrails` with the `base` and `typescript` presets only.

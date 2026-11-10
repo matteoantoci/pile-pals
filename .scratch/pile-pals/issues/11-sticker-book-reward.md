@@ -6,7 +6,7 @@ Spec: [spec.md](../spec.md)
 
 **Blocked by:** 08 (Group and level celebrations), 09 (Save, restore, and the shell)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 - [x] The sticker rules from the spec apply, with P from the catalog.
 - [x] The `placeSticker` and `go` actions and the `stickerAwarded`, `stickerPlaced`, and `bookComplete` events exist.

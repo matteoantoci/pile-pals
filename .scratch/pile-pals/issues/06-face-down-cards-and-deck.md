@@ -6,7 +6,7 @@ Spec: [spec.md](../spec.md)
 
 **Blocked by:** 03 (Level generator: easy levels)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 - [x] The `flipped` event exists, and the UI turns the card with the flip from the motion research.
 - [x] The `tapDeck` action and the `dealt` event exist. After the last card, the deck starts again with no limit.

@@ -6,7 +6,7 @@ Spec: [spec.md](../spec.md)
 
 **Blocked by:** 01 (Tracer bullet: one level on the iPhone), 02 (Noto content pipeline)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 - [x] The generator makes a level from the catalog, a seed, and the level number.
 - [x] Each level uses one association type.

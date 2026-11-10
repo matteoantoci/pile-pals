@@ -6,7 +6,7 @@ Spec: [spec.md](../spec.md)
 
 **Blocked by:** 04 (Native drag feel), 07 (Category cards placed by the Child)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 - [x] In level 1, a semi-transparent hand drags the first card slowly to its pile.
 - [x] The first touch of the Child stops the demo.

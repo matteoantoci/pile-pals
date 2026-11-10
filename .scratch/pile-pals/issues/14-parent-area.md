@@ -6,7 +6,7 @@ Spec: [spec.md](../spec.md)
 
 **Blocked by:** 09 (Save, restore, and the shell), 10 (Title scene), 13 (Pal sounds)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 - [x] A 3-second hold on the logo shows a multiplication problem with factors from 3 to 9 and a digit pad.
 - [x] A new problem shows each time. A wrong answer closes the check.

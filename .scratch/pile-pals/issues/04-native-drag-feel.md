@@ -6,7 +6,7 @@ Spec: [spec.md](../spec.md)
 
 **Blocked by:** 01 (Tracer bullet: one level on the iPhone)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 - [x] Lift: the card grows a little, and a separate shadow element fades in with `opacity`.
 - [x] Snap: a magnet distance pulls the card onto the pile.

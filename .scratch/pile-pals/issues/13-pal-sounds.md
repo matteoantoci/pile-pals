@@ -6,7 +6,7 @@ Spec: [spec.md](../spec.md)
 
 **Blocked by:** 02 (Noto content pipeline), 05 (Card sound effects)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 ## Sources
 

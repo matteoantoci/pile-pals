@@ -6,7 +6,7 @@ Spec: [spec.md](../spec.md)
 
 **Blocked by:** 03 (Level generator: easy levels), 04 (Native drag feel)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 - [x] On `groupComplete`, the cards of the group leave in a parade.
 - [x] Cards with an animated twin play the animation during the parade. The still and the first frame match.

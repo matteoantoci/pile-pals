@@ -6,7 +6,7 @@ Spec: [spec.md](../spec.md)
 
 **Blocked by:** 06 (Face-down cards and the deck)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 - [x] The level has one slot for each group.
 - [x] The `placeAnchor` action puts a category card on an empty slot.

@@ -6,7 +6,7 @@ Spec: [spec.md](../spec.md)
 
 **Blocked by:** 03 (Level generator: easy levels)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 - [x] The app saves to `localStorage` after each resolved move. The save holds a schema version and the full deal, not only the seed.
 - [x] On `visibilitychange` to `hidden`, the app cancels any drag and saves.
