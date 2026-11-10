@@ -21,9 +21,10 @@
   opacity: 0;
 }
 
-/* The fingertip (20, 3 in the 48 by 64 box) is on the point of the transform. */
+/* The fingertip (20, 3 in the 48 by 64 box) is on the point of the transform. The hand is above the copy. */
 .demo-hand {
   position: fixed;
+  z-index: 1;
   left: 0;
   top: 0;
   width: 48px;
