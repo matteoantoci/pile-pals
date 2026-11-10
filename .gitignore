@@ -8,3 +8,6 @@ research/content/.build/
 # Download cache of scripts/audio/prep.py
 .cache/
 __pycache__/
+
+# Local spec and tickets (issue tracker): not published
+.scratch/
