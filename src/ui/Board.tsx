@@ -1,10 +1,9 @@
 import { batch, createSignal, For } from 'solid-js';
-import { apply, dropCard, nextLevel, start } from '../model';
-import { playSound } from '../sound';
-import { draggable } from './drag';
+import { apply, dropCard, nextLevel, start, tapDeck } from '../model';
 import { stillUrl } from './pictures';
 import { playEventSounds } from './sounds';
-import type { Card, GameState, Pile } from '../model';
+import { raiseCard, TableView } from './table';
+import type { CardId, GameState, Pile } from '../model';
 import type { Hooks, Target } from './drag';
 import type { Accessor, JSX } from 'solid-js';
 
@@ -23,12 +22,16 @@ const pileTargets = (): readonly Target[] =>
     return [{ id, at: { x: box.left + box.width / 2, y: box.top + box.height / 2 } }];
   });
 
-/** The card size of the board. A level with more piles and cards gets smaller cards, so that all fit on the screen. */
+/**
+ * The card size of the board. A level with more piles and places gets smaller cards, so that all fit on the screen.
+ * A "place" is a stack of the table or the deck. The numbers keep the table within three rows of its size.
+ */
 const sizeOf = (deal: GameState): string => {
-  if (deal.piles.length > 3 || deal.table.length > 15) {
+  const places = deal.table.length + (deal.deck.length > 0 ? 1 : 0);
+  if (deal.piles.length > 3 || places > 12) {
     return 'small';
   }
-  return deal.piles.length > 2 || deal.table.length > 8 ? 'medium' : 'large';
+  return deal.piles.length > 2 || places > 6 ? 'medium' : 'large';
 };
 
 /** A category pile: the anchor picture on its face, and the cards that landed on it. */
@@ -43,15 +46,55 @@ const PileView = (props: { pile: Pile }): JSX.Element => (
   </div>
 );
 
+/** What the hooks need from the board: the newest state, the way to draw it, and the next level. */
+type Game = {
+  /** The newest state: the state after the last move. */
+  readonly current: () => GameState;
+  /** Keeps a new state. The board draws it when the card lands. */
+  readonly move: (state: GameState) => void;
+  /** Draws the newest state. */
+  readonly show: () => void;
+  /** Deals the next level. */
+  readonly dealNext: () => void;
+};
+
+/** The hooks of one card. A drop plays the sounds of its events and gives true when the card snapped. */
+const cardHooks = (game: Game, cardId: CardId): Hooks => {
+  // True when the drop of this card finished the level.
+  let last = false;
+  // The cards that the drop turns over. They turn over when the dropped card has landed.
+  let flips: readonly CardId[] = [];
+  return {
+    targets: pileTargets,
+    drop: (pileId) => {
+      const outcome = apply(game.current(), dropCard(cardId, pileId));
+      last = outcome.events.some((event) => event.type === 'levelComplete');
+      flips = outcome.events.flatMap((event) => (event.type === 'flipped' ? [event.cardId] : []));
+      playEventSounds(outcome.events);
+      game.move(outcome.state);
+      return outcome.events.some((event) => event.type === 'snapped');
+    },
+    landed: () => {
+      flips.forEach((flipped) => raiseCard(flipped, (id) => cardHooks(game, id)));
+      if (last) {
+        game.dealNext();
+      } else {
+        game.show();
+      }
+    },
+  };
+};
+
 /** The levels that the board shows: the dealt level, the state that the board draws, and the hooks of each card. */
 const playLevels = (): {
   readonly dealt: Accessor<GameState>;
   readonly state: Accessor<GameState>;
-  readonly hooksFor: (card: Card) => Hooks;
+  readonly hooksFor: (cardId: CardId) => Hooks;
+  readonly onTapDeck: () => void;
 } => {
   const [dealt, setDealt] = createSignal(start({ level: 1 }, 1));
   const [state, setState] = createSignal(dealt());
-  // `model` is the state after the last drop. The signal gets it when a card lands,
+  // `model` is the state after the last move. The signal gets it when a card lands,
   // so the pile shows the card only at the end of its spring.
   let model = dealt();
 
@@ -64,26 +107,20 @@ const playLevels = (): {
     });
   };
 
-  const hooksFor = (card: Card): Hooks => {
-    // True when the drop of this card finished the level.
-    let last = false;
-    return {
-      targets: pileTargets,
-      drop: (pileId) => {
-        const outcome = apply(model, dropCard(card.id, pileId));
-        model = outcome.state;
-        last = outcome.events.some((event) => event.type === 'levelComplete');
-        playEventSounds(outcome.events);
-        return outcome.events.some((event) => event.type === 'snapped');
-      },
-      landed: () => (last ? dealNext() : setState(model)),
-    };
+  const game: Game = { current: () => model, move: (next) => (model = next), show: () => setState(model), dealNext };
+
+  const onTapDeck = (): void => {
+    const outcome = apply(model, tapDeck());
+    model = outcome.state;
+    setState(model);
+    playEventSounds(outcome.events);
   };
-  return { dealt, state, hooksFor };
+
+  return { dealt, state, hooksFor: (cardId) => cardHooks(game, cardId), onTapDeck };
 };
 
 export const Board = (): JSX.Element => {
-  const { dealt, state, hooksFor } = playLevels();
+  const { dealt, state, hooksFor, onTapDeck } = playLevels();
 
   // The table draws each dealt card in a fixed place. A card that left the table stays hidden in its place,
   // so the other cards do not move under the finger.
@@ -92,23 +129,7 @@ export const Board = (): JSX.Element => {
       <section class="piles">
         <For each={state().piles}>{(pile) => <PileView pile={pile} />}</For>
       </section>
-      <section class="table">
-        <For each={dealt().table}>
-          {(card) => (
-            <div
-              class="card"
-              classList={{ gone: !state().table.includes(card) }}
-              ref={(el) => draggable(el, hooksFor(card))}
-              onPointerDown={() => playSound('lift')}
-            >
-              <div class="card-shadow" />
-              <div class="card-face">
-                <img src={stillUrl(card.picture)} alt="" />
-              </div>
-            </div>
-          )}
-        </For>
-      </section>
+      <TableView dealt={dealt} state={state} hooksFor={hooksFor} onTapDeck={onTapDeck} />
     </main>
   );
 };

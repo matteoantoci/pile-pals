@@ -13,23 +13,27 @@ export type Difficulty = {
   readonly maxGroups: number;
   /** The cards for each group. The category card is not included. */
   readonly cards: number;
+  /** The cards that start face-down, under the top card of a stack. */
+  readonly faceDown: number;
+  /** The cards in the deck. The Child taps the deck for them. */
+  readonly deck: number;
 };
 
 /** A row applies from its `from` level until the next row starts. */
 type Row = Difficulty & { readonly from: number };
 
-const FIRST: Row = { from: 1, minGroups: 2, maxGroups: 2, cards: 3 };
+const FIRST: Row = { from: 1, minGroups: 2, maxGroups: 2, cards: 3, faceDown: 0, deck: 0 };
 
 // Levels 1 to 10 grow one step each 2 levels: first more cards, then one more pile with 3 cards again.
-// From level 11, a level shows 2 to 4 piles, and the face-down cards and the deck (ticket 06) make it harder.
+// From level 11, a level shows 2 to 4 piles, and the face-down cards and the deck make it harder.
 const TABLE: readonly Row[] = [
   FIRST,
-  { from: 3, minGroups: 2, maxGroups: 2, cards: 4 },
-  { from: 5, minGroups: 3, maxGroups: 3, cards: 3 },
-  { from: 7, minGroups: 3, maxGroups: 3, cards: 4 },
-  { from: 9, minGroups: 4, maxGroups: 4, cards: 3 },
-  { from: 11, minGroups: 2, maxGroups: 4, cards: 4 },
-  { from: 16, minGroups: 2, maxGroups: 4, cards: 5 },
+  { from: 3, minGroups: 2, maxGroups: 2, cards: 4, faceDown: 0, deck: 0 },
+  { from: 5, minGroups: 3, maxGroups: 3, cards: 3, faceDown: 0, deck: 0 },
+  { from: 7, minGroups: 3, maxGroups: 3, cards: 4, faceDown: 0, deck: 0 },
+  { from: 9, minGroups: 4, maxGroups: 4, cards: 3, faceDown: 0, deck: 0 },
+  { from: 11, minGroups: 2, maxGroups: 4, cards: 4, faceDown: 2, deck: 2 },
+  { from: 16, minGroups: 2, maxGroups: 4, cards: 5, faceDown: 3, deck: 3 },
 ];
 
 /** The difficulty of the level. */

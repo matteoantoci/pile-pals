@@ -1,11 +1,12 @@
 import { catalog } from './catalog';
 import { difficultyOf } from './difficulty';
 import { confusable, fitsOther, groupsOfType, safeThings, thingOf } from './fairness';
+import { canFinish } from './moves';
 import { mixSeed, randomFrom } from './random';
 import type { CatalogCard, CatalogGroup } from './catalog';
 import type { Difficulty } from './difficulty';
 import type { Random } from './random';
-import type { GameState, PictureId } from './types';
+import type { Card, GameState, PictureId, Stack } from './types';
 
 // The level generator (spec, Module 2). It works in three steps:
 // 1. `difficultyOf` gives the size of the level.
@@ -16,7 +17,10 @@ import type { GameState, PictureId } from './types';
 type Plan = { readonly group: CatalogGroup; readonly anchor: PictureId; readonly cards: readonly CatalogCard[] };
 
 /** The part of the start state that the generator makes. It is plain data, so a save can keep it whole. */
-export type Deal = Pick<GameState, 'table' | 'piles'>;
+export type Deal = Pick<GameState, 'table' | 'piles' | 'deck' | 'dealt'>;
+
+/** How many deals the dead-end check may reject before the generator stops. The tests prove that it never gets here. */
+const DEAL_ATTEMPTS = 50;
 
 /** What the steps of one try share. */
 type Context = { readonly shown: readonly CatalogGroup[]; readonly cards: number; readonly random: Random };
@@ -130,18 +134,47 @@ const chooseSetup = (difficulty: Difficulty, random: Random, tries = 0): readonl
   return trySetup(difficulty, random) ?? chooseSetup(difficulty, random, tries + 1);
 };
 
-/** Puts the setup on the piles and the table, in a random order. */
-const layOut = (plans: readonly Plan[], random: Random): Deal => ({
-  piles: random
+/**
+ * The stacks of the table: each stack has one face-up card on top, and a face-down card under it when one is left.
+ * A face-down card turns over when the card on top of it moves away.
+ */
+const stackUp = (open: readonly Card[], hidden: readonly Card[]): readonly Stack[] =>
+  open.map((card, index) => ({
+    id: `stack-${String(index)}`,
+    cards: [...(hidden[index] ? [{ ...hidden[index], faceDown: true }] : []), { ...card, faceDown: false }],
+  }));
+
+/** Puts the setup on the piles, the stacks, and the deck, in a random order. */
+const layOut = (plans: readonly Plan[], difficulty: Difficulty, random: Random): Deal => {
+  const piles = random
     .shuffle(plans)
-    .map(({ group, anchor }) => ({ id: group.id, group: group.id, picture: anchor, cards: [] })),
-  table: random.shuffle(
-    plans.flatMap(({ group, cards }) => cards.map((card) => ({ id: card.id, group: group.id, picture: card.id })))
-  ),
-});
+    .map(({ group, anchor }) => ({ id: group.id, group: group.id, picture: anchor, cards: [] }));
+  const cards = random.shuffle(
+    plans.flatMap(({ group, cards: groupCards }) =>
+      groupCards.map((card) => ({ id: card.id, group: group.id, picture: card.id }))
+    )
+  );
+  // One face-down card for each stack, and always a face-up card on the table and in the deck.
+  const faceDown = Math.min(difficulty.faceDown, Math.max(0, cards.length - 2));
+  const deckSize = Math.min(difficulty.deck, cards.length - faceDown - 1);
+  return {
+    piles,
+    table: stackUp(cards.slice(faceDown + deckSize), cards.slice(0, faceDown)),
+    deck: cards.slice(faceDown, faceDown + deckSize),
+    dealt: null,
+  };
+};
+
+/** One try: the check rejects a deal that leaves cards on the table, and the next try takes the next seed. */
+const tryDeal = (level: number, seed: number, attempt: number): Deal => {
+  if (attempt >= DEAL_ATTEMPTS) {
+    throw new Error('The generator found no deal that the Child can finish.');
+  }
+  const difficulty = difficultyOf(level);
+  const random = randomFrom(mixSeed(seed, level, attempt));
+  const laid = layOut(chooseSetup(difficulty, random), difficulty, random);
+  return canFinish({ level, seed, ...laid }) ? laid : tryDeal(level, seed, attempt + 1);
+};
 
 /** Deals a level. The same level number and game seed always give the same deal. */
-export const deal = (level: number, seed: number): Deal => {
-  const random = randomFrom(mixSeed(seed, level));
-  return layOut(chooseSetup(difficultyOf(level), random), random);
-};
+export const deal = (level: number, seed: number): Deal => tryDeal(level, seed, 0);

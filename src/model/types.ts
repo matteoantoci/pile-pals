@@ -2,6 +2,7 @@
 
 export type CardId = string;
 export type PileId = string;
+export type StackId = string;
 export type GroupId = string;
 /** The id of a picture in the content catalog. `pictureOf(id)` gives the files. */
 export type PictureId = string;
@@ -11,6 +12,17 @@ export type Card = {
   readonly id: CardId;
   readonly group: GroupId;
   readonly picture: PictureId;
+};
+
+/** A card on the table. `faceDown` cards show their back: the card below the top card of a stack. */
+export type TableCard = Card & {
+  readonly faceDown: boolean;
+};
+
+/** A column of cards on the table. `cards` holds the cards, the first card at the bottom and the top card last. */
+export type Stack = {
+  readonly id: StackId;
+  readonly cards: readonly TableCard[];
 };
 
 /** A category pile. `cards` holds the cards on the pile, the first card at the bottom. */
@@ -33,16 +45,25 @@ export type Progress = {
 export type GameState = {
   readonly level: number;
   readonly seed: number;
-  readonly table: readonly Card[];
+  readonly table: readonly Stack[];
   readonly piles: readonly Pile[];
+  /** The face-down deck. The last card is the top card: `tapDeck` gives it. */
+  readonly deck: readonly Card[];
+  /** The face-up card that the last tap of the deck gave, or null. */
+  readonly dealt: Card | null;
 };
 
 /** Each action is one input from the Child. Add new actions to this union. */
-export type Action = {
-  readonly type: 'dropCard';
-  readonly cardId: CardId;
-  readonly pileId: PileId;
-};
+export type Action =
+  | {
+      readonly type: 'dropCard';
+      readonly cardId: CardId;
+      readonly pileId: PileId;
+    }
+  /** The Child taps the deck. */
+  | {
+      readonly type: 'tapDeck';
+    };
 
 /** Each event is one thing that the UI shows or plays. Add new events to this union. */
 export type GameEvent =
@@ -56,6 +77,15 @@ export type GameEvent =
   | {
       readonly type: 'rejected';
       readonly cardId: CardId;
+    }
+  /** The card on top of this card moved away, so this card now shows its picture. */
+  | {
+      readonly type: 'flipped';
+      readonly cardId: CardId;
+    }
+  /** The deck gave the card that is now face-up on the table. */
+  | {
+      readonly type: 'dealt';
     }
   /** The last card of the group is on its pile. */
   | {
