@@ -1,0 +1,90 @@
+{
+ "fluent_emoji_folders": 1595,
+ "folders_with_3d_png": 1595,
+ "3d_png_files_including_skin_tones": 3144,
+ "folders_with_skin_tones": 310,
+ "metadata_fields": {
+  "cldr": 1595,
+  "fromVersion": 1595,
+  "glyph": 1595,
+  "group": 1595,
+  "keywords": 1595,
+  "tts": 1595,
+  "unicode": 1595,
+  "mappedToEmoticons": 1546,
+  "glyphAsUtfInEmoticons": 1350,
+  "unicodeSkintones": 310,
+  "comments": 1
+ },
+ "fluent_groups": {
+  "People & Body": 343,
+  "Objects": 260,
+  "Symbols": 223,
+  "Travel & Places": 218,
+  "Smileys & Emotion": 169,
+  "Animals & Nature": 152,
+  "Food & Drink": 136,
+  "Activities": 86,
+  "Flags": 8
+ },
+ "kept_cards": 564,
+ "dropped_by_reason": {
+  "symbol": 253,
+  "gender_dup": 165,
+  "face": 149,
+  "duplicate": 95,
+  "person": 88,
+  "adult": 57,
+  "culture": 46,
+  "gesture": 44,
+  "unfamiliar": 41,
+  "abstract": 33,
+  "clock_time": 24,
+  "moon_phase": 10,
+  "religious": 9,
+  "scary": 9,
+  "flag": 8
+ },
+ "kept_by_group": {
+  "Objects": 135,
+  "Animals & Nature": 119,
+  "Food & Drink": 102,
+  "Travel & Places": 97,
+  "People & Body": 46,
+  "Activities": 45,
+  "Smileys & Emotion": 20
+ },
+ "noto_3d_512_files": 4007,
+ "kept_cards_with_noto_3d_512": 564,
+ "fluent_folders_with_noto_3d_512": 1595,
+ "noto_files_not_in_fluent": 2412,
+ "noto_files_not_in_fluent_by_kind": {
+  "skin-tone variant": 2050,
+  "flag": 288,
+  "single emoji": 37,
+  "joined sequence (families, couples)": 37
+ },
+ "noto_only_concrete_items": 13,
+ "kept_cards_with_at_least_one_tag": 542,
+ "categories": 84,
+ "categories_by_type": {
+  "kind": 29,
+  "home": 9,
+  "goes_with": 22,
+  "moves": 5,
+  "temperature": 2,
+  "size": 2,
+  "feelings": 2,
+  "colour": 11,
+  "shape": 2
+ },
+ "gap_categories": [
+  "fish",
+  "dinosaurs",
+  "furniture",
+  "polar",
+  "shopping",
+  "hops",
+  "crawls"
+ ]
+}

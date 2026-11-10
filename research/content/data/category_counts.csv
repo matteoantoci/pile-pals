@@ -1,0 +1,85 @@
+type,id,anchor,members,concepts,from_keywords,by_hand,computed,maybe,gap,noto_only_adds,members_list
+kind,fruit,Red apple,20,18,18,2,0,2,,,Avocado; Banana; Blueberries; Cherries; Coconut; Grapes; Green apple; Kiwi fruit; Lemon; Lime; Mango; Melon; Peach; Pear; Pineapple; Red apple; Strawberry; Tangerine; Tomato; Watermelon
+kind,vegetables,Carrot,16,16,8,8,0,4,,root vegetable,Avocado; Bell pepper; Broccoli; Brown mushroom; Carrot; Cucumber; Ear of corn; Eggplant; Garlic; Green salad; Hot pepper; Leafy green; Onion; Pea pod; Potato; Tomato
+kind,sweets,Lollipop,13,11,12,1,0,5,,,Birthday cake; Candy; Chocolate bar; Cookie; Cupcake; Custard; Doughnut; Honey pot; Ice cream; Lollipop; Pie; Shortcake; Soft ice cream
+kind,bread,Bread,6,5,0,6,0,8,,,Bagel; Baguette bread; Bread; Croissant; Flatbread; Pretzel
+kind,meals,Pizza,15,15,0,15,0,8,,,Burrito; Cooked rice; Dumpling; French fries; Hamburger; Hot dog; Meat on bone; Pizza; Pot of food; Poultry leg; Sandwich; Spaghetti; Steaming bowl; Sushi; Taco
+kind,drinks,Glass of milk,6,6,0,6,0,3,,,Baby bottle; Beverage box; Cup with straw; Glass of milk; Hot beverage; Teapot
+kind,birds,Bird,16,15,15,1,0,3,,,Baby chick; Bird; Blackbird; Chicken; Dove; Duck; Eagle; Flamingo; Goose; Owl; Parrot; Peacock; Penguin; Rooster; Swan; Turkey
+kind,bugs,Lady beetle,14,14,8,6,0,1,,monarch butterfly,Ant; Beetle; Bug; Butterfly; Cockroach; Cricket; Fly; Honeybee; Lady beetle; Mosquito; Scorpion; Snail; Spider; Worm
+kind,fish,Fish,4,3,0,4,0,11,GAP,,Blowfish; Fish; Shark; Tropical fish
+kind,flowers,Tulip,10,10,10,0,0,4,,,Blossom; Bouquet; Cherry blossom; Hibiscus; Hyacinth; Lotus; Rose; Sunflower; Tulip; Wilted flower
+kind,trees_leaves,Deciduous tree,10,10,0,10,0,4,,leafless tree,Cactus; Deciduous tree; Evergreen tree; Fallen leaf; Four leaf clover; Herb; Maple leaf; Palm tree; Potted plant; Seedling
+kind,dinosaurs,T-rex,3,3,0,3,0,3,GAP,,Mammoth; Sauropod; T-rex
+kind,cars_trucks,Automobile,14,13,0,14,0,11,,,Ambulance; Articulated lorry; Automobile; Bus; Delivery truck; Fire engine; Motor scooter; Motorcycle; Pickup truck; Police car; Racing car; Sport utility vehicle; Taxi; Tractor
+kind,boats,Sailboat,6,6,0,6,0,4,,,Canoe; Ferry; Motor boat; Person rowing boat; Sailboat; Ship
+kind,aircraft,Airplane,6,5,0,6,0,4,,,Airplane; Flying saucer; Helicopter; Parachute; Rocket; Small airplane
+kind,trains,Locomotive,7,5,0,7,0,2,,,Bullet train; Light rail; Locomotive; Mountain railway; Railway car; Train; Tram
+kind,instruments,Guitar,10,10,9,1,0,4,,trombone harp,Accordion; Banjo; Drum; Flute; Guitar; Maracas; Musical keyboard; Saxophone; Trumpet; Violin
+kind,tools,Hammer,8,8,0,8,0,9,,,Axe; Carpentry saw; Hammer; Ladder; Nut and bolt; Screwdriver; Toolbox; Wrench
+kind,clothes,T-shirt,16,13,0,16,0,4,,,Bikini; Briefs; Coat; Dress; Gloves; Jeans; Lab coat; Necktie; One-piece swimsuit; Running shirt; Safety vest; Scarf; Shorts; Socks; T-shirt; Womans clothes
+kind,shoes,Running shoe,9,8,5,4,0,3,,,Ballet shoes; Flat shoe; High-heeled shoe; Hiking boot; Mans shoe; Running shoe; Thong sandal; Womans boot; Womans sandal
+kind,hats,Billed cap,5,5,0,5,0,2,,,Billed cap; Crown; Rescue workers helmet; Top hat; Womans hat
+kind,balls,Soccer ball,9,9,9,0,0,4,,,American football; Baseball; Basketball; Bowling; Ping pong; Rugby football; Soccer ball; Tennis; Volleyball
+kind,toys,Teddy bear,11,11,0,11,0,19,,,Balloon; Boomerang; Flying disc; Game die; Kite; Nesting dolls; Puzzle piece; Teddy bear; Video game; Water pistol; Yo-yo
+kind,furniture,Chair,4,4,0,4,0,4,GAP,,Bed; Chair; Couch and lamp; Mirror
+kind,body,Nose,10,10,0,10,0,1,,,Ear; Eye; Flexed biceps; Foot; Leg; Mouth; Nose; Raised hand; Tongue; Tooth
+kind,jobs,Firefighter,14,14,0,14,0,2,,,Artist; Astronaut; Construction worker; Cook; Detective; Farmer; Firefighter; Health worker; Mechanic; Pilot; Police officer; Scientist; Singer; Teacher
+kind,fairy_tale_people,Princess,8,8,0,8,0,6,,,Dragon; Person elf; Person fairy; Person mage; Person merpeople; Prince; Princess; Unicorn
+kind,weather,Sun behind cloud,9,8,0,9,0,3,,,Cloud; Cloud with lightning; Cloud with rain; Cloud with snow; Rainbow; Snowflake; Sun; Sun behind cloud; Tornado
+kind,buildings,House,8,8,0,8,0,4,,lighthouse,Building construction; Castle; Circus tent; Cityscape; Hospital; House; Hut; School
+home,farm,Cow,13,13,0,13,0,10,,,Baby chick; Chicken; Cow; Donkey; Duck; Ewe; Goat; Goose; Horse; Pig; Rabbit; Rooster; Turkey
+home,sea,Water wave,16,15,0,16,0,6,,orca,Blowfish; Coral; Crab; Dolphin; Fish; Jellyfish; Lobster; Octopus; Oyster; Seal; Shark; Shrimp; Spiral shell; Squid; Tropical fish; Whale
+home,jungle,Palm tree,16,16,0,16,0,10,,,Crocodile; Elephant; Giraffe; Gorilla; Hippopotamus; Leopard; Lion; Monkey; Orangutan; Panda; Parrot; Rhinoceros; Sloth; Snake; Tiger; Zebra
+home,forest,Evergreen tree,14,14,0,14,0,18,,,Badger; Bat; Bear; Boar; Chipmunk; Deer; Fox; Hedgehog; Moose; Mushroom; Owl; Raccoon; Skunk; Wolf
+home,pond,Lotus,7,7,0,7,0,7,,,Beaver; Duck; Frog; Lotus; Otter; Swan; Turtle
+home,polar,Snowflake,3,3,0,3,0,5,GAP,,Penguin; Polar bear; Seal
+home,desert,Cactus,5,5,0,5,0,1,,,Cactus; Camel; Lizard; Scorpion; Snake
+home,pets,House,8,7,0,8,0,7,,,Black cat; Cat; Dog; Hamster; Mouse; Parrot; Rabbit; Turtle
+home,garden,Sunflower,15,15,0,15,0,16,,monarch butterfly,Ant; Beetle; Blossom; Bug; Butterfly; Cricket; Honeybee; Hyacinth; Lady beetle; Rose; Snail; Spider; Sunflower; Tulip; Worm
+goes_with,bath,Bathtub,12,12,0,12,0,5,,,Bathtub; Bubbles; Lotion bottle; Person taking bath; Plunger; Razor; Roll of paper; Shower; Soap; Sponge; Toilet; Toothbrush
+goes_with,kitchen,Cooking,12,12,0,12,0,91,,,Bowl with spoon; Canned food; Chopsticks; Cook; Cooking; Fork and knife; Jar; Kitchen knife; Pot of food; Salt; Spoon; Teapot
+goes_with,bedtime,Bed,7,7,0,7,0,14,,,Alarm clock; Bed; Candle; Crescent moon; Night with stars; Person in bed; Teddy bear
+goes_with,beach,Beach with umbrella,14,13,0,14,0,24,,lighthouse shovel,Beach with umbrella; Bikini; Bucket; Crab; Desert island; Diving mask; One-piece swimsuit; Person surfing; Person swimming; Ring buoy; Spiral shell; Sunglasses; Thong sandal; Water wave
+goes_with,party,Birthday cake,7,7,0,7,0,18,,,Balloon; Birthday cake; Cupcake; Party popper; Piñata; Ribbon; Wrapped gift
+goes_with,rain,Cloud with rain,5,5,0,5,0,9,,,Cloud with lightning; Cloud with rain; Droplet; Rainbow; Umbrella
+goes_with,snow,Snowman,11,11,0,11,0,11,,,Cloud with snow; Gloves; Ice; Ice skate; Scarf; Skier; Skis; Sled; Snowboarder; Snowflake; Snowman
+goes_with,school,Backpack,18,11,0,18,0,10,,eraser,Abacus; Artist palette; Backpack; Blue book; Books; Closed book; Crayon; Green book; Open book; Orange book; Paintbrush; Paperclip; Pen; Pencil; School; Scissors; Straight ruler; Teacher
+goes_with,doctor,Stethoscope,10,10,0,10,0,6,,,Adhesive bandage; Ambulance; Crutch; Health worker; Hospital; Manual wheelchair; Pill; Stethoscope; Syringe; Thermometer
+goes_with,gardening,Seedling,8,8,0,8,0,18,,shovel,Blossom; Herb; Hyacinth; Potted plant; Rose; Seedling; Sunflower; Tulip
+goes_with,camping,Tent,11,10,0,11,0,10,,,Axe; Backpack; Camping; Compass; Fire; Fishing pole; Flashlight; Hiking boot; Mountain; Tent; Wood
+goes_with,firefighters,Fire engine,5,5,0,5,0,4,,,Fire; Fire engine; Fire extinguisher; Firefighter; Rescue workers helmet
+goes_with,building_site,Building construction,10,10,0,10,0,10,,shovel,Brick; Building construction; Carpentry saw; Construction worker; Hammer; Ladder; Safety vest; Screwdriver; Toolbox; Wrench
+goes_with,space,Rocket,13,11,0,13,0,5,,meteor,Alien; Astronaut; Comet; Crescent moon; Flying saucer; Full moon; Globe showing americas; Ringed planet; Rocket; Satellite; Shooting star; Star; Telescope
+goes_with,fair,Circus tent,7,7,0,7,0,13,,,Carousel horse; Circus tent; Clown face; Ferris wheel; Popcorn; Roller coaster; Ticket
+goes_with,breakfast,Croissant,14,14,9,5,0,25,,,Bacon; Bagel; Bowl with spoon; Bread; Butter; Cooking; Croissant; Doughnut; Egg; Glass of milk; Honey pot; Hot beverage; Pancakes; Waffle
+goes_with,christmas,Christmas tree,7,7,0,7,0,15,,,Bell; Candle; Christmas tree; Santa claus; Snowman; Star; Wrapped gift
+goes_with,fairy_tale,Castle,14,14,0,14,0,15,,treasure chest,Castle; Crown; Crystal ball; Dragon; Gem stone; Magic wand; Person elf; Person fairy; Person mage; Person merpeople; Prince; Princess; Ring; Unicorn
+goes_with,sport,Trophy,16,16,0,16,0,16,,,American football; Badminton; Baseball; Basketball; Bowling; Boxing glove; Goal net; Person running; Ping pong; Rugby football; Running shirt; Soccer ball; Sports medal; Tennis; Trophy; Volleyball
+goes_with,police,Police car,5,5,0,5,0,5,,,Detective; Locked; Magnifying glass tilted left; Police car; Police officer
+goes_with,shopping,Shopping cart,4,4,0,4,0,109,GAP,,Basket; Coin; Shopping bags; Shopping cart
+goes_with,halloween,Jack-o-lantern,7,7,0,7,0,12,,,Bat; Black cat; Broom; Ghost; Jack-o-lantern; Spider; Spider web
+moves,flies,Bird,27,25,0,27,0,21,,monarch butterfly,Airplane; Balloon; Bat; Bird; Blackbird; Butterfly; Dove; Dragon; Duck; Eagle; Flamingo; Fly; Flying saucer; Goose; Helicopter; Honeybee; Kite; Lady beetle; Mosquito; Owl; Parachute; Parrot; Person fairy; Person superhero; Rocket; Small airplane; Swan
+moves,swims,Fish,23,22,0,23,0,21,,orca,Beaver; Blowfish; Crocodile; Dolphin; Duck; Fish; Frog; Goose; Jellyfish; Lobster; Octopus; Otter; Penguin; Person merpeople; Person swimming; Seal; Shark; Shrimp; Squid; Swan; Tropical fish; Turtle; Whale
+moves,wheels,Bicycle,29,26,0,29,0,9,,,Ambulance; Articulated lorry; Automobile; Bicycle; Bullet train; Bus; Delivery truck; Fire engine; Kick scooter; Light rail; Locomotive; Manual wheelchair; Motor scooter; Motorcycle; Mountain railway; Person biking; Pickup truck; Police car; Racing car; Railway car; Roller skate; Shopping cart; Skateboard; Sport utility vehicle; Taxi; Tractor; Train; Tram; Wheel
+moves,hops,Kangaroo,4,4,0,4,0,20,GAP,,Cricket; Frog; Kangaroo; Rabbit
+moves,crawls,Snake,4,4,0,4,0,14,GAP,,Bug; Snail; Snake; Worm
+temperature,hot,Fire,11,11,0,11,0,17,,,Candle; Cooking; Desert; Fire; Hot beverage; Hot pepper; Pot of food; Steaming bowl; Sun; Teapot; Volcano
+temperature,cold,Snowflake,8,7,0,8,0,20,,,Cloud with snow; Ice; Ice cream; Penguin; Polar bear; Snowflake; Snowman; Soft ice cream
+size,big_animals,Elephant,14,14,0,14,0,18,,orca,Bear; Bison; Camel; Elephant; Giraffe; Gorilla; Hippopotamus; Mammoth; Moose; Polar bear; Rhinoceros; Sauropod; T-rex; Whale
+size,tiny_animals,Ant,14,14,0,14,0,16,,monarch butterfly,Ant; Beetle; Bug; Butterfly; Cockroach; Cricket; Fly; Honeybee; Lady beetle; Mosquito; Mouse; Snail; Spider; Worm
+feelings,happy,Grinning face,8,8,0,8,0,0,,,Beaming face with smiling eyes; Grinning face; Grinning face with big eyes; Grinning face with smiling eyes; Grinning squinting face; Slightly smiling face; Smiling face; Smiling face with smiling eyes
+feelings,sad,Crying face,8,8,0,8,0,0,,,Crying face; Disappointed face; Frowning face; Loudly crying face; Pensive face; Slightly frowning face; Weary face; Worried face
+colour,red,Red heart,49,49,0,0,49,56,,,Accordion; Axe; Backpack; Bacon; Balloon; Bird; Boxing glove; Cherries; Chopsticks; Closed book; Crab; Cut of meat; Diving mask; Fire engine; Fire extinguisher; Folding hand fan; French fries; Fuel pump; Goal net; High-heeled shoe; Hot pepper; Lobster; Magnet; Maple leaf; Motor scooter; Mushroom; Nesting dolls; Paintbrush; Pickup truck; Pill; Plunger; Postbox; Red apple; Rescue workers helmet; Ribbon; Rose; Safety vest; Scarf; Scissors; Screwdriver; Steaming bowl; Strawberry; Teapot; Telephone; Tomato; Toolbox; Toothbrush; Watermelon; Womans boot
+colour,orange,Orange heart,17,17,0,0,17,67,,,Basketball; Boomerang; Brick; Coral; Fire; Fox; Mango; Megaphone; Orange book; Orangutan; Peach; Pencil; Pineapple; Ringed planet; Rugby football; Tangerine; Tiger
+colour,yellow,Yellow heart,20,19,0,0,20,67,,,Baby chick; Banana; Bell; Butter; Cheese wedge; Crescent moon; Ear of corn; Full moon; Key; Lemon; Light bulb; Pizza; Saxophone; Star; Sun; Sunflower; Taco; Taxi; Ticket; Trumpet
+colour,green,Green heart,36,35,0,0,36,36,,,Avocado; Battery; Beetle; Bell pepper; Beverage box; Broccoli; Cactus; Christmas tree; Cricket; Crocodile; Cucumber; Deciduous tree; Evergreen tree; Four leaf clover; Green apple; Green book; Herb; Kiwi fruit; Leafy green; Lime; Lizard; Melon; Olive; Palm tree; Pea pod; Peacock; Puzzle piece; Running shirt; Sauropod; Seedling; Shorts; Snake; T-rex; T-shirt; Tent; Water pistol
+colour,blue,Blue heart,51,50,0,0,51,65,,,Adhesive bandage; Anchor; Badminton; Billed cap; Blue book; Bowl with spoon; Briefs; Bucket; Bus stop; Canoe; Cityscape; Cloud with lightning; Couch and lamp; Desktop computer; Dolphin; Dress; Droplet; Ferry; Fish; Flat shoe; Fly; Flying disc; Gem stone; Glasses; Globe showing americas; Goggles; Ice; Jar; Jeans; Jellyfish; Kick scooter; Laptop; Luggage; Magnifying glass tilted left; Mirror; Necktie; Pen; Razor; Shield; Shopping bags; Skis; Snowflake; Socks; Sport utility vehicle; Thong sandal; Tropical fish; Watch; Water wave; Whale; Window; Yarn
+colour,purple,Purple heart,9,9,0,0,9,27,,,Bed; Eggplant; Gloves; Grapes; Hyacinth; Stethoscope; Umbrella; Video game; Yo-yo
+colour,pink,Pink heart,15,14,0,0,15,23,,,Ballet shoes; Bikini; Cherry blossom; Flamingo; Hibiscus; Lotion bottle; Lotus; One-piece swimsuit; Pig; Ping pong; Soap; Squid; Tulip; Womans clothes; Worm
+colour,brown,Brown heart,63,62,0,0,63,69,,,American football; Baguette bread; Basket; Bat; Beans; Bear; Beaver; Bison; Boar; Bread; Briefcase; Broom; Brown mushroom; Camel; Chair; Chestnut; Chipmunk; Chocolate bar; Coat; Cockroach; Coconut; Cookie; Croissant; Deer; Dog; Door; Doughnut; Eagle; Egg; Feather; Flute; Goat; Goose; Handbag; Hedgehog; Hiking boot; Honey pot; Horse; Hut; Kangaroo; Ladder; Mammoth; Mans shoe; Monkey; Moose; Onion; Otter; Owl; Package; Pancakes; Peanuts; Pie; Potato; Poultry leg; Pretzel; Scorpion; Sloth; Snail; Teddy bear; Turkey; Violin; Wheel; Wood
+colour,white,White heart,29,28,0,0,29,76,,,Baby bottle; Baseball; Blossom; Chicken; Cloud; Cloud with rain; Cloud with snow; Computer mouse; Dove; Envelope; Ewe; Game die; Glass of milk; Lab coat; Llama; Newspaper; Open book; Polar bear; Rabbit; Rock; Roll of paper; Salt; Snowman; Sun behind cloud; Swan; Syringe; Toilet; Volleyball; Wrench
+colour,grey,Grey heart,35,35,0,0,35,47,,,Bathtub; Camera; Carpentry saw; Cow; Crutch; Donkey; Elephant; Flashlight; Fork and knife; Fountain; Gorilla; Headphone; Hippopotamus; Hospital; Kitchen knife; Koala; Microphone; Microscope; Mouse; Nut and bolt; Paperclip; Raccoon; Radio; Rhinoceros; Seal; Shark; Shopping cart; Shower; Spider web; Spiral shell; Spoon; Straight ruler; Tornado; Wastebasket; Wolf
+colour,black,Black heart,12,12,0,0,12,36,,,Ant; Black cat; Blackbird; Crystal ball; Electric plug; Movie camera; Satellite; Skateboard; Skunk; Spider; Sunglasses; Top hat
+shape,round,Red circle,16,16,0,0,16,59,,,Baseball; Basketball; Coconut; Coin; Cookie; Doughnut; Flatbread; Full moon; Globe showing americas; Jack-o-lantern; Kiwi fruit; Olive; Pie; Soccer ball; Sun; Volleyball
+shape,long,Pencil,31,29,0,0,31,38,,,Adhesive bandage; Axe; Boomerang; Broom; Bug; Candle; Carpentry saw; Crayon; Crutch; Cucumber; Flute; Guitar; Hammer; Key; Kitchen knife; Magic wand; Microphone; Paintbrush; Pen; Pencil; Plunger; Rocket; Screwdriver; Sewing needle; Skateboard; Spoon; Straight ruler; Syringe; Thermometer; Toothbrush; Wrench

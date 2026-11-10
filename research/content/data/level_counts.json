@@ -1,0 +1,223 @@
+{
+ "rows": [
+  {
+   "type": "kind",
+   "categories": 29,
+   "groups": 2,
+   "combinations": 406,
+   "blocked_confusable": 2,
+   "valid_n3": 347,
+   "log10_deals_n3": 9.1,
+   "valid_n5": 229,
+   "log10_deals_n5": 10.4
+  },
+  {
+   "type": "kind",
+   "categories": 29,
+   "groups": 3,
+   "combinations": 3654,
+   "blocked_confusable": 53,
+   "valid_n3": 2826,
+   "log10_deals_n3": 13.1,
+   "valid_n5": 1500,
+   "log10_deals_n5": 15.1
+  },
+  {
+   "type": "kind",
+   "categories": 29,
+   "groups": 4,
+   "combinations": 23751,
+   "blocked_confusable": 676,
+   "valid_n3": 16379,
+   "log10_deals_n3": 17.0,
+   "valid_n5": 6936,
+   "log10_deals_n5": 19.6
+  },
+  {
+   "type": "home",
+   "categories": 9,
+   "groups": 2,
+   "combinations": 36,
+   "blocked_confusable": 2,
+   "valid_n3": 24,
+   "log10_deals_n3": 8.2,
+   "valid_n5": 16,
+   "log10_deals_n5": 9.7
+  },
+  {
+   "type": "home",
+   "categories": 9,
+   "groups": 3,
+   "combinations": 84,
+   "blocked_confusable": 14,
+   "valid_n3": 33,
+   "log10_deals_n3": 11.6,
+   "valid_n5": 8,
+   "log10_deals_n5": 13.7
+  },
+  {
+   "type": "home",
+   "categories": 9,
+   "groups": 4,
+   "combinations": 126,
+   "blocked_confusable": 41,
+   "valid_n3": 18,
+   "log10_deals_n3": 14.4,
+   "valid_n5": 2,
+   "log10_deals_n5": 16.9
+  },
+  {
+   "type": "goes_with",
+   "categories": 22,
+   "groups": 2,
+   "combinations": 231,
+   "blocked_confusable": 2,
+   "valid_n3": 225,
+   "log10_deals_n3": 8.5,
+   "valid_n5": 142,
+   "log10_deals_n5": 9.7
+  },
+  {
+   "type": "goes_with",
+   "categories": 22,
+   "groups": 3,
+   "combinations": 1540,
+   "blocked_confusable": 40,
+   "valid_n3": 1413,
+   "log10_deals_n3": 12.3,
+   "valid_n5": 657,
+   "log10_deals_n5": 13.9
+  },
+  {
+   "type": "goes_with",
+   "categories": 22,
+   "groups": 4,
+   "combinations": 7315,
+   "blocked_confusable": 379,
+   "valid_n3": 6072,
+   "log10_deals_n3": 15.8,
+   "valid_n5": 2001,
+   "log10_deals_n5": 17.8
+  },
+  {
+   "type": "moves",
+   "categories": 5,
+   "groups": 2,
+   "combinations": 10,
+   "blocked_confusable": 0,
+   "valid_n3": 7,
+   "log10_deals_n3": 9.6,
+   "valid_n5": 3,
+   "log10_deals_n5": 12.2
+  },
+  {
+   "type": "moves",
+   "categories": 5,
+   "groups": 3,
+   "combinations": 10,
+   "blocked_confusable": 0,
+   "valid_n3": 3,
+   "log10_deals_n3": 13.2,
+   "valid_n5": 1,
+   "log10_deals_n5": 16.6
+  },
+  {
+   "type": "moves",
+   "categories": 5,
+   "groups": 4,
+   "combinations": 5,
+   "blocked_confusable": 0,
+   "valid_n3": 0,
+   "log10_deals_n3": null,
+   "valid_n5": 0,
+   "log10_deals_n5": null
+  },
+  {
+   "type": "temperature",
+   "categories": 2,
+   "groups": 2,
+   "combinations": 1,
+   "blocked_confusable": 0,
+   "valid_n3": 1,
+   "log10_deals_n3": 5.3,
+   "valid_n5": 1,
+   "log10_deals_n5": 5.1
+  },
+  {
+   "type": "size",
+   "categories": 2,
+   "groups": 2,
+   "combinations": 1,
+   "blocked_confusable": 0,
+   "valid_n3": 1,
+   "log10_deals_n3": 7.2,
+   "valid_n5": 1,
+   "log10_deals_n5": 8.5
+  },
+  {
+   "type": "feelings",
+   "categories": 2,
+   "groups": 2,
+   "combinations": 1,
+   "blocked_confusable": 0,
+   "valid_n3": 1,
+   "log10_deals_n3": 4.9,
+   "valid_n5": 1,
+   "log10_deals_n5": 4.5
+  },
+  {
+   "type": "colour",
+   "categories": 11,
+   "groups": 2,
+   "combinations": 55,
+   "blocked_confusable": 11,
+   "valid_n3": 44,
+   "log10_deals_n3": 12.6,
+   "valid_n5": 44,
+   "log10_deals_n5": 16.7
+  },
+  {
+   "type": "colour",
+   "categories": 11,
+   "groups": 3,
+   "combinations": 165,
+   "blocked_confusable": 85,
+   "valid_n3": 80,
+   "log10_deals_n3": 17.8,
+   "valid_n5": 80,
+   "log10_deals_n5": 23.3
+  },
+  {
+   "type": "colour",
+   "categories": 11,
+   "groups": 4,
+   "combinations": 330,
+   "blocked_confusable": 261,
+   "valid_n3": 69,
+   "log10_deals_n3": 22.2,
+   "valid_n5": 69,
+   "log10_deals_n5": 29.1
+  },
+  {
+   "type": "shape",
+   "categories": 2,
+   "groups": 2,
+   "combinations": 1,
+   "blocked_confusable": 0,
+   "valid_n3": 1,
+   "log10_deals_n3": 8.8,
+   "valid_n5": 1,
+   "log10_deals_n5": 11.1
+  }
+ ],
+ "totals": {
+  "valid_setups_n3": 27544,
+  "valid_setups_k2_n3": 651,
+  "valid_setups_k3_n3": 4355,
+  "valid_setups_k4_n3": 22538,
+  "valid_setups_n5": 11692,
+  "valid_setups_k2_n5": 438,
+  "valid_setups_k3_n5": 2246,
+  "valid_setups_k4_n5": 9008
+ }
+}
