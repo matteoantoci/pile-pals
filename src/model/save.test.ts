@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { apply, dropCard, go, placeAnchor, placeSticker, restore, snapshot, start } from './index';
-import { openCards, playOut } from './test-player';
+import { apply, dropCard, go, openCards, placeAnchor, placeSticker, restore, snapshot, start } from './index';
+import { playOut } from './test-player';
 import type { Card, GameEvent, GameState, Pile, RestoredGame, Stack } from './index';
 
 const firstLevel = (): GameState => start({ level: 1 }, 1);
@@ -47,9 +47,7 @@ describe('snapshot', () => {
 
     const save = snapshot(state);
 
-    expect(save.version).toBe(4);
-    expect(save.state).toEqual(state);
-    expect(save.progress.level).toBe(state.level);
+    expect(save).toEqual({ version: 4, state });
   });
 
   it('is plain data, so it survives the JSON of localStorage', () => {
@@ -90,7 +88,13 @@ describe('restore', () => {
     const result = restored(snapshot(state));
 
     expect(result.state).toEqual(state);
-    expect(result.progress).toEqual({ level: 1 });
+  });
+
+  it('reads a save of version 4 from an older build, which also holds a progress field', () => {
+    const state = firstLevel();
+    const older = { ...snapshot(state), progress: { level: state.level } };
+
+    expect(restore(older)).toEqual({ ok: true, state });
   });
 
   it('plays the same as the original state', () => {
@@ -157,10 +161,9 @@ describe('restore', () => {
 
   it('rejects data that is not a save', () => {
     const state = firstLevel();
-    const noState = { version: 4, progress: { level: 1 } };
+    const noState = { version: 4 };
     const badCard = { ...snapshot(state), state: { ...state, table: [{ id: 1 }] } };
     const noPiles = { ...snapshot(state), state: { ...state, piles: 'none' } };
-    const badProgress = { ...snapshot(state), progress: {} };
     const badBook = { ...snapshot(state), state: { ...state, book: { pages: [[{ pal: 'cat', gold: 'yes' }]] } } };
 
     expect(restore(null)).toEqual({ ok: false, reason: 'shape' });
@@ -169,7 +172,6 @@ describe('restore', () => {
     expect(restore(noState)).toEqual({ ok: false, reason: 'shape' });
     expect(restore(badCard)).toEqual({ ok: false, reason: 'shape' });
     expect(restore(noPiles)).toEqual({ ok: false, reason: 'shape' });
-    expect(restore(badProgress)).toEqual({ ok: false, reason: 'shape' });
     expect(restore(badBook)).toEqual({ ok: false, reason: 'shape' });
   });
 });

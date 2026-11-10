@@ -1,15 +1,17 @@
+import { palSize } from '../../model';
 import { playPal } from '../../sound';
-import { facePose, REST_SCALE, settle, translate3d } from '../motion';
+import { canceled, facePose, ORIGIN, REST_SCALE, settle, translate3d } from '../motion';
 import { animationUrl, stillUrl } from '../pictures';
 import { animationLimiter } from './limits';
 import { wait } from './wait';
 import type { Card, Pile } from '../../model';
-import type { Frame, Vec } from '../motion';
+import type { Frame } from '../motion';
 
 // The parade of a completed group (research/native-feel/motion.md, "Starting values for each moment").
 // The cards of the group leave the pile and walk off the right edge of the screen. A card with an animated
 // twin plays its loop and its pal sound during the walk, in a slot of the animation limiter.
-// The parade cards are copies in a layer above the board: the model state and the piles do not change.
+// The parade cards are copies in a layer above the board. When the copies start, the pile hides its cards
+// (`.paraded`), so the group leaves the table. The model state does not change.
 
 /** The walk of one card to the right edge. */
 const WALK_MS = 900;
@@ -24,7 +26,6 @@ const BOB: readonly Frame[] = [
   { transform: facePose({ y: -4, rotate: 0, scale: REST_SCALE }) },
   { transform: facePose({ rotate: 6, scale: REST_SCALE }) },
 ];
-const ORIGIN: Vec = { x: 0, y: 0 };
 
 /** One card in the parade: its copy on the board, its face, its picture, and its start delay. */
 type Piece = {
@@ -34,8 +35,6 @@ type Piece = {
   readonly img: HTMLImageElement;
   readonly delay: number;
 };
-
-const canceled = (): void => undefined;
 
 const nextFrame = (): Promise<void> =>
   new Promise((resolve) => {
@@ -107,7 +106,7 @@ const animationOf = (piece: Piece): Promise<void> => {
   const play = (): Promise<void> =>
     animationLimiter.run(async () => {
       img.src = src;
-      playPal(card.picture);
+      playPal(card.picture, palSize(card.picture));
       await wait(WALK_MS);
     });
   return wait(piece.delay).then(play);
@@ -148,6 +147,7 @@ const walkGroup = (pile: Pile): Promise<void> => {
   const pieces = pile.cards.map((card, index) =>
     pieceOf(layer, card, { place: places[index % places.length] ?? first, delay: index * STAGGER_MS })
   );
+  element?.classList.add('paraded');
   return Promise.all(pieces.map(walk)).then(() => undefined);
 };
 

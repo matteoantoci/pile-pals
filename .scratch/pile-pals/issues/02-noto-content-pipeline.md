@@ -51,5 +51,5 @@ sheets (`research/content/data/sheets/*.png`); a person should re-check them bef
 **Open item for ticket 16 (device only, not tested here):** the decode cost of 8 animated AVIF
 cards on the iPhone. Ticket 07 limits the number of animations that play at the same time.
 
-**Notes for the next tickets:** `~/.cache/pile-pals-impl/notes/02-catalog.md` (catalog shape, P,
-how to load a picture and an animation, and the fields that the fairness rule of ticket 03 needs).
+**Notes for the next tickets:** `src/model/catalog.ts` has the catalog shape, P (`catalog.pals`), and the
+fields that the fairness rule of ticket 03 needs. `src/ui/pictures.ts` loads a picture and an animation.

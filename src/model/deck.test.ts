@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { apply, dropCard, start, tapDeck } from './index';
+import { apply, dropCard, openCards, placeAnchor, start, tapDeck } from './index';
 import { playOut } from './test-player';
 import type { Card, GameState, Stack, TableCard } from './index';
 
@@ -128,6 +128,36 @@ describe('the deck', () => {
     expect(once.events).toEqual([{ type: 'dealt' }]);
     expect(once.state.dealt).toEqual(first);
     expect(once.state.deck).toHaveLength(state.deck.length - 1);
+  });
+});
+
+/** True when a drop or a category card move on some pile takes the card from the table. */
+const movable = (state: GameState, card: Card): boolean =>
+  state.piles.some(
+    (pile) =>
+      apply(state, dropCard(card.id, pile.id)).state !== state ||
+      apply(state, placeAnchor(card.id, pile.id)).state !== state
+  );
+
+describe('openCards', () => {
+  it('gives the dealt card and the top card of each stack, and never a face-down card', () => {
+    const state = apply(start({ level: 11 }, 5), tapDeck()).state;
+    const stacks = state.table.filter((stack) => stack.cards.length > 0);
+    const open = openCards(state);
+
+    expect(open).toContainEqual(state.dealt);
+    expect(open).toHaveLength(stacks.length + 1);
+    expect(open.filter((card) => tableCards(state).some((own) => own.id === card.id && own.faceDown))).toEqual([]);
+  });
+
+  it('holds each card that a drop or a category card move takes from the table', () => {
+    const missing = states.flatMap((state) =>
+      [...tableCards(state), ...state.deck]
+        .filter((card) => movable(state, card) && !openCards(state).some((own) => own.id === card.id))
+        .map((card) => `${describeLevel(state)}: ${card.id}`)
+    );
+
+    expect(missing).toEqual([]);
   });
 });
 

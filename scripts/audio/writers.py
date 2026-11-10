@@ -16,8 +16,11 @@ export type ClipLevel = {
   readonly lufs: number;
   /** The true peak TP in dBTP. */
   readonly truePeak: number;
-  /** The rule that set the gain: -18 - I ('loudness'), -1 - TP ('peak'), or -6 - TP ('short'). */
-  readonly rule: 'loudness' | 'peak' | 'short';
+  /**
+   * The rule that set the gain: -18 - I ('loudness'), -1 - TP ('peak'), -6 - TP for a file below 0.4 s ('short'),
+   * or -6 - TP for a snap candidate at each length ('pluck').
+   */
+  readonly rule: 'loudness' | 'peak' | 'short' | 'pluck';
   /** The decrease in dB that keeps the file from being louder than the snap. */
   readonly snapLimitDb: number;
   /** The play gain in dB. The sound module applies it. */

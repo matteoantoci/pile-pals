@@ -1,4 +1,5 @@
 import confetti from 'canvas-confetti';
+import { canceled } from '../motion';
 import type { Options } from 'canvas-confetti';
 
 // The confetti of a completed level (research/native-feel/motion.md §6). The default cannon of
@@ -14,8 +15,6 @@ const BURST: Options = {
   zIndex: 1900,
   disableForReducedMotion: true,
 };
-
-const canceled = (): void => undefined;
 
 /** Fires one burst of confetti. The pieces fall over the next step, so the flow does not wait for them. */
 export const fireConfetti = (): void => {

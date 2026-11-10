@@ -1,7 +1,7 @@
-import { titleScene } from '../../model';
+import { palSize, titleScene } from '../../model';
 import { newSeed } from '../../shell/seed';
 import { playPal } from '../../sound';
-import { facePose, FRAME_MS, settle, stop, translate3d } from '../motion';
+import { canceled, facePose, FRAME_MS, settle, stop, translate3d } from '../motion';
 import { stillUrl } from '../pictures';
 import type { PictureId } from '../../model';
 import type { Frame, Vec } from '../motion';
@@ -41,8 +41,6 @@ const JUMP_HEIGHT = 72;
 /** A pal on a pile covers this part of the pal below it. */
 const STACK = 0.3;
 
-const canceled = (): void => undefined;
-
 /** 0 at the start and at the end, 1 in the middle: the height of a hop at the time p (0 to 1). */
 const arc = (p: number): number => 4 * p * (1 - p);
 
@@ -63,7 +61,7 @@ const jumpPose = (p: number): string =>
 const jump = (body: HTMLElement, picture: PictureId): void => {
   stop(body);
   settle(body, sampled(JUMP_MS, jumpPose), { duration: JUMP_MS, easing: 'linear' });
-  playPal(picture);
+  playPal(picture, palSize(picture));
 };
 
 /** One pal of the round, and where it goes. */

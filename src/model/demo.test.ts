@@ -1,6 +1,18 @@
 import { describe, expect, it } from 'vitest';
-import { apply, demoFor, dropCard, go, hintFor, placeAnchor, restore, sawDemo, snapshot, start } from './index';
-import { openCards, playOut } from './test-player';
+import {
+  apply,
+  demoFor,
+  dropCard,
+  go,
+  hintFor,
+  openCards,
+  placeAnchor,
+  restore,
+  sawDemo,
+  snapshot,
+  start,
+} from './index';
+import { playOut } from './test-player';
 import type { DemoKind, GameEvent, GameState } from './index';
 
 // The demo hand and the hint hop (spec, user stories 24 to 29). The tests use the public interface only.

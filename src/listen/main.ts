@@ -65,7 +65,7 @@ const button = (label: string, onClick: () => void): HTMLButtonElement => {
 const playButtons = (slot: Slot, level: ClipLevel): HTMLElement[] => {
   const play = button('Play', () => playClip(level));
   if (slot.id === 'pop') {
-    // The game plays the pop at the rate of the size tag of the pal (src/sound/pal-sizes.json).
+    // The game plays the pop at the rate of the size tag of the pal (`palSize` of the game model).
     const sizes = Object.entries(POP_RATE).map(([size, rate]) =>
       button(`Play for a pal of size ${size}`, () => playClip(level, rate))
     );

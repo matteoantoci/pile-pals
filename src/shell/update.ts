@@ -18,10 +18,10 @@ const ignored = (): void => undefined;
 
 /**
  * Applies a waiting update: the new service worker takes control and the page reloads.
- * Call it only at a safe point, before the first touch of a level: the start of a level, or the
- * next button of the reward screen. The reload then paints the saved table (shell.md §4).
+ * Only the safe window of the title scene calls it (spec Module 9). The green arrow of the reward screen
+ * goes to the title scene, so an update also applies there.
  */
-export const applyUpdateIfWaiting = (): void => {
+const applyUpdateIfWaiting = (): void => {
   if (waiting && update) {
     update(true).catch(ignored);
   }

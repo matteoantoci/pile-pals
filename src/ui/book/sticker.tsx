@@ -1,7 +1,8 @@
 import { createSignal, onMount } from 'solid-js';
+import { palSize } from '../../model';
 import { playPal } from '../../sound';
 import { animationLimiter, wait } from '../celebration';
-import { facePose, settle, stop } from '../motion';
+import { canceled, facePose, settle, stop } from '../motion';
 import { animationUrl, stillUrl } from '../pictures';
 import type { PlacedSticker, Sticker } from '../../model';
 import type { JSX } from 'solid-js';
@@ -11,8 +12,6 @@ const PLAY_MS = 3000;
 
 /** The small hop of a sticker at the start of its play: up, then back to rest. */
 const HOP = [facePose({}), facePose({ y: -14, scale: 1.08 }), facePose({})].map((transform) => ({ transform }));
-
-const canceled = (): void => undefined;
 
 /** The picture of a sticker, and the play of its animation and its sound one time. */
 export type Playable = {
@@ -34,7 +33,7 @@ export const playable = (sticker: Sticker): Playable => {
     animationLimiter
       .run(async () => {
         setPlaying(true);
-        playPal(sticker.pal);
+        playPal(sticker.pal, palSize(sticker.pal));
         const img = host.querySelector<HTMLElement>('.sticker-img');
         if (img) {
           stop(img);

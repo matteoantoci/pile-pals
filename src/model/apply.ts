@@ -30,6 +30,12 @@ export const cardsLeft = (state: GameState): readonly Card[] => [
   ...(state.dealt ? [state.dealt] : []),
 ];
 
+/** The cards that the Child can pick up: the top card of each stack and the dealt card. */
+export const openCards = (state: GameState): readonly Card[] => [
+  ...state.table.flatMap((stack) => stack.cards.slice(-1)),
+  ...(state.dealt ? [state.dealt] : []),
+];
+
 /** The events after a snap: `groupComplete` when no card of the group is left, `levelComplete` when no card is left. */
 const completions = (state: GameState, group: GroupId, pileId: PileId): readonly GameEvent[] => {
   const left = cardsLeft(state);

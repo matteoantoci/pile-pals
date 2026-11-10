@@ -3,7 +3,7 @@
 
 export { land, lift, LIFTED, restPose, RESTING, shake } from './card';
 export type { CardParts } from './card';
-export { facePose, freeze, REST_SCALE, settle, stop, translate3d } from './primitives';
+export { canceled, facePose, freeze, ORIGIN, REST_SCALE, settle, stop, translate3d } from './primitives';
 export type { Frame, Pose, Vec } from './primitives';
 export { FRAME_MS, LANDING, releaseVelocity, RETURN, sampleSpring, springTo } from './spring';
 export type { Move, Sample, SampledSpring, Spring } from './spring';

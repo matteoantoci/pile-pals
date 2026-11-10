@@ -21,6 +21,15 @@ export type Pose = {
 /** The resting scale of a card face. The card box has the lifted size, and the face rests at 1/1.08. */
 export const REST_SCALE = 0.926;
 
+/** The translate of an element at its place in the layout. */
+export const ORIGIN: Vec = { x: 0, y: 0 };
+
+/**
+ * The reject handler of stopped motion. A canceled animation rejects its `finished` promise, and a stopped wait
+ * rejects too. The next motion then owns the element, so there is nothing to do.
+ */
+export const canceled = (): void => undefined;
+
 /** The transform of a moving element (`.card`, the demo hand). The drag writes the same form. */
 export const translate3d = (p: Vec): string => `translate3d(${String(p.x)}px, ${String(p.y)}px, 0)`;
 
