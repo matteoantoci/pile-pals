@@ -28,7 +28,7 @@ const holdOf = (onHold: () => void): Hold => {
   const down: Hold['down'] = (event) => {
     stop();
     event.currentTarget.setPointerCapture(event.pointerId);
-    timer = window.setTimeout(onHold, HOLD_MS);
+    timer = setTimeout(onHold, HOLD_MS);
   };
   return { down, stop };
 };
