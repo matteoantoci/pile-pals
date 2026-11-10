@@ -5,6 +5,8 @@ export { apply, dropCard, tapDeck } from './apply';
 export { catalog, pictureOf } from './catalog';
 export { restore, SAVE_VERSION, snapshot } from './save';
 export { nextLevel, start } from './start';
+export { titleScene } from './title';
+export type { TitlePile, TitleScene } from './title';
 export type { RestoreFailure, RestoreResult, RestoredGame, SaveData } from './save';
 export type { Catalog, CatalogCard, CatalogGroup, Picture } from './catalog';
 export type {

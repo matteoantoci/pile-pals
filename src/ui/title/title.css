@@ -1,0 +1,151 @@
+/* The title scene (src/ui/title/). Only WAAPI animates the pals and the logo eyes: no CSS transitions. */
+.title {
+  --title-pal: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  height: 100%;
+  padding: 16px 16px 24px;
+  box-sizing: border-box;
+}
+
+.title-top {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.logo {
+  width: 144px;
+  height: 131px;
+}
+
+.logo-card {
+  fill: #fff;
+  stroke: var(--pile-edge);
+  stroke-width: 3;
+}
+
+.logo-card-back {
+  fill: #f4e9d2;
+}
+
+.logo-card-middle {
+  fill: #ffd36e;
+}
+
+.logo-eyes {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+
+.logo-eye {
+  fill: #fff;
+  stroke: #1d1d1f;
+  stroke-width: 2.5;
+}
+
+.logo-pupil {
+  fill: #1d1d1f;
+}
+
+.book-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 72px;
+  height: 72px;
+  padding: 0;
+  border: none;
+  background: none;
+  touch-action: none;
+  cursor: pointer;
+}
+
+.book-button svg {
+  width: 100%;
+  height: 100%;
+}
+
+.book-cover {
+  fill: #f2b33d;
+  stroke: #9a6a12;
+  stroke-width: 3;
+}
+
+.book-spine {
+  fill: #d48f1c;
+}
+
+.book-star {
+  fill: #fff;
+}
+
+/*
+ * The stage of the pals. The pals hop near the top and fall onto the 3 mats at the bottom.
+ * The stage goes to the edges of the screen, so that the pals come in from the edge.
+ */
+.title-stage {
+  position: relative;
+  flex: 1;
+  width: calc(100% + 32px);
+  min-height: 0;
+  margin: 0 -16px;
+  overflow: hidden;
+}
+
+.title-piles {
+  position: absolute;
+  right: 0;
+  bottom: 12px;
+  left: 0;
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.title-pile {
+  width: 96px;
+  height: 28px;
+  border: 4px dashed rgb(255 255 255 / 0.5);
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+
+.title-pals {
+  position: absolute;
+  inset: 0;
+}
+
+.title-pal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--title-pal);
+  height: var(--title-pal);
+  transform: translate3d(-200px, 0, 0);
+  will-change: transform;
+  cursor: pointer;
+}
+
+.title-pal-body {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.2);
+  transform-origin: 50% 100%;
+}
+
+.title-pal img {
+  width: 52px;
+  height: 52px;
+}
+
+.title-pal,
+.title-pal-body {
+  transition: none;
+}

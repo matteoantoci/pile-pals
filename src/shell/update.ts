@@ -8,30 +8,13 @@ import { registerSW } from 'virtual:pwa-register';
 type Update = (reloadPage?: boolean) => Promise<void>;
 
 let waiting = false;
+/** True while the screen is at a safe point (the title scene before the first touch). */
+let safe = false;
 let registration: ServiceWorkerRegistration | undefined;
 let update: Update | undefined;
 
-/** Registers the service worker and starts the check. Call it one time, before the first render. */
-export const watchUpdates = (): void => {
-  update = registerSW({
-    immediate: true,
-    // No prompt on the screen: the update waits for a safe point.
-    onNeedRefresh: () => {
-      waiting = true;
-    },
-    onRegisteredSW: (_url, registered) => {
-      registration = registered;
-    },
-  });
-};
-
 /** A service worker call that fails is not an error of the game. */
 const ignored = (): void => undefined;
-
-/** Asks the browser for a new version. A return from the background is not a navigation (shell.md §4). */
-export const checkForUpdate = (): void => {
-  registration?.update().catch(ignored);
-};
 
 /**
  * Applies a waiting update: the new service worker takes control and the page reloads.
@@ -42,4 +25,39 @@ export const applyUpdateIfWaiting = (): void => {
   if (waiting && update) {
     update(true).catch(ignored);
   }
+};
+
+/** Registers the service worker and starts the check. Call it one time, before the first render. */
+export const watchUpdates = (): void => {
+  update = registerSW({
+    immediate: true,
+    // No prompt on the screen: the update waits for a safe point. During a safe window, it applies at once.
+    onNeedRefresh: () => {
+      waiting = true;
+      if (safe) {
+        applyUpdateIfWaiting();
+      }
+    },
+    onRegisteredSW: (_url, registered) => {
+      registration = registered;
+    },
+  });
+};
+
+/** Asks the browser for a new version. A return from the background is not a navigation (shell.md §4). */
+export const checkForUpdate = (): void => {
+  registration?.update().catch(ignored);
+};
+
+/**
+ * Starts a safe window: a waiting update applies now, and an update that becomes ready during the window
+ * applies when it is ready. The title scene opens the window when it shows, and closes it at the first touch
+ * (spec Module 9). Returns the function that closes the window.
+ */
+export const openSafeWindow = (): (() => void) => {
+  safe = true;
+  applyUpdateIfWaiting();
+  return () => {
+    safe = false;
+  };
 };
