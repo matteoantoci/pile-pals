@@ -3,12 +3,13 @@ import { start } from '../model';
 import { loadGame, saveGame } from '../shell/save';
 import { newSeed } from '../shell/seed';
 import { Board } from './Board';
+import { openBook } from './book';
 import { TitleScene } from './title/TitleScene';
 import type { GameState } from '../model';
 import type { JSX } from 'solid-js';
 
 // The screens of the app: the title scene and the level (spec: title scene -> level -> reward -> title scene).
-// A restored level skips the title scene (spec Module 9).
+// The level screen ends with the sticker book page. A restored level skips the title scene (spec Module 9).
 
 type Screen = { readonly name: 'title' } | { readonly name: 'level'; readonly state: GameState };
 
@@ -29,7 +30,11 @@ export const App = (props: { readonly restored: GameState | undefined }): JSX.El
     <>
       {(() => {
         const now = screen();
-        return now.name === 'title' ? <TitleScene onGo={play} /> : <Board initial={now.state} />;
+        return now.name === 'title' ? (
+          <TitleScene onGo={play} onOpenBook={openBook} />
+        ) : (
+          <Board initial={now.state} onTitle={() => setScreen({ name: 'title' })} />
+        );
       })()}
     </>
   );

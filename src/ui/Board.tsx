@@ -1,14 +1,15 @@
-import { batch, createSignal, For, onMount, Show } from 'solid-js';
-import { apply, dropCard, nextLevel, placeAnchor, tapDeck } from '../model';
+import { createSignal, For, onCleanup, onMount, Show } from 'solid-js';
+import { apply, dropCard, isFinished, placeAnchor, tapDeck } from '../model';
 import { watchLifecycle } from '../shell/lifecycle';
 import { saveGame } from '../shell/save';
 import { applyUpdateIfWaiting, checkForUpdate } from '../shell/update';
+import { RewardPage } from './book';
 import { celebrateLevel, parade } from './celebration';
 import { cancelDrag } from './drag';
 import { stillUrl } from './pictures';
 import { playEventSounds } from './sounds';
 import { raiseCard, TableView } from './table';
-import type { Action, CardId, GameState, Pile, PileId } from '../model';
+import type { Action, CardId, GameState, Outcome, Pile, PileId } from '../model';
 import type { Hooks, Target } from './drag';
 import type { Accessor, JSX } from 'solid-js';
 
@@ -59,12 +60,12 @@ const dropAction = (state: GameState, cardId: CardId, pileId: PileId): Action =>
     : dropCard(cardId, pileId);
 };
 
-/** What the hooks need from the board: the newest state, the way to draw it, and the next level. */
+/** What the hooks need from the board: the newest state, the way to draw it, and the sticker book page. */
 type Game = {
   readonly current: () => GameState;
   readonly move: (state: GameState) => void;
   readonly show: () => void;
-  readonly dealNext: () => void;
+  readonly showReward: () => void;
 };
 
 /** The hooks of one card. A drop plays the sounds of its events and gives true when the card snapped. */
@@ -91,73 +92,80 @@ const cardHooks = (game: Game, cardId: CardId): Hooks => {
       if (pile !== undefined) {
         parade(pile);
       }
+      // The finished level is saved with its new sticker, so a reload opens the sticker book page again.
+      saveGame(game.current());
       if (last) {
-        celebrateLevel(game.dealNext);
-      } else {
-        saveGame(game.current());
+        celebrateLevel(game.showReward);
       }
     },
   };
 };
 
-/** The levels that the board shows. `first` is the saved level, or a new game (main.tsx reads the save). */
-const playLevels = (
-  first: GameState
-): {
+/** What the board draws, and the inputs of the table and of the sticker book page. */
+type Levels = {
   readonly dealt: Accessor<GameState>;
   readonly state: Accessor<GameState>;
+  readonly reward: Accessor<boolean>;
   readonly hooksFor: (cardId: CardId) => Hooks;
   readonly onTapDeck: () => void;
+  readonly act: (action: Action) => Outcome;
   readonly current: () => GameState;
-} => {
-  const [dealt, setDealt] = createSignal(first);
+};
+
+/** The level that the board shows. `first` is the saved level, or a new game (App.tsx reads the save). */
+const playLevels = (first: GameState): Levels => {
   const [state, setState] = createSignal(first);
+  // A saved level that is finished comes back on its sticker book page.
+  const [reward, setReward] = createSignal(isFinished(first));
   // `model` is the state after the last move. The signal gets it when a card lands,
   // so the pile shows the card only at the end of its spring.
   let model = first;
 
-  // The celebration plays first, then the next level replaces the table. Ticket 11 adds the sticker book.
-  const dealNext = (): void => {
-    model = nextLevel(model);
-    batch(() => {
-      setDealt(model);
-      setState(model);
-    });
-    saveGame(model);
-    applyUpdateIfWaiting();
-  };
-
-  const game: Game = { current: () => model, move: (next) => (model = next), show: () => setState(model), dealNext };
-
-  const onTapDeck = (): void => {
-    const outcome = apply(model, tapDeck());
+  // The sticker actions of the book page. After `go`, the model and the save hold the next level.
+  const act = (action: Action): Outcome => {
+    const outcome = apply(model, action);
     model = outcome.state;
-    setState(model);
     playEventSounds(outcome.events);
     saveGame(model);
+    return outcome;
+  };
+
+  const game: Game = {
+    current: () => model,
+    move: (next) => (model = next),
+    show: () => setState(model),
+    showReward: () => setReward(true),
   };
 
   return {
-    dealt,
+    dealt: () => first,
     state,
+    reward,
     hooksFor: (cardId) => cardHooks(game, cardId),
-    onTapDeck,
+    onTapDeck: () => {
+      act(tapDeck());
+      setState(model);
+    },
+    act,
     current: () => model,
   };
 };
 
-export const Board = (props: { readonly initial: GameState }): JSX.Element => {
-  const { dealt, state, hooksFor, onTapDeck, current } = playLevels(props.initial);
+/**
+ * One level, then its sticker book page. `onTitle` runs after the green arrow of the book page: the save then
+ * holds the next level, and the app shows the title scene (spec: level -> reward -> title scene).
+ */
+export const Board = (props: { readonly initial: GameState; readonly onTitle: () => void }): JSX.Element => {
+  const { dealt, state, reward, hooksFor, onTapDeck, act, current } = playLevels(props.initial);
   onMount(() => {
-    watchLifecycle({
+    const stop = watchLifecycle({
       hidden: () => {
         cancelDrag();
-        // `nextLevel` returns the same state until the level is finished. A page can hide during the
-        // celebration, so save the next level then instead of a table with no cards.
-        saveGame(nextLevel(current()));
+        saveGame(current());
       },
       visible: checkForUpdate,
     });
+    onCleanup(stop);
     // A safe point for a waiting update: the level starts and nobody has touched it yet.
     applyUpdateIfWaiting();
   });
@@ -170,6 +178,9 @@ export const Board = (props: { readonly initial: GameState }): JSX.Element => {
         <For each={state().piles}>{(pile) => <PileView pile={pile} />}</For>
       </section>
       <TableView dealt={dealt} state={state} hooksFor={hooksFor} onTapDeck={onTapDeck} />
+      <Show when={reward()}>
+        <RewardPage book={state().book} act={act} done={props.onTitle} />
+      </Show>
     </main>
   );
 };

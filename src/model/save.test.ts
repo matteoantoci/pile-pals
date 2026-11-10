@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { apply, dropCard, placeAnchor, restore, snapshot, start } from './index';
+import { apply, dropCard, go, placeAnchor, placeSticker, restore, snapshot, start } from './index';
 import { openCards, playOut } from './test-player';
 import type { Card, GameEvent, GameState, Pile, RestoredGame, Stack } from './index';
 
@@ -47,7 +47,7 @@ describe('snapshot', () => {
 
     const save = snapshot(state);
 
-    expect(save.version).toBe(2);
+    expect(save.version).toBe(3);
     expect(save.state).toEqual(state);
     expect(save.progress.level).toBe(state.level);
   });
@@ -68,6 +68,18 @@ describe('snapshot', () => {
 
     expect(save.state.table).toEqual(played.table);
     expect(save.state.piles).toEqual(played.piles);
+  });
+
+  it('keeps the stickers of the book and their places on the page', () => {
+    const first = playOut(start({ level: 1 }, 4)).end;
+    const second = playOut(apply(apply(first, placeSticker({ x: 0.2, y: 0.3 })).state, go()).state).end;
+    const waiting = apply(second, placeSticker({ x: 0.9, y: 0.1 })).state;
+
+    const back = restored(JSON.parse(JSON.stringify(snapshot(waiting))) as unknown).state;
+
+    expect(back.book).toEqual(waiting.book);
+    expect(back.book.pages[0]?.[0]?.at).toEqual({ x: 0.2, y: 0.3 });
+    expect(back.book.award?.at).toEqual({ x: 0.9, y: 0.1 });
   });
 });
 
@@ -107,10 +119,13 @@ describe('restore', () => {
     expect(afterRestore.end).toEqual(original.end);
   });
 
-  it('rejects an unknown schema version', () => {
-    const save = { ...snapshot(firstLevel()), version: 3 };
+  it('rejects an unknown schema version, and a save of version 2 that has no sticker book', () => {
+    const save = { ...snapshot(firstLevel()), version: 4 };
+    const { book: _book, ...oldState } = firstLevel();
+    const old = { version: 2, state: oldState, progress: { level: 1 } };
 
     expect(restore(save)).toEqual({ ok: false, reason: 'version' });
+    expect(restore(old)).toEqual({ ok: false, reason: 'version' });
   });
 
   it('rejects a save of version 1, which has no category cards on the table', () => {
@@ -142,10 +157,11 @@ describe('restore', () => {
 
   it('rejects data that is not a save', () => {
     const state = firstLevel();
-    const noState = { version: 2, progress: { level: 1 } };
+    const noState = { version: 3, progress: { level: 1 } };
     const badCard = { ...snapshot(state), state: { ...state, table: [{ id: 1 }] } };
     const noPiles = { ...snapshot(state), state: { ...state, piles: 'none' } };
     const badProgress = { ...snapshot(state), progress: {} };
+    const badBook = { ...snapshot(state), state: { ...state, book: { pages: [[{ pal: 'cat', gold: 'yes' }]] } } };
 
     expect(restore(null)).toEqual({ ok: false, reason: 'shape' });
     expect(restore('save')).toEqual({ ok: false, reason: 'shape' });
@@ -154,5 +170,6 @@ describe('restore', () => {
     expect(restore(badCard)).toEqual({ ok: false, reason: 'shape' });
     expect(restore(noPiles)).toEqual({ ok: false, reason: 'shape' });
     expect(restore(badProgress)).toEqual({ ok: false, reason: 'shape' });
+    expect(restore(badBook)).toEqual({ ok: false, reason: 'shape' });
   });
 });

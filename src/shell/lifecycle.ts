@@ -9,13 +9,15 @@ export type Lifecycle = {
   readonly visible: () => void;
 };
 
-/** Adds the one listener of the shell. Call it one time, after the first render. */
-export const watchLifecycle = ({ hidden, visible }: Lifecycle): void => {
-  document.addEventListener('visibilitychange', () => {
+/** Adds the listener of the shell while a level shows. Returns the function that removes it. */
+export const watchLifecycle = ({ hidden, visible }: Lifecycle): (() => void) => {
+  const listener = (): void => {
     if (document.visibilityState === 'hidden') {
       hidden();
       return;
     }
     visible();
-  });
+  };
+  document.addEventListener('visibilitychange', listener);
+  return () => document.removeEventListener('visibilitychange', listener);
 };

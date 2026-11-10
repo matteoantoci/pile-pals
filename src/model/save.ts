@@ -1,19 +1,19 @@
 // The save data of the game. All data is plain JSON, so localStorage and a save code can hold it.
 // The UI stores it after each resolved move (research/native-feel/shell.md §3).
 
-import type { Card, GameState, Pile, Progress, Stack, TableCard } from './types';
+import type { Book, Card, GameState, Pile, PlacedSticker, Position, Progress, Stack, TableCard } from './types';
 
 /**
  * The schema version of `SaveData`. A save with another version is not read.
  * Raise this number when `restore` cannot read the data of the older version.
  */
-export const SAVE_VERSION = 2;
+export const SAVE_VERSION = 3;
 
 /**
  * The data of one save.
  * `state` is the level that the Child plays, whole: the deal, not only the seed.
- * `progress` is what the Child finished. Later tickets add the stickers, their positions on each page,
- * and the flags of the demos that the Child already saw.
+ * `progress` is what the Child finished. The sticker book (the stickers, gold flags, and their places on each
+ * page) is in `state.book`, because `apply` changes it. A later ticket adds the flags of the demos.
  */
 export type SaveData = {
   readonly version: number;
@@ -88,6 +88,38 @@ const hasDeck = (value: unknown): value is { readonly deck: readonly Card[]; rea
   'dealt' in value &&
   (value.dealt === null || isCard(value.dealt));
 
+const isPosition = (value: unknown): value is Position =>
+  typeof value === 'object' &&
+  value !== null &&
+  'x' in value &&
+  typeof value.x === 'number' &&
+  'y' in value &&
+  typeof value.y === 'number';
+
+/** The `pal` and `gold` fields of a sticker. */
+const isSticker = (value: unknown): value is { readonly pal: string; readonly gold: boolean } =>
+  typeof value === 'object' &&
+  value !== null &&
+  'pal' in value &&
+  typeof value.pal === 'string' &&
+  'gold' in value &&
+  typeof value.gold === 'boolean';
+
+const isPlaced = (value: unknown): value is PlacedSticker => isSticker(value) && 'at' in value && isPosition(value.at);
+
+/** The new sticker that waits for the Child, or null. Its place is null until the Child drags it. */
+const isAward = (value: unknown): value is Book['award'] =>
+  value === null || (isSticker(value) && 'at' in value && (value.at === null || isPosition(value.at)));
+
+const isBook = (value: unknown): value is Book =>
+  typeof value === 'object' &&
+  value !== null &&
+  'pages' in value &&
+  Array.isArray(value.pages) &&
+  value.pages.every((page) => Array.isArray(page) && page.every(isPlaced)) &&
+  'award' in value &&
+  isAward(value.award);
+
 /**
  * The checks of the fields of `GameState` that this build knows. A field of a later ticket passes
  * without a check; `restore` then keeps it in the state as it is.
@@ -100,7 +132,9 @@ const isState = (value: unknown): value is GameState =>
   'piles' in value &&
   Array.isArray(value.piles) &&
   value.piles.every(isPile) &&
-  hasDeck(value);
+  hasDeck(value) &&
+  'book' in value &&
+  isBook(value.book);
 
 const isProgress = (value: unknown): value is Progress =>
   typeof value === 'object' && value !== null && 'level' in value && typeof value.level === 'number';
