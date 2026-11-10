@@ -1,9 +1,14 @@
-import { batch, createSignal, For } from 'solid-js';
-import { apply, dropCard, nextLevel, start, tapDeck } from '../model';
+import { batch, createSignal, For, onMount } from 'solid-js';
+import { apply, dropCard, nextLevel, tapDeck } from '../model';
+import { watchLifecycle } from '../shell/lifecycle';
+import { saveGame } from '../shell/save';
+import { applyUpdateIfWaiting, checkForUpdate } from '../shell/update';
+import { celebrateLevel, parade } from './celebration';
+import { cancelDrag } from './drag';
 import { stillUrl } from './pictures';
 import { playEventSounds } from './sounds';
 import { raiseCard, TableView } from './table';
-import type { CardId, GameState, Pile } from '../model';
+import type { CardId, GameState, Pile, PileId } from '../model';
 import type { Hooks, Target } from './drag';
 import type { Accessor, JSX } from 'solid-js';
 
@@ -48,27 +53,23 @@ const PileView = (props: { pile: Pile }): JSX.Element => (
 
 /** What the hooks need from the board: the newest state, the way to draw it, and the next level. */
 type Game = {
-  /** The newest state: the state after the last move. */
   readonly current: () => GameState;
-  /** Keeps a new state. The board draws it when the card lands. */
   readonly move: (state: GameState) => void;
-  /** Draws the newest state. */
   readonly show: () => void;
-  /** Deals the next level. */
   readonly dealNext: () => void;
 };
 
 /** The hooks of one card. A drop plays the sounds of its events and gives true when the card snapped. */
 const cardHooks = (game: Game, cardId: CardId): Hooks => {
-  // True when the drop of this card finished the level.
   let last = false;
-  // The cards that the drop turns over. They turn over when the dropped card has landed.
+  let completed: PileId | undefined;
   let flips: readonly CardId[] = [];
   return {
     targets: pileTargets,
     drop: (pileId) => {
       const outcome = apply(game.current(), dropCard(cardId, pileId));
       last = outcome.events.some((event) => event.type === 'levelComplete');
+      completed = outcome.events.find((event) => event.type === 'groupComplete')?.pileId;
       flips = outcome.events.flatMap((event) => (event.type === 'flipped' ? [event.cardId] : []));
       playEventSounds(outcome.events);
       game.move(outcome.state);
@@ -76,35 +77,46 @@ const cardHooks = (game: Game, cardId: CardId): Hooks => {
     },
     landed: () => {
       flips.forEach((flipped) => raiseCard(flipped, (id) => cardHooks(game, id)));
+      // The pile shows its new card before the parade copies read their places from the screen.
+      game.show();
+      const pile = completed === undefined ? undefined : game.current().piles.find((item) => item.id === completed);
+      if (pile !== undefined) {
+        parade(pile);
+      }
       if (last) {
-        game.dealNext();
+        celebrateLevel(game.dealNext);
       } else {
-        game.show();
+        saveGame(game.current());
       }
     },
   };
 };
 
-/** The levels that the board shows: the dealt level, the state that the board draws, and the hooks of each card. */
-const playLevels = (): {
+/** The levels that the board shows. `first` is the saved level, or a new game (main.tsx reads the save). */
+const playLevels = (
+  first: GameState
+): {
   readonly dealt: Accessor<GameState>;
   readonly state: Accessor<GameState>;
   readonly hooksFor: (cardId: CardId) => Hooks;
   readonly onTapDeck: () => void;
+  readonly current: () => GameState;
 } => {
-  const [dealt, setDealt] = createSignal(start({ level: 1 }, 1));
-  const [state, setState] = createSignal(dealt());
+  const [dealt, setDealt] = createSignal(first);
+  const [state, setState] = createSignal(first);
   // `model` is the state after the last move. The signal gets it when a card lands,
   // so the pile shows the card only at the end of its spring.
-  let model = dealt();
+  let model = first;
 
-  // When the last card of the level lands, the next level replaces the table. Ticket 08 adds the celebration first.
+  // The celebration plays first, then the next level replaces the table. Ticket 11 adds the sticker book.
   const dealNext = (): void => {
     model = nextLevel(model);
     batch(() => {
       setDealt(model);
       setState(model);
     });
+    saveGame(model);
+    applyUpdateIfWaiting();
   };
 
   const game: Game = { current: () => model, move: (next) => (model = next), show: () => setState(model), dealNext };
@@ -114,13 +126,33 @@ const playLevels = (): {
     model = outcome.state;
     setState(model);
     playEventSounds(outcome.events);
+    saveGame(model);
   };
 
-  return { dealt, state, hooksFor: (cardId) => cardHooks(game, cardId), onTapDeck };
+  return {
+    dealt,
+    state,
+    hooksFor: (cardId) => cardHooks(game, cardId),
+    onTapDeck,
+    current: () => model,
+  };
 };
 
-export const Board = (): JSX.Element => {
-  const { dealt, state, hooksFor, onTapDeck } = playLevels();
+export const Board = (props: { readonly initial: GameState }): JSX.Element => {
+  const { dealt, state, hooksFor, onTapDeck, current } = playLevels(props.initial);
+  onMount(() => {
+    watchLifecycle({
+      hidden: () => {
+        cancelDrag();
+        // `nextLevel` returns the same state until the level is finished. A page can hide during the
+        // celebration, so save the next level then instead of a table with no cards.
+        saveGame(nextLevel(current()));
+      },
+      visible: checkForUpdate,
+    });
+    // A safe point for a waiting update: the level starts and nobody has touched it yet.
+    applyUpdateIfWaiting();
+  });
 
   // The table draws each dealt card in a fixed place. A card that left the table stays hidden in its place,
   // so the other cards do not move under the finger.

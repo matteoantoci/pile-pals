@@ -50,6 +50,12 @@ img {
   pointer-events: none;
 }
 
+/* The first frame after a restore shows the saved table, with no motion of any kind (shell.md §3). */
+html[data-restoring] * {
+  transition: none !important;
+  animation: none !important;
+}
+
 .board {
   display: flex;
   flex-direction: column;
@@ -239,4 +245,22 @@ img {
 /* A card that left the table keeps its place, so the other cards do not move. */
 .card.gone {
   visibility: hidden;
+}
+
+/*
+ * The celebration (src/ui/celebration/). The parade layer holds the copies of the completed group cards,
+ * above the board. It sits inside .board, so the card size variables of the board apply.
+ * The confetti canvas belongs to canvas-confetti: it sets its own fixed style and draws above the parade.
+ */
+.parade {
+  position: fixed;
+  inset: 0;
+  z-index: 1500;
+  pointer-events: none;
+}
+
+.parade-card {
+  position: fixed;
+  margin-left: calc(var(--card-w) / -2);
+  margin-top: calc(var(--card-h) / -2);
 }

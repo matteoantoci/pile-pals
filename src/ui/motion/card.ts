@@ -11,8 +11,8 @@ export type CardParts = { readonly face: HTMLElement; readonly shadow: HTMLEleme
 export const RESTING = facePose({ scale: REST_SCALE });
 export const LIFTED = facePose({});
 
-const SHADOW_DOWN: Frame = { transform: 'translate(0px, 2px)', opacity: 0 };
-const SHADOW_UP: Frame = { transform: 'translate(0px, 8px)', opacity: 1 };
+const SHADOW_DOWN = { transform: 'translate(0px, 2px)', opacity: 0 };
+const SHADOW_UP = { transform: 'translate(0px, 8px)', opacity: 1 };
 
 const LIFT: KeyframeAnimationOptions = { duration: 120, easing: 'cubic-bezier(0.2, 0, 0, 1)' };
 const LAND_MS = 260;
@@ -54,3 +54,15 @@ export const shake = (parts: CardParts): Animation =>
     SHAKE_X.map((x) => ({ transform: facePose({ x }) })),
     { duration: SHAKE_MS, easing: 'linear' }
   );
+
+/**
+ * Puts the face and the shadow in the resting pose at once, with no animation.
+ * The shell uses it when a drag is canceled (the page goes hidden).
+ */
+export const restPose = (parts: CardParts): void => {
+  stop(parts.face);
+  stop(parts.shadow);
+  parts.face.style.setProperty('transform', RESTING);
+  parts.shadow.style.setProperty('transform', SHADOW_DOWN.transform);
+  parts.shadow.style.setProperty('opacity', String(SHADOW_DOWN.opacity));
+};
