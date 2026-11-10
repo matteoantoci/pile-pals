@@ -72,6 +72,10 @@ pnpm smoke       # build, then drive the main flows in headless Chrome
 | 🖼️ Pictures          | [Noto Emoji](https://github.com/googlefonts/noto-emoji) by Google                     | Apache 2.0 |
 | 🎞️ Animations        | [Noto Emoji Animation](https://googlefonts.github.io/noto-emoji-animation/) by Google | CC BY 4.0  |
 | 🦦 Otter sound       | "Otters Squeaking.wav" by Motion_S, on Freesound                                      | CC BY 4.0  |
-| 🔉 Other sounds (47) | Kenney Casino Audio, Freesound authors, and sounds reused from labrynth2              | CC0        |
+| 🔉 Other sounds (47) | [Kenney](https://kenney.nl/) Casino Audio and Freesound authors                       | CC0        |
 
 The parent area lists every source and author. The game data for credits is in `src/credits.json`.
+
+## 📄 Licence
+
+No licence is chosen for the code yet, so all rights are reserved. The pictures, animations, and sounds keep their own licences from the Credits table. See [`public/pictures/LICENSE.txt`](public/pictures/LICENSE.txt) and [`public/animations/LICENSE.txt`](public/animations/LICENSE.txt).
