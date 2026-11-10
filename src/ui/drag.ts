@@ -4,7 +4,19 @@
 // - All other motion goes through ./motion: WAAPI on `transform` and `opacity` only.
 // - The drag knows no game rule. `Hooks.drop` asks the model.
 
-import { freeze, land, LANDING, lift, releaseVelocity, RETURN, shake, springTo, translate3d } from './motion';
+import {
+  freeze,
+  land,
+  LANDING,
+  lift,
+  releaseVelocity,
+  restPose,
+  RETURN,
+  shake,
+  springTo,
+  stop,
+  translate3d,
+} from './motion';
 import type { CardParts, Sample, Vec } from './motion';
 
 /** A place where a card can land. `at` is the viewport point where the card centre lands. */
@@ -32,8 +44,33 @@ type Near = { readonly target: Target; readonly distance: number };
 /** A held card. `grab` is the finger minus the translate. `home` is the card centre at translate 0. */
 type Hold = { readonly pointer: number; readonly grab: Vec; readonly home: Vec; readonly targets: readonly Target[] };
 
+/** The values that the pointer listeners of one card share. `active` points at the drag that runs now. */
+type Drag = {
+  readonly piece: Piece;
+  hold: Hold | undefined;
+  raw: Vec;
+  at: Vec;
+  samples: Sample[];
+};
+
 /** A canceled animation rejects its `finished` promise. The next drag then owns the card. */
 const canceled = (): void => undefined;
+
+let active: Drag | undefined;
+
+/** Ends the drag that runs now. The card goes home at once, with no animation (shell.md §3). */
+export const cancelDrag = (): void => {
+  const drag = active;
+  if (!drag) {
+    return;
+  }
+  drag.hold = undefined;
+  active = undefined;
+  stop(drag.piece.card);
+  drag.piece.card.style.setProperty('transform', translate3d(ORIGIN));
+  drag.piece.card.classList.remove('lifted');
+  restPose(drag.piece.parts);
+};
 
 /** Finds the nearest target within the magnet distance of `center`. */
 const nearest = (targets: readonly Target[], center: Vec): Near | undefined =>
@@ -113,51 +150,61 @@ const pickUp = (piece: Piece, event: PointerEvent, targets: readonly Target[]): 
   return { hold: { pointer: event.pointerId, grab, home, targets }, from };
 };
 
+/** The hold of a drag when the pointer of that hold goes up. */
+const endedHold = (drag: Drag, event: PointerEvent): Hold | undefined =>
+  event.pointerId === drag.hold?.pointer ? drag.hold : undefined;
+
+/** Forgets the drag when it ends, so the shell has nothing to cancel. */
+const forget = (drag: Drag): void => {
+  if (active === drag) {
+    active = undefined;
+  }
+};
+
 /** Makes the card draggable with one finger. */
 export const draggable = (card: HTMLElement, hooks: Hooks): void => {
   const piece = { card, parts: partsOf(card) };
-  let hold: Hold | undefined;
-  let raw = ORIGIN;
-  let at = ORIGIN;
-  let samples: Sample[] = [];
-
-  const end = (event: PointerEvent): Hold | undefined => {
-    const ended = event.pointerId === hold?.pointer ? hold : undefined;
-    hold = ended ? undefined : hold;
-    return ended;
-  };
+  const drag: Drag = { piece, hold: undefined, raw: ORIGIN, at: ORIGIN, samples: [] };
 
   card.addEventListener('pointerdown', (event) => {
-    if (hold) {
+    if (drag.hold) {
       return;
     }
     const picked = pickUp(piece, event, hooks.targets());
-    hold = picked.hold;
-    raw = picked.from;
-    at = picked.from;
-    samples = [{ t: event.timeStamp, ...at }];
+    drag.hold = picked.hold;
+    drag.raw = picked.from;
+    drag.at = picked.from;
+    drag.samples = [{ t: event.timeStamp, ...picked.from }];
+    active = drag;
   });
 
   card.addEventListener('pointermove', (event) => {
+    const { hold } = drag;
     if (!hold || event.pointerId !== hold.pointer) {
       return;
     }
-    raw = { x: event.clientX - hold.grab.x, y: event.clientY - hold.grab.y };
-    at = pulled(hold, raw);
-    samples = [...samples.slice(1 - SAMPLES), { t: event.timeStamp, ...at }];
-    card.style.setProperty('transform', translate3d(at));
+    drag.raw = { x: event.clientX - hold.grab.x, y: event.clientY - hold.grab.y };
+    drag.at = pulled(hold, drag.raw);
+    drag.samples = [...drag.samples.slice(1 - SAMPLES), { t: event.timeStamp, ...drag.at }];
+    card.style.setProperty('transform', translate3d(drag.at));
   });
 
   card.addEventListener('pointerup', (event) => {
-    const ended = end(event);
+    const ended = endedHold(drag, event);
+    drag.hold = ended ? undefined : drag.hold;
+    forget(drag);
     if (ended) {
-      release(piece, { hold: ended, raw, at, velocity: releaseVelocity(samples, event.timeStamp) }, hooks);
+      const velocity = releaseVelocity(drag.samples, event.timeStamp);
+      release(piece, { hold: ended, raw: drag.raw, at: drag.at, velocity }, hooks);
     }
   });
 
   card.addEventListener('pointercancel', (event) => {
-    if (end(event)) {
-      goHome(piece, at, ORIGIN);
+    const ended = endedHold(drag, event);
+    drag.hold = ended ? undefined : drag.hold;
+    forget(drag);
+    if (ended) {
+      goHome(piece, drag.at, ORIGIN);
     }
   });
 };

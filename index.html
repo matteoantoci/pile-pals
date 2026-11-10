@@ -9,6 +9,18 @@
     <meta name="color-scheme" content="light" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Pile Pals" />
+    <!-- Real PNG files, not data URLs (WebKit bug 280262). iPhone 12: 390 x 844 pt at 3x.
+         No status-bar meta: it is deprecated, and the status bar takes the page colour. -->
+    <link
+      rel="apple-touch-startup-image"
+      href="%BASE_URL%splash/iphone-12-portrait.png"
+      media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      href="%BASE_URL%splash/iphone-12-landscape.png"
+      media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    />
     <style>
       html {
         background: #2f6f4e;

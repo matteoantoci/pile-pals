@@ -1,8 +1,11 @@
-import { batch, createSignal, For } from 'solid-js';
-import { apply, dropCard, nextLevel, start } from '../model';
+import { batch, createSignal, For, onMount } from 'solid-js';
+import { apply, dropCard, nextLevel } from '../model';
+import { watchLifecycle } from '../shell/lifecycle';
+import { saveGame } from '../shell/save';
+import { applyUpdateIfWaiting, checkForUpdate } from '../shell/update';
 import { playSound } from '../sound';
 import { celebrateLevel, parade } from './celebration';
-import { draggable } from './drag';
+import { cancelDrag, draggable } from './drag';
 import { stillUrl } from './pictures';
 import { playEventSounds } from './sounds';
 import type { Card, GameEvent, GameState, Pile, PileId } from '../model';
@@ -48,17 +51,20 @@ const PileView = (props: { pile: Pile }): JSX.Element => (
   </div>
 );
 
-/** The levels that the board shows: the dealt level, the state that the board draws, and the hooks of each card. */
-const playLevels = (): {
+/** The levels that the board shows. `first` is the saved level, or a new game (main.tsx reads the save). */
+const playLevels = (
+  first: GameState
+): {
   readonly dealt: Accessor<GameState>;
   readonly state: Accessor<GameState>;
   readonly hooksFor: (card: Card) => Hooks;
+  readonly current: () => GameState;
 } => {
-  const [dealt, setDealt] = createSignal(start({ level: 1 }, 1));
-  const [state, setState] = createSignal(dealt());
+  const [dealt, setDealt] = createSignal(first);
+  const [state, setState] = createSignal(first);
   // `model` is the state after the last drop. The signal gets it when a card lands,
   // so the pile shows the card only at the end of its spring.
-  let model = dealt();
+  let model = first;
 
   // When the last card of the level lands, the celebration plays, then the next level replaces the table.
   // Ticket 11 puts the sticker book in the `afterCelebration` hook of `celebrateLevel`.
@@ -68,6 +74,9 @@ const playLevels = (): {
       setDealt(model);
       setState(model);
     });
+    saveGame(model);
+    // A new level starts and the Child has not touched it: ticket 10 and 11 move this call to their screens.
+    applyUpdateIfWaiting();
   };
 
   const hooksFor = (card: Card): Hooks => {
@@ -85,6 +94,7 @@ const playLevels = (): {
         playEventSounds(outcome.events);
         return outcome.events.some((event) => event.type === 'snapped');
       },
+      // The move is resolved when the card lands: save it then, never in the middle of an animation.
       landed: () => {
         // The pile shows its new card before the parade copies read their places from the screen.
         setState(model);
@@ -93,16 +103,34 @@ const playLevels = (): {
           parade(pile);
         }
         if (last) {
+          // The celebration runs first, then `dealNext` saves the next level.
           celebrateLevel(dealNext);
+          return;
         }
+        saveGame(model);
       },
     };
   };
-  return { dealt, state, hooksFor };
+  return { dealt, state, hooksFor, current: () => model };
 };
 
-export const Board = (): JSX.Element => {
-  const { dealt, state, hooksFor } = playLevels();
+export const Board = (props: { readonly initial: GameState }): JSX.Element => {
+  const { dealt, state, hooksFor, current } = playLevels(props.initial);
+  onMount(() => {
+    // The shell saves after each resolved move, and saves again and cancels the drag when the page goes hidden.
+    watchLifecycle({
+      hidden: () => {
+        cancelDrag();
+        // A page can hide during the celebration, before `dealNext` runs: save the next level,
+        // because a level with no card on the table is finished and the Child cannot play it again.
+        const state = current();
+        saveGame(state.table.length === 0 ? nextLevel(state) : state);
+      },
+      visible: checkForUpdate,
+    });
+    // A safe point for a waiting update: the level starts and nobody has touched it yet (shell.md §4).
+    applyUpdateIfWaiting();
+  });
 
   // The table draws each dealt card in a fixed place. A card that left the table stays hidden in its place,
   // so the other cards do not move under the finger.
