@@ -5,7 +5,7 @@ import { SHIPPED } from './levels';
 import type { PalSize } from '../model';
 import type { Clip } from './levels';
 
-export { isSoundOn, loadClip, playClip, setSoundOn } from './engine';
+export { isAudioRunning, isSoundOn, loadClip, playClip, setSoundOn } from './engine';
 export { CLIPS } from './levels';
 export type { Clip, ClipLevel } from './levels';
 

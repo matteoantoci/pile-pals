@@ -8,6 +8,7 @@ import { celebrateLevel, parade } from './celebration';
 import { startCoach } from './coach';
 import { cancelDrag } from './drag';
 import { stillUrl } from './pictures';
+import { createSoundGate } from './sound-gate';
 import { playEventSounds } from './sounds';
 import { hasDeck, raiseCard, TableView } from './table';
 import type { Action, CardId, GameState, Outcome, Pile, PileId } from '../model';
@@ -171,8 +172,13 @@ const playLevels = (first: GameState): Levels => {
  * One level, then its sticker book page. `onTitle` runs after the green arrow of the book page: the save then
  * holds the next level, and the app shows the title scene (spec: level -> reward -> title scene).
  */
-export const Board = (props: { readonly initial: GameState; readonly onTitle: () => void }): JSX.Element => {
+export const Board = (props: {
+  readonly initial: GameState;
+  readonly askTap: boolean;
+  readonly onTitle: () => void;
+}): JSX.Element => {
   const { initial, state, reward, hooksFor, onTapDeck, act, current, coach } = playLevels(props.initial);
+  const soundGate = createSoundGate(props.askTap, coach.rest);
   onMount(() => {
     const stop = watchLifecycle({
       hidden: () => {
@@ -182,14 +188,14 @@ export const Board = (props: { readonly initial: GameState; readonly onTitle: ()
       },
       visible: () => {
         checkForUpdate();
-        coach.rest();
+        soundGate.check();
       },
     });
     onCleanup(() => {
       stop();
       coach.stop();
     });
-    coach.rest();
+    soundGate.start();
   });
 
   // The table draws each dealt card in a fixed place. A card that left the table stays hidden in its place,
@@ -203,6 +209,7 @@ export const Board = (props: { readonly initial: GameState; readonly onTitle: ()
       <Show when={reward()}>
         <RewardPage book={state().book} act={act} done={props.onTitle} />
       </Show>
+      <soundGate.View />
     </main>
   );
 };

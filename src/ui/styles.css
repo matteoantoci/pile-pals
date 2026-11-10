@@ -282,3 +282,15 @@ html[data-restoring] * {
   margin-left: calc(var(--card-w) / -2);
   margin-top: calc(var(--card-h) / -2);
 }
+
+/* The tap that starts the sound after a restore or a return from the background (Board.tsx). It covers the
+ * board, so the first touch is a tap on the go button and not a drag. Above the demo hand (1550), below the
+ * sticker book page (1600). */
+.sound-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 1580;
+  display: grid;
+  place-items: center;
+  background: rgb(0 0 0 / 0.2);
+}

@@ -40,6 +40,9 @@ export const unlockAudio = (): void => {
   }
 };
 
+/** True when the context plays now. iOS starts or resumes it only in a tap: the end of a drag does not count. */
+export const isAudioRunning = (): boolean => context?.state === 'running';
+
 const wait = (ms: number): Promise<void> =>
   new Promise((resolve) => {
     setTimeout(resolve, ms);

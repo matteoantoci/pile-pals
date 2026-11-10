@@ -15,20 +15,22 @@ import type { JSX } from 'solid-js';
 
 type Screen =
   | { readonly name: 'title' }
-  | { readonly name: 'level'; readonly state: GameState }
+  | { readonly name: 'level'; readonly state: GameState; readonly restored: boolean }
   | { readonly name: 'parent' };
 
 /** `restored` is the saved level that main.tsx read before the first frame, or undefined. */
 export const App = (props: { readonly restored: GameState | undefined }): JSX.Element => {
   const restored = props.restored;
-  const [screen, setScreen] = createSignal<Screen>(restored ? { name: 'level', state: restored } : { name: 'title' });
+  const [screen, setScreen] = createSignal<Screen>(
+    restored ? { name: 'level', state: restored, restored: true } : { name: 'title' }
+  );
 
   // The go button plays the saved level, or level 1 of a new game. The save gets the level before the board
   // shows, so a reload shows the same level again.
   const play = (): void => {
     const state = loadGame()?.state ?? start({ level: 1 }, newSeed());
     saveGame(state);
-    setScreen({ name: 'level', state });
+    setScreen({ name: 'level', state, restored: false });
   };
 
   return (
@@ -36,7 +38,7 @@ export const App = (props: { readonly restored: GameState | undefined }): JSX.El
       {(() => {
         const now = screen();
         if (now.name === 'level') {
-          return <Board initial={now.state} onTitle={() => setScreen({ name: 'title' })} />;
+          return <Board initial={now.state} askTap={now.restored} onTitle={() => setScreen({ name: 'title' })} />;
         }
         if (now.name === 'parent') {
           return <ParentArea onClose={() => setScreen({ name: 'title' })} />;

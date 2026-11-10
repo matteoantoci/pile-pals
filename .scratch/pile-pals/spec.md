@@ -170,7 +170,7 @@ Screens: title scene → level → reward (the sticker book page) → title scen
    - Start image and background colour so that no white flash shows.
    - vite-plugin-pwa with `registerType: 'prompt'` and no visible prompt. The app applies an update on the title scene before the first touch, or on the green arrow of the reward screen.
    - Save to `localStorage` after each resolved move. Save the full deal, not only the seed, with a schema version. On `visibilitychange` to `hidden`, cancel any drag and save.
-   - Restore before the first frame. A restored level skips the title scene.
+   - Restore before the first frame. A restored level skips the title scene. The go button covers the restored board until the first tap, because iOS starts the sound only in a tap and the end of a drag is not a tap. A return from the background shows the go button again when the sound stopped.
 10. **Title scene.** Animated pals hop and fall into 3 small piles in a loop. The logo is a card pile with eyes. One green round button with a white arrow. A book icon opens the sticker book. A tap on a pal makes it jump with its sound. A 3-second hold on the logo opens the parent check.
 11. **Parent area.** English text is allowed here. Entry: a 3-second hold on the logo, then a multiplication problem with factors from 3 to 9 and a digit pad. A wrong answer closes the check. Content: credits, export save code, restore save code, reset with confirmation, sound on or off.
 
