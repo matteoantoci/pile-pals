@@ -6,6 +6,14 @@
   --card-h: 128px;
   /* 80 CSS px = 240 device px on an iPhone 12 (3x). The pictures are 256 px (research/content/pictures.py). */
   --picture: 80px;
+  /* The layout of the board. A smaller card size (below) changes these values too. */
+  --board-gap: 32px;
+  --gap: 16px;
+  --pile-side: 32px;
+  --pile-line: 4px;
+  --pile-pad: 12px;
+  /* The size of a card picture on a pile. */
+  --mini: 32px;
 }
 
 html {
@@ -42,7 +50,7 @@ img {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 32px;
+  gap: var(--board-gap);
   height: 100%;
   padding: 24px 16px;
   box-sizing: border-box;
@@ -53,7 +61,7 @@ img {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 16px;
+  gap: var(--gap);
 }
 
 .pile {
@@ -61,9 +69,9 @@ img {
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  width: calc(var(--card-w) + 32px);
-  padding: 12px 0;
-  border: 4px dashed rgb(255 255 255 / 0.5);
+  width: calc(var(--card-w) + var(--pile-side));
+  padding: var(--pile-pad) 0;
+  border: var(--pile-line) dashed rgb(255 255 255 / 0.5);
   border-radius: 20px;
 }
 
@@ -95,8 +103,33 @@ img {
 }
 
 .pile-card {
-  width: 32px;
-  height: 32px;
+  width: var(--mini);
+  height: var(--mini);
+}
+
+/*
+ * Smaller cards for a level with more piles and cards. Board.tsx sets data-size from the dealt level.
+ * On the iPhone 12 screen, "medium" fits 3 piles with 15 cards and "small" fits 4 piles with 20 cards.
+ */
+.board[data-size='medium'] {
+  --card-w: 76px;
+  --card-h: 100px;
+  --picture: 62px;
+  --gap: 8px;
+  --pile-side: 16px;
+  --mini: 28px;
+}
+
+.board[data-size='small'] {
+  --card-w: 64px;
+  --card-h: 84px;
+  --picture: 52px;
+  --board-gap: 16px;
+  --gap: 8px;
+  --pile-side: 10px;
+  --pile-line: 3px;
+  --pile-pad: 8px;
+  --mini: 24px;
 }
 
 /*
