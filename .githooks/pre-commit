@@ -38,6 +38,8 @@ step 'lint' oxlint
 # The typescript preset needs --type-aware and oxlint-tsgolint. Without them its rules do not run.
 step 'lint (type-aware)' oxlint --type-aware
 step 'types' tsc --noEmit
+# Unused, unlisted, and unresolved dependencies.
+step 'dependencies' knip --strict --include dependencies,unlisted,unresolved
 # Without --passWithNoTests, vitest fails when no test file exists.
 step 'tests' vitest run --passWithNoTests
 printf 'pre-commit: all checks passed.\n'
