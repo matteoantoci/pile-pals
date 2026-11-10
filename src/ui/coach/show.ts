@@ -1,0 +1,164 @@
+// The rounds of the demo hand. Numbers: note 04 ("Demo hand") and research/native-feel/motion.md.
+// Ticket 16 tunes the felt values on the iPhone. Change a value here only.
+
+import { facePose, land, lift, settle, springTo, translate3d } from '../motion';
+import { cardOf, centreOf, copyOf, deckOf, handOf, pileFaceOf } from './parts';
+import type { Hint } from '../../model';
+import type { CardParts, Spring, Vec } from '../motion';
+import type { Run } from './parts';
+
+/** The slow move of the hand and the card. */
+const DEMO_SPRING: Spring = { duration: 1.2, bounce: 0 };
+/** After the demo, the copy goes back to the place of the card, and the card shows again. */
+const BACK_SPRING: Spring = { duration: 0.6, bounce: 0 };
+/** The hand is semi-transparent. */
+const HAND_ALPHA = 0.7;
+const COME_IN_MS = 450;
+const PRESS_MS = 140;
+const HOLD_MS = 450;
+const FADE_MS = 250;
+const ROUND_GAP_MS = 700;
+/** The hand comes in from below and to the right of the point. */
+const COME_IN_FROM: Vec = { x: 40, y: 70 };
+const ORIGIN: Vec = { x: 0, y: 0 };
+const UP = facePose({});
+const PRESSED = facePose({ scale: 0.86 });
+const DECK_PRESSED = facePose({ scale: 0.95 });
+
+type Hand = { readonly hand: HTMLElement; readonly body: HTMLElement };
+type Round = () => Promise<void>;
+
+const canceled = (): void => undefined;
+
+/** Waits for the animation. A canceled animation rejects, so a stopped run ends here. */
+const done = (animation: Animation): Promise<unknown> => animation.finished;
+
+/** Waits, and rejects when the run stopped in the meantime. */
+const pause = (run: Run, ms: number): Promise<void> =>
+  new Promise((resolve, reject) => {
+    window.setTimeout(() => {
+      if (run.stopped()) {
+        reject(new Error('The demo stopped.'));
+        return;
+      }
+      resolve();
+    }, ms);
+  });
+
+const comeIn = (hand: Hand, at: Vec): Promise<unknown> =>
+  done(
+    settle(
+      hand.hand,
+      [
+        { transform: translate3d({ x: at.x + COME_IN_FROM.x, y: at.y + COME_IN_FROM.y }), opacity: 0 },
+        { transform: translate3d(at), opacity: HAND_ALPHA },
+      ],
+      { duration: COME_IN_MS, easing: 'cubic-bezier(0.2, 0, 0, 1)' }
+    )
+  );
+
+const press = (hand: Hand, down: boolean): Promise<unknown> =>
+  done(
+    settle(hand.body, [{ transform: down ? UP : PRESSED }, { transform: down ? PRESSED : UP }], {
+      duration: PRESS_MS,
+      easing: 'ease-out',
+    })
+  );
+
+const fadeOut = (el: HTMLElement): Promise<unknown> =>
+  done(settle(el, [{ opacity: HAND_ALPHA }, { opacity: 0 }], { duration: FADE_MS, easing: 'ease-in' }));
+
+const partsOf = (card: HTMLElement): CardParts | undefined => {
+  const face = card.querySelector<HTMLElement>('.card-face');
+  const shadow = card.querySelector<HTMLElement>('.card-shadow');
+  return face && shadow ? { face, shadow } : undefined;
+};
+
+/** The copy goes from the card to the target with the hand on it, lands, and then goes back with no hand. */
+const carry = async (run: Run, hand: Hand, move: { readonly source: HTMLElement; readonly to: Vec }): Promise<void> => {
+  const copy = copyOf(run, move.source);
+  const parts = copy && partsOf(copy);
+  if (!copy || !parts) {
+    return;
+  }
+  const from = centreOf(move.source);
+  const offset = { x: move.to.x - from.x, y: move.to.y - from.y };
+  lift(parts);
+  springTo(hand.hand, { from, to: move.to, velocity: ORIGIN }, DEMO_SPRING);
+  await done(springTo(copy, { from: ORIGIN, to: offset, velocity: ORIGIN }, DEMO_SPRING).animation);
+  land(parts, 0).catch(canceled);
+  await press(hand, false);
+  await pause(run, HOLD_MS);
+  await Promise.all([
+    fadeOut(hand.hand),
+    done(springTo(copy, { from: offset, to: ORIGIN, velocity: ORIGIN }, BACK_SPRING).animation),
+  ]);
+  copy.remove();
+  move.source.classList.remove('demo-source');
+};
+
+/** One drag round: the hand presses the card and moves it slowly to its pile. */
+const dragRound = async (run: Run, source: HTMLElement, target: HTMLElement): Promise<void> => {
+  const hand = handOf(run);
+  await comeIn(hand, centreOf(source));
+  await press(hand, true);
+  await carry(run, hand, { source, to: centreOf(target) });
+  hand.hand.remove();
+};
+
+/** One tap of the hand on the deck. The deck gives a small press, but the deck does not deal. */
+const tap = async (hand: Hand, deck: HTMLElement): Promise<void> => {
+  await press(hand, true);
+  settle(deck, [{ transform: UP }, { transform: DECK_PRESSED }, { transform: UP }], {
+    duration: PRESS_MS * 2,
+    easing: 'ease-out',
+  });
+  await press(hand, false);
+};
+
+/** One tap round: the hand taps the deck two times. */
+const tapRound = async (run: Run, deck: HTMLElement): Promise<void> => {
+  const hand = handOf(run);
+  await comeIn(hand, centreOf(deck));
+  await tap(hand, deck);
+  await pause(run, HOLD_MS);
+  await tap(hand, deck);
+  await fadeOut(hand.hand);
+  hand.hand.remove();
+};
+
+/** The round of the move, or undefined when its elements are not on the screen. */
+const roundOf = (run: Run, move: Hint): Round | undefined => {
+  if (move.type === 'tapDeck') {
+    const deck = deckOf();
+    return deck && (() => tapRound(run, deck));
+  }
+  const source = cardOf(move.cardId);
+  const target = pileFaceOf(move.type === 'dropCard' ? move.pileId : move.slotId);
+  return source && target && (() => dragRound(run, source, target));
+};
+
+const repeat = async (run: Run, round: Round, rounds: number): Promise<void> => {
+  await round();
+  if (rounds > 1) {
+    await pause(run, ROUND_GAP_MS);
+    await repeat(run, round, rounds - 1);
+  }
+};
+
+/**
+ * Shows the move with the hand, `rounds` times. Resolves true when the demo played to its end, and false when
+ * it stopped (the Child touched the screen). At the end, the run has no element on the screen.
+ */
+export const showMove = (run: Run, move: Hint, rounds: number): Promise<boolean> => {
+  const round = roundOf(run, move);
+  const played = round ? repeat(run, round, rounds) : Promise.resolve();
+  return played
+    .then(
+      () => !run.stopped(),
+      () => false
+    )
+    .finally(() => {
+      run.stop();
+    });
+};
