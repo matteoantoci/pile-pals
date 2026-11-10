@@ -1,5 +1,5 @@
-import { batch, createSignal, For, onMount, Show } from 'solid-js';
-import { apply, dropCard, isFinished, tapDeck } from '../model';
+import { createSignal, For, onCleanup, onMount, Show } from 'solid-js';
+import { apply, dropCard, isFinished, placeAnchor, tapDeck } from '../model';
 import { watchLifecycle } from '../shell/lifecycle';
 import { saveGame } from '../shell/save';
 import { applyUpdateIfWaiting, checkForUpdate } from '../shell/update';
@@ -40,17 +40,25 @@ const sizeOf = (deal: GameState): string => {
   return deal.piles.length > 2 || places > 6 ? 'medium' : 'large';
 };
 
-/** A category pile: the anchor picture on its face, and the cards that landed on it. */
+/** A category pile: the anchor picture on its face, and the cards that landed on it. An empty slot has no picture. */
 const PileView = (props: { pile: Pile }): JSX.Element => (
-  <div class="pile" data-pile={props.pile.id}>
+  <div class="pile" classList={{ slot: props.pile.picture === null }} data-pile={props.pile.id}>
     <div class="pile-face">
-      <img src={stillUrl(props.pile.picture)} alt="" />
+      <Show when={props.pile.picture}>{(picture) => <img src={stillUrl(picture())} alt="" />}</Show>
     </div>
     <div class="pile-cards">
       <For each={props.pile.cards}>{(card) => <img class="pile-card" src={stillUrl(card.picture)} alt="" />}</For>
     </div>
   </div>
 );
+
+/** The action of a drop: a category card goes on a slot, and a picture card goes on a pile. The model decides. */
+const dropAction = (state: GameState, cardId: CardId, pileId: PileId): Action => {
+  const open = [...state.table.flatMap((stack) => stack.cards), ...(state.dealt ? [state.dealt] : [])];
+  return open.some((card) => card.id === cardId && card.anchor)
+    ? placeAnchor(cardId, pileId)
+    : dropCard(cardId, pileId);
+};
 
 /** What the hooks need from the board: the newest state, the way to draw it, and the sticker book page. */
 type Game = {
@@ -68,13 +76,13 @@ const cardHooks = (game: Game, cardId: CardId): Hooks => {
   return {
     targets: pileTargets,
     drop: (pileId) => {
-      const outcome = apply(game.current(), dropCard(cardId, pileId));
+      const outcome = apply(game.current(), dropAction(game.current(), cardId, pileId));
       last = outcome.events.some((event) => event.type === 'levelComplete');
       completed = outcome.events.find((event) => event.type === 'groupComplete')?.pileId;
       flips = outcome.events.flatMap((event) => (event.type === 'flipped' ? [event.cardId] : []));
       playEventSounds(outcome.events);
       game.move(outcome.state);
-      return outcome.events.some((event) => event.type === 'snapped');
+      return outcome.events.some((event) => event.type === 'snapped' || event.type === 'anchorPlaced');
     },
     landed: () => {
       flips.forEach((flipped) => raiseCard(flipped, (id) => cardHooks(game, id)));
@@ -101,13 +109,11 @@ type Levels = {
   readonly hooksFor: (cardId: CardId) => Hooks;
   readonly onTapDeck: () => void;
   readonly act: (action: Action) => Outcome;
-  readonly dealNext: () => void;
   readonly current: () => GameState;
 };
 
-/** The levels that the board shows. `first` is the saved level, or a new game (main.tsx reads the save). */
+/** The level that the board shows. `first` is the saved level, or a new game (App.tsx reads the save). */
 const playLevels = (first: GameState): Levels => {
-  const [dealt, setDealt] = createSignal(first);
   const [state, setState] = createSignal(first);
   // A saved level that is finished comes back on its sticker book page.
   const [reward, setReward] = createSignal(isFinished(first));
@@ -115,23 +121,13 @@ const playLevels = (first: GameState): Levels => {
   // so the pile shows the card only at the end of its spring.
   let model = first;
 
+  // The sticker actions of the book page. After `go`, the model and the save hold the next level.
   const act = (action: Action): Outcome => {
     const outcome = apply(model, action);
     model = outcome.state;
     playEventSounds(outcome.events);
     saveGame(model);
     return outcome;
-  };
-
-  // After `go`, the model and the save hold the next level. The table shows it when the book page closes.
-  // That is a safe point for a waiting update: the save points at the next level, nobody touched it yet.
-  const dealNext = (): void => {
-    batch(() => {
-      setDealt(model);
-      setState(model);
-      setReward(false);
-    });
-    applyUpdateIfWaiting();
   };
 
   const game: Game = {
@@ -142,7 +138,7 @@ const playLevels = (first: GameState): Levels => {
   };
 
   return {
-    dealt,
+    dealt: () => first,
     state,
     reward,
     hooksFor: (cardId) => cardHooks(game, cardId),
@@ -151,21 +147,25 @@ const playLevels = (first: GameState): Levels => {
       setState(model);
     },
     act,
-    dealNext,
     current: () => model,
   };
 };
 
-export const Board = (props: { readonly initial: GameState }): JSX.Element => {
-  const { dealt, state, reward, hooksFor, onTapDeck, act, dealNext, current } = playLevels(props.initial);
+/**
+ * One level, then its sticker book page. `onTitle` runs after the green arrow of the book page: the save then
+ * holds the next level, and the app shows the title scene (spec: level -> reward -> title scene).
+ */
+export const Board = (props: { readonly initial: GameState; readonly onTitle: () => void }): JSX.Element => {
+  const { dealt, state, reward, hooksFor, onTapDeck, act, current } = playLevels(props.initial);
   onMount(() => {
-    watchLifecycle({
+    const stop = watchLifecycle({
       hidden: () => {
         cancelDrag();
         saveGame(current());
       },
       visible: checkForUpdate,
     });
+    onCleanup(stop);
     // A safe point for a waiting update: the level starts and nobody has touched it yet.
     applyUpdateIfWaiting();
   });
@@ -179,7 +179,7 @@ export const Board = (props: { readonly initial: GameState }): JSX.Element => {
       </section>
       <TableView dealt={dealt} state={state} hooksFor={hooksFor} onTapDeck={onTapDeck} />
       <Show when={reward()}>
-        <RewardPage book={state().book} act={act} done={dealNext} />
+        <RewardPage book={state().book} act={act} done={props.onTitle} />
       </Show>
     </main>
   );

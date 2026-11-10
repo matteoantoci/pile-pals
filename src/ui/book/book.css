@@ -91,7 +91,7 @@
 }
 
 /* The round icon buttons of the old pages: turn back, close, turn on. They have no text. */
-.book-button {
+.page-button {
   display: grid;
   place-items: center;
   width: 72px;
@@ -105,11 +105,11 @@
   cursor: pointer;
 }
 
-.book-button.hidden {
+.page-button.hidden {
   visibility: hidden;
 }
 
-.book-button svg {
+.page-button svg {
   width: 60%;
   height: 60%;
   fill: none;

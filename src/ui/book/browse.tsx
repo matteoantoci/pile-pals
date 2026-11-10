@@ -17,7 +17,7 @@ const IconButton = (props: {
 }): JSX.Element => (
   <button
     type="button"
-    class={`book-button ${props.class}`}
+    class={`page-button ${props.class}`}
     classList={{ hidden: props.hidden === true }}
     aria-label={props.label}
     onClick={() => props.onTap()}

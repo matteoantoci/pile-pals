@@ -1,34 +1,30 @@
 import { playSound } from '../sound';
 import type { GameEvent } from '../model';
+import type { SoundSlot } from '../sound';
 
-/** Plays the sound slot of one model event. A new event type gets its case here (ticket 06). */
+/**
+ * The sound slot of each model event, or null for an event with no own sound. A new event type must get its key
+ * here (the Record type checks it). A category card on its slot sounds like the first card on a pile. The sticker
+ * award and the complete book come with the level fanfare; the book page plays the pal of the new sticker.
+ */
+const SLOTS: Readonly<Record<GameEvent['type'], SoundSlot | null>> = {
+  snapped: 'snap',
+  anchorPlaced: 'snap',
+  rejected: 'wrong',
+  flipped: 'flip',
+  dealt: 'deck',
+  groupComplete: 'group',
+  levelComplete: 'level',
+  stickerAwarded: null,
+  stickerPlaced: 'snap',
+  bookComplete: null,
+};
+
+/** Plays the sound slot of one model event. A snap plays the note of its place on the pile. */
 const playEventSound = (event: GameEvent): void => {
-  switch (event.type) {
-    case 'snapped':
-      playSound('snap', event.noteIndex);
-      break;
-    case 'rejected':
-      playSound('wrong');
-      break;
-    case 'flipped':
-      playSound('flip');
-      break;
-    case 'dealt':
-      playSound('deck');
-      break;
-    case 'groupComplete':
-      playSound('group');
-      break;
-    case 'levelComplete':
-      playSound('level');
-      break;
-    case 'stickerPlaced':
-      playSound('snap');
-      break;
-    case 'stickerAwarded':
-    case 'bookComplete':
-      // These come with the level fanfare. The sticker book page plays the pal of the new sticker when it opens.
-      break;
+  const slot = SLOTS[event.type];
+  if (slot !== null) {
+    playSound(slot, event.type === 'snapped' ? event.noteIndex : 0);
   }
 };
 

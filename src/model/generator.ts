@@ -7,7 +7,7 @@ import { EMPTY_BOOK } from './stickers';
 import type { CatalogCard, CatalogGroup } from './catalog';
 import type { Difficulty } from './difficulty';
 import type { Random } from './random';
-import type { Card, GameState, PictureId, Stack } from './types';
+import type { Card, GameState, GroupId, Pile, PictureId, Stack } from './types';
 
 // The level generator (spec, Module 2). It works in three steps:
 // 1. `difficultyOf` gives the size of the level.
@@ -145,23 +145,35 @@ const stackUp = (open: readonly Card[], hidden: readonly Card[]): readonly Stack
     cards: [...(hidden[index] ? [{ ...hidden[index], faceDown: true }] : []), { ...card, faceDown: false }],
   }));
 
-/** Puts the setup on the piles, the stacks, and the deck, in a random order. */
+/** A card of the level. The catalog picture id is also the card id: rule 4 makes it unique in the level. */
+const cardOf = (picture: PictureId, group: GroupId, anchor: boolean): Card => ({ id: picture, group, picture, anchor });
+
+/** The pile of a group with its category card on it, or an empty slot when the Child places the category card. */
+const pileOf = (plan: Plan, index: number, loose: ReadonlySet<Plan>): Pile =>
+  loose.has(plan)
+    ? { id: `slot-${String(index)}`, group: null, picture: null, cards: [] }
+    : { id: plan.group.id, group: plan.group.id, picture: plan.anchor, cards: [] };
+
+/**
+ * Puts the setup on the piles, the stacks, and the deck, in a random order. The loose category cards go on the table
+ * or in the deck, never face-down, and each one has an empty slot.
+ */
 const layOut = (plans: readonly Plan[], difficulty: Difficulty, random: Random): Deal => {
-  const piles = random
-    .shuffle(plans)
-    .map(({ group, anchor }) => ({ id: group.id, group: group.id, picture: anchor, cards: [] }));
+  const ordered = random.shuffle(plans);
+  // A level with no loose category card uses no random value here, so its deal does not change.
+  const loose = new Set(difficulty.looseAnchors > 0 ? random.shuffle(ordered).slice(0, difficulty.looseAnchors) : []);
   const cards = random.shuffle(
-    plans.flatMap(({ group, cards: groupCards }) =>
-      groupCards.map((card) => ({ id: card.id, group: group.id, picture: card.id }))
-    )
+    plans.flatMap(({ group, cards: groupCards }) => groupCards.map((card) => cardOf(card.id, group.id, false)))
   );
+  const anchors = [...loose].map(({ group, anchor }) => cardOf(anchor, group.id, true));
   // One face-down card for each stack, and always a face-up card on the table and in the deck.
   const faceDown = Math.min(difficulty.faceDown, Math.max(0, cards.length - 2));
-  const deckSize = Math.min(difficulty.deck, cards.length - faceDown - 1);
+  const open = anchors.length > 0 ? random.shuffle([...cards.slice(faceDown), ...anchors]) : cards.slice(faceDown);
+  const deckSize = Math.min(difficulty.deck, open.length - 1);
   return {
-    piles,
-    table: stackUp(cards.slice(faceDown + deckSize), cards.slice(0, faceDown)),
-    deck: cards.slice(faceDown, faceDown + deckSize),
+    piles: ordered.map((plan, index) => pileOf(plan, index, loose)),
+    table: stackUp(open.slice(deckSize), cards.slice(0, faceDown)),
+    deck: open.slice(0, deckSize),
     dealt: null,
   };
 };

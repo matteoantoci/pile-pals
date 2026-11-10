@@ -33,6 +33,7 @@ export const apply = (state: GameState, action: Action): Outcome => {
       return goOn(state);
     case 'dropCard':
     case 'tapDeck':
+    case 'placeAnchor':
       return rewarded(playMove(state, action));
     default: {
       // A new member of the `Action` union must get its case above. This line keeps the switch complete.
