@@ -89,15 +89,50 @@ img {
   font-size: 32px;
 }
 
-/* The drag writes the transform of .card. Effects (ticket 04) animate .card-face. */
+/*
+ * The drag and the springs write the transform of .card. The effects (src/ui/motion/card.ts) animate
+ * .card-face and .card-shadow. The card box has the lifted size. The face rests at scale 0.926 (1/1.08),
+ * so a lifted card never scales above 1. Only WAAPI animates these elements: no CSS transitions.
+ */
 .card {
   position: relative;
   touch-action: none;
   will-change: transform;
   transform: translate3d(0px, 0px, 0);
+}
+
+.card-face {
+  position: relative;
+  transform: translate(0px, 0px) rotate(0deg) scale(0.926, 0.926);
+  transform-origin: 50% 100%;
+}
+
+/* A static shadow. Only its opacity and transform animate. */
+.card-shadow {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  opacity: 0;
+  transform: translate(0px, 2px);
+  box-shadow: 0 8px 16px rgb(0 0 0 / 0.25);
+}
+
+.card,
+.card-face,
+.card-shadow {
   transition: none;
 }
 
 .card.lifted {
   z-index: 1000;
+}
+
+/* A snapped card does not take a new drag while it lands. */
+.card.placed {
+  pointer-events: none;
+}
+
+/* A card that left the table keeps its place, so the other cards do not move. */
+.card.gone {
+  visibility: hidden;
 }
