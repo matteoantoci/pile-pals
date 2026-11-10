@@ -2,7 +2,7 @@ import { playSound } from '../sound';
 import type { GameEvent } from '../model';
 
 /** Plays the sound slot of one model event. A new event type gets its case here (tickets 06 and 08). */
-export const playEventSound = (event: GameEvent): void => {
+const playEventSound = (event: GameEvent): void => {
   switch (event.type) {
     case 'snapped':
       playSound('snap', event.noteIndex);
@@ -10,5 +10,13 @@ export const playEventSound = (event: GameEvent): void => {
     case 'rejected':
       playSound('wrong');
       break;
+  }
+};
+
+/** Plays the events of one action. Call it in the input handler (for example the drop):
+ * the input is a user gesture, so it can also start the audio. */
+export const playEventSounds = (events: readonly GameEvent[]): void => {
+  for (const event of events) {
+    playEventSound(event);
   }
 };
