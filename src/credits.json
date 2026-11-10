@@ -9,9 +9,68 @@
       "name": "CC BY 4.0",
       "url": "https://creativecommons.org/licenses/by/4.0/",
       "creditRequired": true
+    },
+    "Apache-2.0": {
+      "name": "Apache License 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0",
+      "creditRequired": true
     }
   },
   "entries": [
+    {
+      "kind": "picture",
+      "title": "Noto Emoji",
+      "author": "Google",
+      "licence": "Apache-2.0",
+      "url": "https://github.com/googlefonts/noto-emoji",
+      "files": ["pictures/*"],
+      "change": "Made smaller (256 px) and saved as WebP. The picture of a pal is the rest frame of its Noto Emoji Animation loop. pictures/LICENSE.txt holds the licence text."
+    },
+    {
+      "kind": "animation",
+      "title": "Noto Emoji Animation",
+      "author": "Google",
+      "licence": "CC-BY-4.0",
+      "url": "https://googlefonts.github.io/noto-emoji-animation/",
+      "files": ["animations/*"],
+      "change": "Each loop starts at the frame with the marker 'rest', made smaller (256 px), 30 frames per second, and saved as animated AVIF. The still pictures of the pals in pictures/ are these rest frames."
+    },
+    {
+      "kind": "sound",
+      "title": "AcousticGuitar-C-Chord.wav",
+      "author": "spitefuloctopus",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/spitefuloctopus/sounds/315706/",
+      "files": ["sounds/guitar-315706.wav"],
+      "change": "Cut 0:00.1 to 0:02.6 of the source file, with a 0.05 s fade-in and a 0.2 s fade-out. Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "Baby Chicks Chirp.boaay",
+      "author": "BOAAY",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/BOAAY/sounds/519193/",
+      "files": ["sounds/baby-chick-519193.wav"],
+      "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "Bee Buzzing",
+      "author": "JonCon_Library",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/JonCon_Library/sounds/481647/",
+      "files": ["sounds/honeybee-481647.wav"],
+      "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "Bike.ogg",
+      "author": "egomassive",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/egomassive/sounds/536730/",
+      "files": ["sounds/motorcycle-536730.wav"],
+      "change": "Cut 0:00.9 to 0:03.4 of the source file, with a 0.05 s fade-in and a 0.2 s fade-out. Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
     {
       "kind": "sound",
       "title": "Boing 2",
@@ -32,6 +91,42 @@
     },
     {
       "kind": "sound",
+      "title": "Bubble.wav",
+      "author": "megmcduffee",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/megmcduffee/sounds/332597/",
+      "files": ["sounds/jellyfish-332597.wav"],
+      "change": "Cut 0:06.8 to 0:09.3 of the source file, with a 0.05 s fade-in and a 0.2 s fade-out. Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "Bubbles Light Short Descend.wav",
+      "author": "murraysortz",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/murraysortz/sounds/192496/",
+      "files": ["sounds/fish-192496.wav"],
+      "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "Car Honking",
+      "author": "MicktheMicGuy",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/MicktheMicGuy/sounds/434878/",
+      "files": ["sounds/automobile-434878.wav"],
+      "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "Cartoon - Smoochy Squeak + Plop",
+      "author": "Breviceps",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/Breviceps/sounds/444494/",
+      "files": ["sounds/octopus-444494.wav"],
+      "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
       "title": "Casino Audio",
       "author": "Kenney",
       "licence": "CC0-1.0",
@@ -41,11 +136,191 @@
     },
     {
       "kind": "sound",
+      "title": "Collared Dove",
+      "author": "D4XX",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/D4XX/sounds/607243/",
+      "files": ["sounds/dove-607243.wav"],
+      "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "Cricket Chirp",
+      "author": "Sojan",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/Sojan/sounds/400663/",
+      "files": ["sounds/cricket-400663.wav"],
+      "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "Dog_Barking.wav",
+      "author": "ken788",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/ken788/sounds/386766/",
+      "files": ["sounds/dog-386766.wav"],
+      "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "Dolphin Noise-.wav",
+      "author": "jfournier18",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/jfournier18/sounds/456151/",
+      "files": ["sounds/dolphin-456151.wav"],
+      "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "Donkey Bray",
+      "author": "StarNinjas37",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/StarNinjas37/sounds/560692/",
+      "files": ["sounds/donkey-560692.wav"],
+      "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "Flamingos",
+      "author": "Breviceps",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/Breviceps/sounds/535778/",
+      "files": ["sounds/flamingo-535778.wav"],
+      "change": "Cut 0:00.3 to 0:01.8 of the source file, with a 0.05 s fade-in and a 0.2 s fade-out. Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "Frog.ogg",
+      "author": "egomassive",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/egomassive/sounds/536759/",
+      "files": ["sounds/frog-536759.wav"],
+      "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
       "title": "G4 soft - kalimba",
       "author": "hollandm",
       "licence": "CC0-1.0",
       "url": "https://freesound.org/people/hollandm/sounds/691805/",
       "files": ["sounds/kalimba-g4.wav"],
+      "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "Goat Sound 2.wav",
+      "author": "Erokia",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/Erokia/sounds/188182/",
+      "files": ["sounds/goat-188182.wav"],
+      "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "Happy Bird Singing",
+      "author": "se2001",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/se2001/sounds/511094/",
+      "files": ["sounds/bird-511094.wav"],
+      "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "Jet.ogg",
+      "author": "egomassive",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/egomassive/sounds/536809/",
+      "files": ["sounds/airplane-536809.wav"],
+      "change": "Cut 0:00.1 to 0:02.6 of the source file, with a 0.05 s fade-in and a 0.2 s fade-out. Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "Monkey Imitation 3",
+      "author": "AntumDeluge",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/AntumDeluge/sounds/417823/",
+      "files": ["sounds/monkey-417823.wav"],
+      "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "Otters Squeaking.wav",
+      "author": "Motion_S",
+      "licence": "CC-BY-4.0",
+      "url": "https://freesound.org/people/Motion_S/sounds/221761/",
+      "files": ["sounds/otter-221761.wav"],
+      "change": "Cut 0:33.3 to 0:34.8 of the source file, with a 0.05 s fade-in and a 0.2 s fade-out. Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "Penguin Squeak",
+      "author": "Breviceps",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/Breviceps/sounds/705839/",
+      "files": ["sounds/penguin-705839.wav"],
+      "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "Pig Oink",
+      "author": "qubodup",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/qubodup/sounds/442906/",
+      "files": ["sounds/pig-442906.wav"],
+      "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "Pop sound",
+      "author": "deraj",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/deraj/sounds/202230/",
+      "files": ["sounds/pop-202230.wav"],
+      "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "Ringing bell - happy.wav",
+      "author": "domrodrig",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/domrodrig/sounds/116779/",
+      "files": ["sounds/bell-116779.wav"],
+      "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "Rocket Launch",
+      "author": "Jarusca",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/Jarusca/sounds/521377/",
+      "files": ["sounds/rocket-521377.wav"],
+      "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "Rooster Crow 1",
+      "author": "BenjaminNelan",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/BenjaminNelan/sounds/435508/",
+      "files": ["sounds/rooster-435508.wav"],
+      "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "Sound of a Seal",
+      "author": "florianreichelt",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/florianreichelt/sounds/450751/",
+      "files": ["sounds/seal-450751.wav"],
+      "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "Steam Whistle.mp3",
+      "author": "Bidone",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/Bidone/sounds/71778/",
+      "files": ["sounds/locomotive-71778.wav"],
       "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
     },
     {
@@ -65,6 +340,132 @@
       "url": "https://freesound.org/people/plasterbrain/sounds/397355/",
       "files": ["sounds/tada-fanfare-a.wav"],
       "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "Wolf howl",
+      "author": "NaturesTemper",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/NaturesTemper/sounds/398430/",
+      "files": ["sounds/wolf-398430.wav"],
+      "change": "Cut 0:01.0 to 0:03.5 of the source file, with a 0.05 s fade-in and a 0.2 s fade-out. Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "bicycle-bell_19.wav",
+      "author": "newagesoup",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/newagesoup/sounds/383631/",
+      "files": ["sounds/bicycle-383631.wav"],
+      "change": "Cut 0:00.0 to 0:02.5 of the source file, with a 0.05 s fade-in and a 0.2 s fade-out. Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "drum roll",
+      "author": "owowowwo",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/owowowwo/sounds/197763/",
+      "files": ["sounds/drum-197763.wav"],
+      "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "goose honk",
+      "author": "jahjahjahjah",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/jahjahjahjah/sounds/805297/",
+      "files": ["sounds/goose-805297.wav"],
+      "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "horse neigh shortened.wav",
+      "author": "shadoWisp",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/shadoWisp/sounds/269571/",
+      "files": ["sounds/horse-269571.wav"],
+      "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "lion.wav",
+      "author": "SGAK",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/SGAK/sounds/467762/",
+      "files": ["sounds/lion-467762.wav"],
+      "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "maracas",
+      "author": "nathanmanaker",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/nathanmanaker/sounds/486950/",
+      "files": ["sounds/maracas-486950.wav"],
+      "change": "Cut 0:01.1 to 0:03.6 of the source file, with a 0.05 s fade-in and a 0.2 s fade-out. Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "old alarm clock ringing",
+      "author": "tuberatanka",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/tuberatanka/sounds/102435/",
+      "files": ["sounds/alarm-clock-102435.wav"],
+      "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "owl.wav",
+      "author": "Anthousai",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/Anthousai/sounds/398734/",
+      "files": ["sounds/owl-398734.wav"],
+      "change": "Cut 0:00.4 to 0:02.9 of the source file, with a 0.05 s fade-in and a 0.2 s fade-out. Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "scissors;snips.wav",
+      "author": "Abir19",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/Abir19/sounds/629513/",
+      "files": ["sounds/crab-629513.wav"],
+      "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "thunder3.ogg",
+      "author": "Josh74000MC",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/Josh74000MC/sounds/475094/",
+      "files": ["sounds/cloud-with-lightning-475094.wav"],
+      "change": "Cut 0:00.2 to 0:02.7 of the source file, with a 0.05 s fade-in and a 0.2 s fade-out. Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "tiger_roar.wav",
+      "author": "Vaporpup",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/Vaporpup/sounds/571288/",
+      "files": ["sounds/tiger-571288.wav"],
+      "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "trumpet-E4",
+      "author": "germanio",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/germanio/sounds/369912/",
+      "files": ["sounds/trumpet-369912.wav"],
+      "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "violin arco vib G5.aif",
+      "author": "ldk1609",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/ldk1609/sounds/55954/",
+      "files": ["sounds/violin-55954.wav"],
+      "change": "Cut 0:00.0 to 0:02.5 of the source file, with a 0.2 s fade-out. Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
     }
   ]
 }

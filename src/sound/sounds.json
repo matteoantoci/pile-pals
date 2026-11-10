@@ -60,6 +60,347 @@
           "why": "The spec names the labrynth2 fanfare, with the same cut at 3.7 s and the 0.5 s fade-out. The game has no level event yet (ticket 08)."
         }
       ]
+    },
+    {
+      "name": "Pals",
+      "slots": [
+        {
+          "id": "pop",
+          "name": "Pop (pals with no own sound)",
+          "status": "doubt",
+          "pick": "pop-202230",
+          "candidates": ["pop-202230", "pop-258269", "bubble-pop"],
+          "why": "A pal with no own sound plays the pop: higher for a small pal, lower for a big pal. The pick is the most downloaded pop on Freesound. Bubble Pop is also the lift sound."
+        },
+        {
+          "id": "pal-crab",
+          "name": "Crab",
+          "status": "sure",
+          "pick": "crab-629513",
+          "candidates": ["crab-629513"],
+          "why": "The labrynth2 sound, with the same source and cut. The Parent heard it in labrynth2."
+        },
+        {
+          "id": "pal-dolphin",
+          "name": "Dolphin",
+          "status": "sure",
+          "pick": "dolphin-456151",
+          "candidates": ["dolphin-456151"],
+          "why": "The labrynth2 sound, with the same source and cut. The Parent heard it in labrynth2."
+        },
+        {
+          "id": "pal-fish",
+          "name": "Fish",
+          "status": "sure",
+          "pick": "fish-192496",
+          "candidates": ["fish-192496"],
+          "why": "The labrynth2 sound, with the same source and cut. The Parent heard it in labrynth2."
+        },
+        {
+          "id": "pal-flamingo",
+          "name": "Flamingo",
+          "status": "sure",
+          "pick": "flamingo-535778",
+          "candidates": ["flamingo-535778"],
+          "why": "The labrynth2 sound, with the same source and cut. The Parent heard it in labrynth2."
+        },
+        {
+          "id": "pal-jellyfish",
+          "name": "Jellyfish",
+          "status": "sure",
+          "pick": "jellyfish-332597",
+          "candidates": ["jellyfish-332597"],
+          "why": "The labrynth2 sound, with the same source and cut. The Parent heard it in labrynth2."
+        },
+        {
+          "id": "pal-octopus",
+          "name": "Octopus",
+          "status": "sure",
+          "pick": "octopus-444494",
+          "candidates": ["octopus-444494"],
+          "why": "The labrynth2 sound, with the same source and cut. The Parent heard it in labrynth2."
+        },
+        {
+          "id": "pal-otter",
+          "name": "Otter",
+          "status": "sure",
+          "pick": "otter-221761",
+          "candidates": ["otter-221761"],
+          "why": "The labrynth2 sound, with the same source and cut. The Parent heard it in labrynth2."
+        },
+        {
+          "id": "pal-penguin",
+          "name": "Penguin",
+          "status": "sure",
+          "pick": "penguin-705839",
+          "candidates": ["penguin-705839"],
+          "why": "The labrynth2 sound, with the same source and cut. The Parent heard it in labrynth2."
+        },
+        {
+          "id": "pal-seal",
+          "name": "Seal",
+          "status": "sure",
+          "pick": "seal-450751",
+          "candidates": ["seal-450751"],
+          "why": "The labrynth2 sound, with the same source and cut. The Parent heard it in labrynth2."
+        },
+        {
+          "id": "pal-dog",
+          "name": "Dog",
+          "status": "doubt",
+          "pick": "dog-386766",
+          "candidates": ["dog-386766", "dog-163459", "dog-583142"],
+          "why": "Three barks. The pick has the best rating (4.6) and no noise between the barks. The second has the most downloads, so the two are close."
+        },
+        {
+          "id": "pal-lion",
+          "name": "Lion",
+          "status": "doubt",
+          "pick": "lion-467762",
+          "candidates": ["lion-467762", "lion-675443", "lion-684527"],
+          "why": "Three short roars. The pick has the most downloads. A roar can be too scary for a small child."
+        },
+        {
+          "id": "pal-pig",
+          "name": "Pig",
+          "status": "sure",
+          "pick": "pig-442906",
+          "candidates": ["pig-442906", "pig-442905", "pig-233183"],
+          "why": "The pick is a clean oink of 0.7 s, with the most downloads and a 4.7 rating."
+        },
+        {
+          "id": "pal-horse",
+          "name": "Horse",
+          "status": "sure",
+          "pick": "horse-269571",
+          "candidates": ["horse-269571", "horse-826753", "horse-385947"],
+          "why": "The pick is a short neigh with ten times the downloads of the other two."
+        },
+        {
+          "id": "pal-donkey",
+          "name": "Donkey",
+          "status": "doubt",
+          "pick": "donkey-560692",
+          "candidates": ["donkey-560692", "donkey-133761", "donkey-705300"],
+          "why": "The pick is a short bray. The two field recordings are cut from 10 s files and have village noise."
+        },
+        {
+          "id": "pal-goat",
+          "name": "Goat",
+          "status": "sure",
+          "pick": "goat-188182",
+          "candidates": ["goat-188182", "goat-683259", "goat-689407"],
+          "why": "The pick is a clean bleat of 0.9 s with ten times the downloads of the other two."
+        },
+        {
+          "id": "pal-rooster",
+          "name": "Rooster",
+          "status": "sure",
+          "pick": "rooster-435508",
+          "candidates": ["rooster-435508", "rooster-233160", "rooster-456804"],
+          "why": "The pick is a full cock-a-doodle-doo of 2 s with a 4.8 rating and no noise floor."
+        },
+        {
+          "id": "pal-baby-chick",
+          "name": "Baby chick",
+          "status": "doubt",
+          "pick": "baby-chick-519193",
+          "candidates": ["baby-chick-519193", "baby-chick-518323", "baby-chick-826677"],
+          "why": "Freesound has few CC0 chick peeps. The pick has some noise."
+        },
+        {
+          "id": "pal-owl",
+          "name": "Owl",
+          "status": "doubt",
+          "pick": "owl-398734",
+          "candidates": ["owl-398734", "owl-69508", "owl-465697"],
+          "why": "Hoot sequences longer than 3 s, so each clip is a 2.5 s cut. The Breviceps owl is very quiet (-41 LUFS) and gets +23 dB."
+        },
+        {
+          "id": "pal-frog",
+          "name": "Frog",
+          "status": "sure",
+          "pick": "frog-536759",
+          "candidates": ["frog-536759", "frog-361117", "frog-354132"],
+          "why": "The pick is a clean croak of 0.5 s with the most downloads and a 4.8 rating."
+        },
+        {
+          "id": "pal-monkey",
+          "name": "Monkey",
+          "status": "doubt",
+          "pick": "monkey-417823",
+          "candidates": ["monkey-417823", "monkey-588625", "monkey-67361"],
+          "why": "A child knows the 'ooh ooh' of a monkey imitation. The real monkey (Affen schreit) is a scream."
+        },
+        {
+          "id": "pal-wolf",
+          "name": "Wolf",
+          "status": "doubt",
+          "pick": "wolf-398430",
+          "candidates": ["wolf-398430", "wolf-378334", "wolf-429109"],
+          "why": "A howl is long, so each clip is a 2.5 s cut. The cut can stop in the middle of a howl."
+        },
+        {
+          "id": "pal-bird",
+          "name": "Bird",
+          "status": "doubt",
+          "pick": "bird-511094",
+          "candidates": ["bird-511094", "bird-85404", "bird-233255"],
+          "why": "Three bird songs. Nobody listened yet."
+        },
+        {
+          "id": "pal-goose",
+          "name": "Goose",
+          "status": "doubt",
+          "pick": "goose-805297",
+          "candidates": ["goose-805297", "goose-160686", "goose-137764"],
+          "why": "The pick is one clean honk, but very quiet (-39 LUFS), so it gets +20 dB."
+        },
+        {
+          "id": "pal-honeybee",
+          "name": "Honeybee",
+          "status": "doubt",
+          "pick": "honeybee-481647",
+          "candidates": ["honeybee-481647", "honeybee-103047", "honeybee-466795"],
+          "why": "Three buzzes. The first two have almost the same number of downloads."
+        },
+        {
+          "id": "pal-cricket",
+          "name": "Cricket",
+          "status": "sure",
+          "pick": "cricket-400663",
+          "candidates": ["cricket-400663", "cricket-822935", "cricket-164485"],
+          "why": "The pick is a clean chirp of 1.1 s with the most downloads and a 4.8 rating."
+        },
+        {
+          "id": "pal-dove",
+          "name": "Dove",
+          "status": "doubt",
+          "pick": "dove-607243",
+          "candidates": ["dove-607243", "dove-607224", "dove-649390"],
+          "why": "A coo is soft. Nobody listened yet."
+        },
+        {
+          "id": "pal-tiger",
+          "name": "Tiger",
+          "status": "doubt",
+          "pick": "tiger-571288",
+          "candidates": ["tiger-571288", "tiger-811790", "tiger-420466"],
+          "why": "Three short roars, close to the lion. Roar.m4a is very loud in the source (-5 LUFS)."
+        },
+        {
+          "id": "pal-automobile",
+          "name": "Automobile",
+          "status": "doubt",
+          "pick": "automobile-434878",
+          "candidates": ["automobile-434878", "automobile-423990", "automobile-182474"],
+          "why": "Three car horns. The second is a 'beep beep' that clips in the source."
+        },
+        {
+          "id": "pal-locomotive",
+          "name": "Locomotive",
+          "status": "doubt",
+          "pick": "locomotive-71778",
+          "candidates": ["locomotive-71778", "locomotive-539589", "locomotive-623817"],
+          "why": "A steam whistle, a 'choo choo', and one steam chuff. The pick has the most downloads."
+        },
+        {
+          "id": "pal-motorcycle",
+          "name": "Motorcycle",
+          "status": "doubt",
+          "pick": "motorcycle-536730",
+          "candidates": ["motorcycle-536730", "motorcycle-156204", "motorcycle-432804"],
+          "why": "Engine sounds of 4.5 s to 5 s, so each clip is a 2.5 s cut."
+        },
+        {
+          "id": "pal-airplane",
+          "name": "Airplane",
+          "status": "doubt",
+          "pick": "airplane-536809",
+          "candidates": ["airplane-536809", "airplane-805169", "airplane-320395"],
+          "why": "Jet sounds. A jet is a slow noise with no clear start."
+        },
+        {
+          "id": "pal-bicycle",
+          "name": "Bicycle",
+          "status": "doubt",
+          "pick": "bicycle-383631",
+          "candidates": ["bicycle-383631", "bicycle-81875", "bicycle-156064"],
+          "why": "Three bicycle bells. The pick (4.9 rating) is cut to 2.5 s."
+        },
+        {
+          "id": "pal-rocket",
+          "name": "Rocket",
+          "status": "sure",
+          "pick": "rocket-521377",
+          "candidates": ["rocket-521377", "rocket-151402", "rocket-259285"],
+          "why": "The pick is a short launch of 1.4 s with the most downloads and a 4.9 rating."
+        },
+        {
+          "id": "pal-alarm-clock",
+          "name": "Alarm clock",
+          "status": "doubt",
+          "pick": "alarm-clock-102435",
+          "candidates": ["alarm-clock-102435", "alarm-clock-14262", "alarm-clock-128910"],
+          "why": "Three bell alarm clocks. A ring can be too loud and sharp for a small child."
+        },
+        {
+          "id": "pal-bell",
+          "name": "Bell",
+          "status": "doubt",
+          "pick": "bell-116779",
+          "candidates": ["bell-116779", "bell-611113", "bell-352242"],
+          "why": "Three bells. Nobody listened yet."
+        },
+        {
+          "id": "pal-drum",
+          "name": "Drum",
+          "status": "doubt",
+          "pick": "drum-197763",
+          "candidates": ["drum-197763", "drum-77305", "drum-191718"],
+          "why": "Three snare drum rolls. The pick is the shortest (1.7 s)."
+        },
+        {
+          "id": "pal-guitar",
+          "name": "Guitar",
+          "status": "doubt",
+          "pick": "guitar-315706",
+          "candidates": ["guitar-315706", "guitar-188037", "guitar-171501"],
+          "why": "One chord, a strum, and a short phrase. Nobody listened yet."
+        },
+        {
+          "id": "pal-trumpet",
+          "name": "Trumpet",
+          "status": "doubt",
+          "pick": "trumpet-369912",
+          "candidates": ["trumpet-369912", "trumpet-258107", "trumpet-374126"],
+          "why": "Three single trumpet notes. Nobody listened yet."
+        },
+        {
+          "id": "pal-violin",
+          "name": "Violin",
+          "status": "doubt",
+          "pick": "violin-55954",
+          "candidates": ["violin-55954", "violin-56228", "violin-251929"],
+          "why": "A bowed note (cut to 2.5 s), a short spiccato note, and a sharp phrase."
+        },
+        {
+          "id": "pal-maracas",
+          "name": "Maracas",
+          "status": "doubt",
+          "pick": "maracas-486950",
+          "candidates": ["maracas-486950", "maracas-792505", "maracas-204658"],
+          "why": "Three maraca shakes. The pick is quiet in the source (-36 LUFS)."
+        },
+        {
+          "id": "pal-cloud-with-lightning",
+          "name": "Cloud with lightning",
+          "status": "doubt",
+          "pick": "cloud-with-lightning-475094",
+          "candidates": ["cloud-with-lightning-475094", "cloud-with-lightning-195439", "cloud-with-lightning-193170"],
+          "why": "Three thunder claps. Thunder can scare a small child."
+        }
+      ]
     }
   ],
   "clips": {
@@ -197,8 +538,1020 @@
       "licence": "CC0-1.0",
       "page": "https://freesound.org/people/FunWithSound/sounds/456966/",
       "source": "https://cdn.freesound.org/previews/456/456966_6456158-hq.mp3",
-      "cut": { "start": 0, "duration": 3.7, "fadeOut": 0.5 },
+      "cut": {
+        "start": 0,
+        "duration": 3.7,
+        "fadeOut": 0.5
+      },
       "note": "labrynth2 goal.wav."
+    },
+    "pop-202230": {
+      "title": "Pop sound",
+      "author": "deraj",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/deraj/sounds/202230/",
+      "source": "https://cdn.freesound.org/previews/202/202230_3725006-hq.mp3",
+      "note": "Freesound: 62492 downloads, rating 4.4."
+    },
+    "pop-258269": {
+      "title": "Mouth pop",
+      "author": "jcallison",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/jcallison/sounds/258269/",
+      "source": "https://cdn.freesound.org/previews/258/258269_4824549-hq.mp3",
+      "note": "Freesound: 4402 downloads, rating 4.7."
+    },
+    "crab-629513": {
+      "title": "scissors;snips.wav",
+      "author": "Abir19",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/Abir19/sounds/629513/",
+      "source": "https://cdn.freesound.org/previews/629/629513_11298046-hq.mp3",
+      "note": "labrynth2 friends/crab.wav. A cartoon effect: scissors snips."
+    },
+    "dolphin-456151": {
+      "title": "Dolphin Noise-.wav",
+      "author": "jfournier18",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/jfournier18/sounds/456151/",
+      "source": "https://cdn.freesound.org/previews/456/456151_9126235-hq.mp3",
+      "note": "labrynth2 friends/dolphin.wav."
+    },
+    "fish-192496": {
+      "title": "Bubbles Light Short Descend.wav",
+      "author": "murraysortz",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/murraysortz/sounds/192496/",
+      "source": "https://cdn.freesound.org/previews/192/192496_3289374-hq.mp3",
+      "note": "labrynth2 friends/fish.wav. A cartoon effect: bubbles."
+    },
+    "flamingo-535778": {
+      "title": "Flamingos",
+      "author": "Breviceps",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/Breviceps/sounds/535778/",
+      "source": "https://cdn.freesound.org/previews/535/535778_9159316-hq.mp3",
+      "cut": {
+        "start": 0.3,
+        "duration": 1.5
+      },
+      "note": "labrynth2 friends/flamingo.wav."
+    },
+    "jellyfish-332597": {
+      "title": "Bubble.wav",
+      "author": "megmcduffee",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/megmcduffee/sounds/332597/",
+      "source": "https://cdn.freesound.org/previews/332/332597_4357924-hq.mp3",
+      "cut": {
+        "start": 6.85,
+        "duration": 2.5
+      },
+      "note": "labrynth2 friends/jellyfish.wav. A cartoon effect: bubbles."
+    },
+    "octopus-444494": {
+      "title": "Cartoon - Smoochy Squeak + Plop",
+      "author": "Breviceps",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/Breviceps/sounds/444494/",
+      "source": "https://cdn.freesound.org/previews/444/444494_9159316-hq.mp3",
+      "note": "labrynth2 friends/octopus.wav. A cartoon effect: a squeak."
+    },
+    "otter-221761": {
+      "title": "Otters Squeaking.wav",
+      "author": "Motion_S",
+      "licence": "CC-BY-4.0",
+      "page": "https://freesound.org/people/Motion_S/sounds/221761/",
+      "source": "https://cdn.freesound.org/previews/221/221761_3299593-hq.mp3",
+      "cut": {
+        "start": 33.3,
+        "duration": 1.5
+      },
+      "note": "labrynth2 friends/otter.wav. CC BY 4.0: the credits page must show it."
+    },
+    "penguin-705839": {
+      "title": "Penguin Squeak",
+      "author": "Breviceps",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/Breviceps/sounds/705839/",
+      "source": "https://cdn.freesound.org/previews/705/705839_9159316-hq.mp3",
+      "note": "labrynth2 friends/penguin.wav."
+    },
+    "seal-450751": {
+      "title": "Sound of a Seal",
+      "author": "florianreichelt",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/florianreichelt/sounds/450751/",
+      "source": "https://cdn.freesound.org/previews/450/450751_6253486-hq.mp3",
+      "note": "labrynth2 friends/seal.wav."
+    },
+    "dog-386766": {
+      "title": "Dog_Barking.wav",
+      "author": "ken788",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/ken788/sounds/386766/",
+      "source": "https://cdn.freesound.org/previews/386/386766_5768130-hq.mp3",
+      "note": "Freesound: 7953 downloads, rating 4.6."
+    },
+    "dog-163459": {
+      "title": "LBS_FX DOG Small Alert Bark001.wav",
+      "author": "LittleBigSounds",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/LittleBigSounds/sounds/163459/",
+      "source": "https://cdn.freesound.org/previews/163/163459_2965892-hq.mp3",
+      "note": "Freesound: 17662 downloads, rating 3.9."
+    },
+    "dog-583142": {
+      "title": "Puppy Bark",
+      "author": "AntumDeluge",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/AntumDeluge/sounds/583142/",
+      "source": "https://cdn.freesound.org/previews/583/583142_3403708-hq.mp3",
+      "note": "Freesound: 3003 downloads, rating 4.6."
+    },
+    "lion-467762": {
+      "title": "lion.wav",
+      "author": "SGAK",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/SGAK/sounds/467762/",
+      "source": "https://cdn.freesound.org/previews/467/467762_371166-hq.mp3",
+      "note": "Freesound: 4544 downloads, rating 4.6."
+    },
+    "lion-675443": {
+      "title": "S01-09_Short lion roars.wav",
+      "author": "craigsmith",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/craigsmith/sounds/675443/",
+      "source": "https://cdn.freesound.org/previews/675/675443_2524442-hq.mp3",
+      "note": "Freesound: 326 downloads, rating 5.0."
+    },
+    "lion-684527": {
+      "title": "lion.wav",
+      "author": "shakezerz",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/shakezerz/sounds/684527/",
+      "source": "https://cdn.freesound.org/previews/684/684527_14372820-hq.mp3",
+      "note": "Freesound: 1440 downloads, rating 4.7."
+    },
+    "pig-442906": {
+      "title": "Pig Oink",
+      "author": "qubodup",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/qubodup/sounds/442906/",
+      "source": "https://cdn.freesound.org/previews/442/442906_71257-hq.mp3",
+      "note": "Freesound: 4597 downloads, rating 4.7."
+    },
+    "pig-442905": {
+      "title": "Pig Sound",
+      "author": "qubodup",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/qubodup/sounds/442905/",
+      "source": "https://cdn.freesound.org/previews/442/442905_71257-hq.mp3",
+      "note": "Freesound: 2122 downloads, rating 4.5."
+    },
+    "pig-233183": {
+      "title": "Pig - Multiple Snorts 2 (2 pigs) - 96kHz.wav",
+      "author": "JarredGibb",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/JarredGibb/sounds/233183/",
+      "source": "https://cdn.freesound.org/previews/233/233183_4056007-hq.mp3",
+      "note": "Freesound: 2553 downloads, rating 4.9."
+    },
+    "horse-269571": {
+      "title": "horse neigh shortened.wav",
+      "author": "shadoWisp",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/shadoWisp/sounds/269571/",
+      "source": "https://cdn.freesound.org/previews/269/269571_4564240-hq.mp3",
+      "note": "Freesound: 5689 downloads, rating 4.5."
+    },
+    "horse-826753": {
+      "title": "Renill de cavall / Horse Neigh",
+      "author": "Salsero_classic",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/Salsero_classic/sounds/826753/",
+      "source": "https://cdn.freesound.org/previews/826/826753_3339822-hq.mp3",
+      "note": "Freesound: 573 downloads, rating 4.7."
+    },
+    "horse-385947": {
+      "title": "Horse neigh",
+      "author": "felix.blume",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/felix.blume/sounds/385947/",
+      "source": "https://cdn.freesound.org/previews/385/385947_1661766-hq.mp3",
+      "cut": {
+        "start": 4.56,
+        "duration": 2.5
+      },
+      "note": "Freesound: 5553 downloads, rating 4.6."
+    },
+    "donkey-560692": {
+      "title": "Donkey Bray",
+      "author": "StarNinjas37",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/StarNinjas37/sounds/560692/",
+      "source": "https://cdn.freesound.org/previews/560/560692_10936067-hq.mp3",
+      "note": "Freesound: 944 downloads, rating 3.8."
+    },
+    "donkey-133761": {
+      "title": "A donkey is braying in the field, close to the small village of La Preciosita",
+      "author": "felix.blume",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/felix.blume/sounds/133761/",
+      "source": "https://cdn.freesound.org/previews/133/133761_1661766-hq.mp3",
+      "cut": {
+        "start": 0.04,
+        "duration": 2.5
+      },
+      "note": "Freesound: 957 downloads, rating 4.5."
+    },
+    "donkey-705300": {
+      "title": "Donkey braying loud with distant village atmosphere, close recording",
+      "author": "felix.blume",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/felix.blume/sounds/705300/",
+      "source": "https://cdn.freesound.org/previews/705/705300_1661766-hq.mp3",
+      "cut": {
+        "start": 0.05,
+        "duration": 2.5
+      },
+      "note": "Freesound: 381 downloads, rating 5.0."
+    },
+    "goat-188182": {
+      "title": "Goat Sound 2.wav",
+      "author": "Erokia",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/Erokia/sounds/188182/",
+      "source": "https://cdn.freesound.org/previews/188/188182_9497060-hq.mp3",
+      "note": "Freesound: 8701 downloads, rating 4.7."
+    },
+    "goat-683259": {
+      "title": "goat.mp3",
+      "author": "saha213131",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/saha213131/sounds/683259/",
+      "source": "https://cdn.freesound.org/previews/683/683259_14040168-hq.mp3",
+      "note": "Freesound: 916 downloads, rating 4.9."
+    },
+    "goat-689407": {
+      "title": "goat.mp3",
+      "author": "saha213131",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/saha213131/sounds/689407/",
+      "source": "https://cdn.freesound.org/previews/689/689407_14040168-hq.mp3",
+      "note": "Freesound: 599 downloads, rating 4.9."
+    },
+    "rooster-435508": {
+      "title": "Rooster Crow 1",
+      "author": "BenjaminNelan",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/BenjaminNelan/sounds/435508/",
+      "source": "https://cdn.freesound.org/previews/435/435508_1196020-hq.mp3",
+      "note": "Freesound: 4309 downloads, rating 4.8."
+    },
+    "rooster-233160": {
+      "title": "Rooster - Crow 2 - 96kHz.wav",
+      "author": "JarredGibb",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/JarredGibb/sounds/233160/",
+      "source": "https://cdn.freesound.org/previews/233/233160_4056007-hq.mp3",
+      "note": "Freesound: 684 downloads, rating 4.6."
+    },
+    "rooster-456804": {
+      "title": "Rooster Call (cock-a-doodle-doo)",
+      "author": "Breviceps",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/Breviceps/sounds/456804/",
+      "source": "https://cdn.freesound.org/previews/456/456804_9159316-hq.mp3",
+      "note": "Freesound: 562 downloads, rating 4.8."
+    },
+    "baby-chick-519193": {
+      "title": "Baby Chicks Chirp.boaay",
+      "author": "BOAAY",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/BOAAY/sounds/519193/",
+      "source": "https://cdn.freesound.org/previews/519/519193_11452660-hq.mp3",
+      "note": "Freesound: 528 downloads, rating 4.5."
+    },
+    "baby-chick-518323": {
+      "title": "DP Chick 1.wav",
+      "author": "DozyPilchard",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/DozyPilchard/sounds/518323/",
+      "source": "https://cdn.freesound.org/previews/518/518323_2250258-hq.mp3",
+      "note": "Freesound: 34 downloads, rating 0.0."
+    },
+    "baby-chick-826677": {
+      "title": "Fowl - Chicken; Baby Chick, Peep",
+      "author": "TheKingOfGeeks360",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/TheKingOfGeeks360/sounds/826677/",
+      "source": "https://cdn.freesound.org/previews/826/826677_15895934-hq.mp3",
+      "cut": {
+        "start": 4.57,
+        "duration": 2.5
+      },
+      "note": "Freesound: 119 downloads, rating 0.0."
+    },
+    "owl-398734": {
+      "title": "owl.wav",
+      "author": "Anthousai",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/Anthousai/sounds/398734/",
+      "source": "https://cdn.freesound.org/previews/398/398734_5923045-hq.mp3",
+      "cut": {
+        "start": 0.39,
+        "duration": 2.5
+      },
+      "note": "Freesound: 10239 downloads, rating 4.7."
+    },
+    "owl-69508": {
+      "title": "owl 1.wav",
+      "author": "Zixem",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/Zixem/sounds/69508/",
+      "source": "https://cdn.freesound.org/previews/69/69508_748587-hq.mp3",
+      "cut": {
+        "start": 0.0,
+        "duration": 2.5
+      },
+      "note": "Freesound: 2299 downloads, rating 3.9."
+    },
+    "owl-465697": {
+      "title": "Owl Hoot",
+      "author": "Breviceps",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/Breviceps/sounds/465697/",
+      "source": "https://cdn.freesound.org/previews/465/465697_9159316-hq.mp3",
+      "cut": {
+        "start": 1.9,
+        "duration": 2.5
+      },
+      "note": "Freesound: 15445 downloads, rating 4.7."
+    },
+    "frog-536759": {
+      "title": "Frog.ogg",
+      "author": "egomassive",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/egomassive/sounds/536759/",
+      "source": "https://cdn.freesound.org/previews/536/536759_1415754-hq.mp3",
+      "note": "Freesound: 6409 downloads, rating 4.8."
+    },
+    "frog-361117": {
+      "title": "frog_quak.mp3",
+      "author": "katzlbt",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/katzlbt/sounds/361117/",
+      "source": "https://cdn.freesound.org/previews/361/361117_914016-hq.mp3",
+      "note": "Freesound: 1933 downloads, rating 4.8."
+    },
+    "frog-354132": {
+      "title": "Frog croaking sound effect",
+      "author": "betterchinese",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/betterchinese/sounds/354132/",
+      "source": "https://cdn.freesound.org/previews/354/354132_5462031-hq.mp3",
+      "note": "Freesound: 3740 downloads, rating 4.8."
+    },
+    "monkey-417823": {
+      "title": "Monkey Imitation 3",
+      "author": "AntumDeluge",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/AntumDeluge/sounds/417823/",
+      "source": "https://cdn.freesound.org/previews/417/417823_3403708-hq.mp3",
+      "note": "Freesound: 2513 downloads, rating 4.4."
+    },
+    "monkey-588625": {
+      "title": "Monkey noise (imitation) 3",
+      "author": "wilika2",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/wilika2/sounds/588625/",
+      "source": "https://cdn.freesound.org/previews/588/588625_5661246-hq.mp3",
+      "note": "Freesound: 2384 downloads, rating 4.7."
+    },
+    "monkey-67361": {
+      "title": "Affen schreit.mp3",
+      "author": "Bidone",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/Bidone/sounds/67361/",
+      "source": "https://cdn.freesound.org/previews/67/67361_706955-hq.mp3",
+      "cut": {
+        "start": 0.21,
+        "duration": 2.5
+      },
+      "note": "Freesound: 7142 downloads, rating 4.2."
+    },
+    "wolf-398430": {
+      "title": "Wolf howl",
+      "author": "NaturesTemper",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/NaturesTemper/sounds/398430/",
+      "source": "https://cdn.freesound.org/previews/398/398430_3862281-hq.mp3",
+      "cut": {
+        "start": 0.96,
+        "duration": 2.5
+      },
+      "note": "Freesound: 18893 downloads, rating 4.8."
+    },
+    "wolf-378334": {
+      "title": "Howling wolves",
+      "author": "Kingcornz",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/Kingcornz/sounds/378334/",
+      "source": "https://cdn.freesound.org/previews/378/378334_4804147-hq.mp3",
+      "cut": {
+        "start": 3.3,
+        "duration": 2.5
+      },
+      "note": "Freesound: 5243 downloads, rating 4.0."
+    },
+    "wolf-429109": {
+      "title": "15-WolfCrying.wav",
+      "author": "cazadordoblekatana",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/cazadordoblekatana/sounds/429109/",
+      "source": "https://cdn.freesound.org/previews/429/429109_7312716-hq.mp3",
+      "cut": {
+        "start": 0.18,
+        "duration": 2.5
+      },
+      "note": "Freesound: 2425 downloads, rating 3.1."
+    },
+    "bird-511094": {
+      "title": "Happy Bird Singing",
+      "author": "se2001",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/se2001/sounds/511094/",
+      "source": "https://cdn.freesound.org/previews/511/511094_8472935-hq.mp3",
+      "note": "Freesound: 1476 downloads, rating 4.6."
+    },
+    "bird-85404": {
+      "title": "CanaryArtie-4.wav",
+      "author": "ReadeOnly",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/ReadeOnly/sounds/85404/",
+      "source": "https://cdn.freesound.org/previews/85/85404_545448-hq.mp3",
+      "note": "Freesound: 1497 downloads, rating 4.4."
+    },
+    "bird-233255": {
+      "title": "Single Bird Chirp",
+      "author": "alegemaate",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/alegemaate/sounds/233255/",
+      "source": "https://cdn.freesound.org/previews/233/233255_2531187-hq.mp3",
+      "note": "Freesound: 2414 downloads, rating 4.4."
+    },
+    "goose-805297": {
+      "title": "goose honk",
+      "author": "jahjahjahjah",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/jahjahjahjah/sounds/805297/",
+      "source": "https://cdn.freesound.org/previews/805/805297_17326459-hq.mp3",
+      "note": "Freesound: 578 downloads, rating 4.8."
+    },
+    "goose-160686": {
+      "title": "A squeaking goose",
+      "author": "antique98",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/antique98/sounds/160686/",
+      "source": "https://cdn.freesound.org/previews/160/160686_2369092-hq.mp3",
+      "cut": {
+        "start": 1.4,
+        "duration": 2.5
+      },
+      "note": "Freesound: 886 downloads, rating 4.4."
+    },
+    "goose-137764": {
+      "title": "goose.aiff",
+      "author": "helupema",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/helupema/sounds/137764/",
+      "source": "https://cdn.freesound.org/previews/137/137764_2508191-hq.mp3",
+      "cut": {
+        "start": 12.11,
+        "duration": 2.5
+      },
+      "note": "Freesound: 3035 downloads, rating 4.3."
+    },
+    "honeybee-481647": {
+      "title": "Bee Buzzing",
+      "author": "JonCon_Library",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/JonCon_Library/sounds/481647/",
+      "source": "https://cdn.freesound.org/previews/481/481647_9580304-hq.mp3",
+      "note": "Freesound: 6915 downloads, rating 4.4."
+    },
+    "honeybee-103047": {
+      "title": "BEE_buzzin_02.wav",
+      "author": "Department64",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/Department64/sounds/103047/",
+      "source": "https://cdn.freesound.org/previews/103/103047_861714-hq.mp3",
+      "note": "Freesound: 5668 downloads, rating 4.2."
+    },
+    "honeybee-466795": {
+      "title": "Bumblebee",
+      "author": "Breviceps",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/Breviceps/sounds/466795/",
+      "source": "https://cdn.freesound.org/previews/466/466795_9159316-hq.mp3",
+      "cut": {
+        "start": 0.7,
+        "duration": 2.5
+      },
+      "note": "Freesound: 1681 downloads, rating 4.4."
+    },
+    "cricket-400663": {
+      "title": "Cricket Chirp",
+      "author": "Sojan",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/Sojan/sounds/400663/",
+      "source": "https://cdn.freesound.org/previews/400/400663_5477651-hq.mp3",
+      "note": "Freesound: 2818 downloads, rating 4.8."
+    },
+    "cricket-822935": {
+      "title": "cricket chirping (slow)",
+      "author": "_sinny_",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/_sinny_/sounds/822935/",
+      "source": "https://cdn.freesound.org/previews/822/822935_14007850-hq.mp3",
+      "note": "Freesound: 511 downloads, rating 5.0."
+    },
+    "cricket-164485": {
+      "title": "Cricket 2.wav",
+      "author": "deleted_user_2104797",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/deleted_user_2104797/sounds/164485/",
+      "source": "https://cdn.freesound.org/previews/164/164485_2104797-hq.mp3",
+      "note": "Freesound: 749 downloads, rating 4.7."
+    },
+    "dove-607243": {
+      "title": "Collared Dove",
+      "author": "D4XX",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/D4XX/sounds/607243/",
+      "source": "https://cdn.freesound.org/previews/607/607243_887696-hq.mp3",
+      "note": "Freesound: 662 downloads, rating 5.0."
+    },
+    "dove-607224": {
+      "title": "Wood Pigeon Call",
+      "author": "D4XX",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/D4XX/sounds/607224/",
+      "source": "https://cdn.freesound.org/previews/607/607224_887696-hq.mp3",
+      "note": "Freesound: 1726 downloads, rating 4.9."
+    },
+    "dove-649390": {
+      "title": "pigeon territorial coo.wav",
+      "author": "5ro4",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/5ro4/sounds/649390/",
+      "source": "https://cdn.freesound.org/previews/649/649390_1629501-hq.mp3",
+      "cut": {
+        "start": 0.0,
+        "duration": 2.5
+      },
+      "note": "Freesound: 593 downloads, rating 4.8."
+    },
+    "tiger-571288": {
+      "title": "tiger_roar.wav",
+      "author": "Vaporpup",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/Vaporpup/sounds/571288/",
+      "source": "https://cdn.freesound.org/previews/571/571288_11058236-hq.mp3",
+      "note": "Freesound: 1938 downloads, rating 4.6."
+    },
+    "tiger-811790": {
+      "title": "Tiger roar female",
+      "author": "eZZin",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/eZZin/sounds/811790/",
+      "source": "https://cdn.freesound.org/previews/811/811790_2175308-hq.mp3",
+      "note": "Freesound: 1325 downloads, rating 4.7."
+    },
+    "tiger-420466": {
+      "title": "Roar.m4a",
+      "author": "tahirahg1991",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/tahirahg1991/sounds/420466/",
+      "source": "https://cdn.freesound.org/previews/420/420466_8379536-hq.mp3",
+      "note": "Freesound: 1381 downloads, rating 2.7."
+    },
+    "automobile-434878": {
+      "title": "Car Honking",
+      "author": "MicktheMicGuy",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/MicktheMicGuy/sounds/434878/",
+      "source": "https://cdn.freesound.org/previews/434/434878_3388578-hq.mp3",
+      "note": "Freesound: 13210 downloads, rating 4.6."
+    },
+    "automobile-423990": {
+      "title": "Car horn beep beep two beeps honk honk",
+      "author": "AmishRob",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/AmishRob/sounds/423990/",
+      "source": "https://cdn.freesound.org/previews/423/423990_4023430-hq.mp3",
+      "note": "Freesound: 9432 downloads, rating 4.6."
+    },
+    "automobile-182474": {
+      "title": "car horn.wav",
+      "author": "keweldog",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/keweldog/sounds/182474/",
+      "source": "https://cdn.freesound.org/previews/182/182474_3153523-hq.mp3",
+      "cut": {
+        "start": 0.56,
+        "duration": 2.5
+      },
+      "note": "Freesound: 34831 downloads, rating 4.5."
+    },
+    "locomotive-71778": {
+      "title": "Steam Whistle.mp3",
+      "author": "Bidone",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/Bidone/sounds/71778/",
+      "source": "https://cdn.freesound.org/previews/71/71778_706955-hq.mp3",
+      "note": "Freesound: 9419 downloads, rating 4.5."
+    },
+    "locomotive-539589": {
+      "title": "MP Choo Choo.wav",
+      "author": "GeraRamirez",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/GeraRamirez/sounds/539589/",
+      "source": "https://cdn.freesound.org/previews/539/539589_11822799-hq.mp3",
+      "note": "Freesound: 442 downloads, rating 5.0."
+    },
+    "locomotive-623817": {
+      "title": "single steam train chuff",
+      "author": "birdOfTheNorth",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/birdOfTheNorth/sounds/623817/",
+      "source": "https://cdn.freesound.org/previews/623/623817_12923717-hq.mp3",
+      "note": "Freesound: 801 downloads, rating 5.0."
+    },
+    "motorcycle-536730": {
+      "title": "Bike.ogg",
+      "author": "egomassive",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/egomassive/sounds/536730/",
+      "source": "https://cdn.freesound.org/previews/536/536730_1415754-hq.mp3",
+      "cut": {
+        "start": 0.87,
+        "duration": 2.5
+      },
+      "note": "Freesound: 549 downloads, rating 4.9."
+    },
+    "motorcycle-156204": {
+      "title": "motorbike-acceleration_1.wav",
+      "author": "Lau7",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/Lau7/sounds/156204/",
+      "source": "https://cdn.freesound.org/previews/156/156204_2385138-hq.mp3",
+      "cut": {
+        "start": 0.34,
+        "duration": 2.5
+      },
+      "note": "Freesound: 667 downloads, rating 4.6."
+    },
+    "motorcycle-432804": {
+      "title": "Passing motorcycle.wav",
+      "author": "JanIsAGuy",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/JanIsAGuy/sounds/432804/",
+      "source": "https://cdn.freesound.org/previews/432/432804_8388871-hq.mp3",
+      "cut": {
+        "start": 1.05,
+        "duration": 2.5
+      },
+      "note": "Freesound: 1444 downloads, rating 4.9."
+    },
+    "airplane-536809": {
+      "title": "Jet.ogg",
+      "author": "egomassive",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/egomassive/sounds/536809/",
+      "source": "https://cdn.freesound.org/previews/536/536809_1415754-hq.mp3",
+      "cut": {
+        "start": 0.12,
+        "duration": 2.5
+      },
+      "note": "Freesound: 805 downloads, rating 4.7."
+    },
+    "airplane-805169": {
+      "title": "Jet Flyby 02",
+      "author": "mrspivey",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/mrspivey/sounds/805169/",
+      "source": "https://cdn.freesound.org/previews/805/805169_17325486-hq.mp3",
+      "cut": {
+        "start": 0.82,
+        "duration": 2.5
+      },
+      "note": "Freesound: 210 downloads, rating 0.0."
+    },
+    "airplane-320395": {
+      "title": "Jet.wav",
+      "author": "Bird_man",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/Bird_man/sounds/320395/",
+      "source": "https://cdn.freesound.org/previews/320/320395_4745081-hq.mp3",
+      "note": "Freesound: 4435 downloads, rating 4.0."
+    },
+    "bicycle-383631": {
+      "title": "bicycle-bell_19.wav",
+      "author": "newagesoup",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/newagesoup/sounds/383631/",
+      "source": "https://cdn.freesound.org/previews/383/383631_4067257-hq.mp3",
+      "cut": {
+        "start": 0.02,
+        "duration": 2.5
+      },
+      "note": "Freesound: 1085 downloads, rating 4.9."
+    },
+    "bicycle-81875": {
+      "title": "Bike Bell.wav",
+      "author": "bsumusictech",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/bsumusictech/sounds/81875/",
+      "source": "https://cdn.freesound.org/previews/81/81875_791247-hq.mp3",
+      "note": "Freesound: 3489 downloads, rating 4.2."
+    },
+    "bicycle-156064": {
+      "title": "bicycle bell.wav",
+      "author": "marcolo91",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/marcolo91/sounds/156064/",
+      "source": "https://cdn.freesound.org/previews/156/156064_2365601-hq.mp3",
+      "note": "Freesound: 851 downloads, rating 4.5."
+    },
+    "rocket-521377": {
+      "title": "Rocket Launch",
+      "author": "Jarusca",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/Jarusca/sounds/521377/",
+      "source": "https://cdn.freesound.org/previews/521/521377_10847299-hq.mp3",
+      "note": "Freesound: 5752 downloads, rating 4.9."
+    },
+    "rocket-151402": {
+      "title": "Rocket Launch.wav",
+      "author": "HolyMatt123",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/HolyMatt123/sounds/151402/",
+      "source": "https://cdn.freesound.org/previews/151/151402_2741127-hq.mp3",
+      "cut": {
+        "start": 2.54,
+        "duration": 2.5
+      },
+      "note": "Freesound: 1500 downloads, rating 4.4."
+    },
+    "rocket-259285": {
+      "title": "Launch.wav",
+      "author": "Philip_Daniels",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/Philip_Daniels/sounds/259285/",
+      "source": "https://cdn.freesound.org/previews/259/259285_3151690-hq.mp3",
+      "cut": {
+        "start": 0.0,
+        "duration": 2.5
+      },
+      "note": "Freesound: 1263 downloads, rating 3.6."
+    },
+    "alarm-clock-102435": {
+      "title": "old alarm clock ringing",
+      "author": "tuberatanka",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/tuberatanka/sounds/102435/",
+      "source": "https://cdn.freesound.org/previews/102/102435_1537422-hq.mp3",
+      "note": "Freesound: 1673 downloads, rating 4.2."
+    },
+    "alarm-clock-14262": {
+      "title": "alarm_clock.wav",
+      "author": "xyzr_kx",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/xyzr_kx/sounds/14262/",
+      "source": "https://cdn.freesound.org/previews/14/14262_31076-hq.mp3",
+      "cut": {
+        "start": 0.15,
+        "duration": 2.5
+      },
+      "note": "Freesound: 11764 downloads, rating 4.1."
+    },
+    "alarm-clock-128910": {
+      "title": "Alarm Clock.wav",
+      "author": "ecfike",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/ecfike/sounds/128910/",
+      "source": "https://cdn.freesound.org/previews/128/128910_2337290-hq.mp3",
+      "cut": {
+        "start": 0.09,
+        "duration": 2.5
+      },
+      "note": "Freesound: 4027 downloads, rating 4.4."
+    },
+    "bell-116779": {
+      "title": "Ringing bell - happy.wav",
+      "author": "domrodrig",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/domrodrig/sounds/116779/",
+      "source": "https://cdn.freesound.org/previews/116/116779_1550701-hq.mp3",
+      "note": "Freesound: 14350 downloads, rating 4.6."
+    },
+    "bell-611113": {
+      "title": "bell ding 1.wav",
+      "author": "5ro4",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/5ro4/sounds/611113/",
+      "source": "https://cdn.freesound.org/previews/611/611113_1629501-hq.mp3",
+      "note": "Freesound: 10813 downloads, rating 4.6."
+    },
+    "bell-352242": {
+      "title": "handbell.wav",
+      "author": "dikt",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/dikt/sounds/352242/",
+      "source": "https://cdn.freesound.org/previews/352/352242_6498196-hq.mp3",
+      "cut": {
+        "start": 0.08,
+        "duration": 2.5
+      },
+      "note": "Freesound: 995 downloads, rating 4.6."
+    },
+    "drum-197763": {
+      "title": "drum roll",
+      "author": "owowowwo",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/owowowwo/sounds/197763/",
+      "source": "https://cdn.freesound.org/previews/197/197763_3680406-hq.mp3",
+      "note": "Freesound: 3180 downloads, rating 4.3."
+    },
+    "drum-77305": {
+      "title": "buzz roll.wav",
+      "author": "bigjoedrummer",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/bigjoedrummer/sounds/77305/",
+      "source": "https://cdn.freesound.org/previews/77/77305_1105584-hq.mp3",
+      "cut": {
+        "start": 1.03,
+        "duration": 2.5
+      },
+      "note": "Freesound: 20746 downloads, rating 4.4."
+    },
+    "drum-191718": {
+      "title": "drumroll.wav",
+      "author": "adriann",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/adriann/sounds/191718/",
+      "source": "https://cdn.freesound.org/previews/191/191718_185249-hq.mp3",
+      "cut": {
+        "start": 2.04,
+        "duration": 2.5
+      },
+      "note": "Freesound: 29479 downloads, rating 4.6."
+    },
+    "guitar-315706": {
+      "title": "AcousticGuitar-C-Chord.wav",
+      "author": "spitefuloctopus",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/spitefuloctopus/sounds/315706/",
+      "source": "https://cdn.freesound.org/previews/315/315706_4831592-hq.mp3",
+      "cut": {
+        "start": 0.06,
+        "duration": 2.5
+      },
+      "note": "Freesound: 1045 downloads, rating 4.5."
+    },
+    "guitar-188037": {
+      "title": "Guitar Strumming",
+      "author": "AntumDeluge",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/AntumDeluge/sounds/188037/",
+      "source": "https://cdn.freesound.org/previews/188/188037_3403708-hq.mp3",
+      "note": "Freesound: 1475 downloads, rating 3.4."
+    },
+    "guitar-171501": {
+      "title": "Guitar in D",
+      "author": "wkinton",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/wkinton/sounds/171501/",
+      "source": "https://cdn.freesound.org/previews/171/171501_1916456-hq.mp3",
+      "note": "Freesound: 772 downloads, rating 4.3."
+    },
+    "trumpet-369912": {
+      "title": "trumpet-E4",
+      "author": "germanio",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/germanio/sounds/369912/",
+      "source": "https://cdn.freesound.org/previews/369/369912_6627281-hq.mp3",
+      "note": "Freesound: 2473 downloads, rating 4.8."
+    },
+    "trumpet-258107": {
+      "title": "overall quality of single note - trumpet - B5",
+      "author": "fuannnakimochi",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/fuannnakimochi/sounds/258107/",
+      "source": "https://cdn.freesound.org/previews/258/258107_4795809-hq.mp3",
+      "note": "Freesound: 452 downloads, rating 4.6."
+    },
+    "trumpet-374126": {
+      "title": "Trumpet - staccato - F#4 (Sum_SHTrumpet_stac_G3_v3_rr2.wav)",
+      "author": "sgossner",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/sgossner/sounds/374126/",
+      "source": "https://cdn.freesound.org/previews/374/374126_2475994-hq.mp3",
+      "note": "Freesound: 350 downloads, rating 4.4."
+    },
+    "violin-55954": {
+      "title": "violin arco vib G5.aif",
+      "author": "ldk1609",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/ldk1609/sounds/55954/",
+      "source": "https://cdn.freesound.org/previews/55/55954_692375-hq.mp3",
+      "cut": {
+        "start": 0.0,
+        "duration": 2.5
+      },
+      "note": "Freesound: 1217 downloads, rating 4.7."
+    },
+    "violin-56228": {
+      "title": "violin spiccato G5.aif",
+      "author": "ldk1609",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/ldk1609/sounds/56228/",
+      "source": "https://cdn.freesound.org/previews/56/56228_692375-hq.mp3",
+      "note": "Freesound: 1819 downloads, rating 4.6."
+    },
+    "violin-251929": {
+      "title": "Violin_Sharp_LuckyClover_Edited.aif",
+      "author": "luckyclover",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/luckyclover/sounds/251929/",
+      "source": "https://cdn.freesound.org/previews/251/251929_4635238-hq.mp3",
+      "note": "Freesound: 1291 downloads, rating 4.5."
+    },
+    "maracas-486950": {
+      "title": "maracas",
+      "author": "nathanmanaker",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/nathanmanaker/sounds/486950/",
+      "source": "https://cdn.freesound.org/previews/486/486950_6657415-hq.mp3",
+      "cut": {
+        "start": 1.07,
+        "duration": 2.5
+      },
+      "note": "Freesound: 1349 downloads, rating 4.1."
+    },
+    "maracas-792505": {
+      "title": "Big Maraca OS 1",
+      "author": "Sadiquecat",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/Sadiquecat/sounds/792505/",
+      "source": "https://cdn.freesound.org/previews/792/792505_5287430-hq.mp3",
+      "note": "Freesound: 265 downloads, rating 4.2."
+    },
+    "maracas-204658": {
+      "title": "Maraca Rolling",
+      "author": "juancamiloorjuela",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/juancamiloorjuela/sounds/204658/",
+      "source": "https://cdn.freesound.org/previews/204/204658_2211283-hq.mp3",
+      "note": "Freesound: 388 downloads, rating 4.3."
+    },
+    "cloud-with-lightning-475094": {
+      "title": "thunder3.ogg",
+      "author": "Josh74000MC",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/Josh74000MC/sounds/475094/",
+      "source": "https://cdn.freesound.org/previews/475/475094_9608356-hq.mp3",
+      "cut": {
+        "start": 0.18,
+        "duration": 2.5
+      },
+      "note": "Freesound: 10085 downloads, rating 4.7."
+    },
+    "cloud-with-lightning-195439": {
+      "title": "strike 3 sec.wav",
+      "author": "Littlebrojay",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/Littlebrojay/sounds/195439/",
+      "source": "https://cdn.freesound.org/previews/195/195439_3634316-hq.mp3",
+      "cut": {
+        "start": 0.02,
+        "duration": 2.5
+      },
+      "note": "Freesound: 3815 downloads, rating 4.7."
+    },
+    "cloud-with-lightning-193170": {
+      "title": "thunder",
+      "author": "netaj",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/netaj/sounds/193170/",
+      "source": "https://cdn.freesound.org/previews/193/193170_3012047-hq.mp3",
+      "cut": {
+        "start": 0.85,
+        "duration": 2.5
+      },
+      "note": "Freesound: 22998 downloads, rating 3.3."
     }
   }
 }
