@@ -4,14 +4,19 @@ import { loadGame, saveGame } from '../shell/save';
 import { newSeed } from '../shell/seed';
 import { Board } from './Board';
 import { openBook } from './book';
+import { ParentArea } from './parent/ParentArea';
 import { TitleScene } from './title/TitleScene';
 import type { GameState } from '../model';
 import type { JSX } from 'solid-js';
 
-// The screens of the app: the title scene and the level (spec: title scene -> level -> reward -> title scene).
-// The level screen ends with the sticker book page. A restored level skips the title scene (spec Module 9).
+// The screens of the app: the title scene, the level (spec: title scene -> level -> reward -> title scene), and
+// the parent area. The level screen ends with the sticker book page. A restored level skips the title scene
+// (spec Module 9). The parent area opens from the title scene and goes back to it.
 
-type Screen = { readonly name: 'title' } | { readonly name: 'level'; readonly state: GameState };
+type Screen =
+  | { readonly name: 'title' }
+  | { readonly name: 'level'; readonly state: GameState }
+  | { readonly name: 'parent' };
 
 /** `restored` is the saved level that main.tsx read before the first frame, or undefined. */
 export const App = (props: { readonly restored: GameState | undefined }): JSX.Element => {
@@ -30,11 +35,13 @@ export const App = (props: { readonly restored: GameState | undefined }): JSX.El
     <>
       {(() => {
         const now = screen();
-        return now.name === 'title' ? (
-          <TitleScene onGo={play} onOpenBook={openBook} />
-        ) : (
-          <Board initial={now.state} onTitle={() => setScreen({ name: 'title' })} />
-        );
+        if (now.name === 'level') {
+          return <Board initial={now.state} onTitle={() => setScreen({ name: 'title' })} />;
+        }
+        if (now.name === 'parent') {
+          return <ParentArea onClose={() => setScreen({ name: 'title' })} />;
+        }
+        return <TitleScene onGo={play} onOpenBook={openBook} onParent={() => setScreen({ name: 'parent' })} />;
       })()}
     </>
   );

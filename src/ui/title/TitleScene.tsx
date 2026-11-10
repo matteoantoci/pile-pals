@@ -1,6 +1,7 @@
-import { onCleanup, onMount, Show } from 'solid-js';
+import { createSignal, onCleanup, onMount, Show } from 'solid-js';
 import { checkForUpdate, openSafeWindow } from '../../shell/update';
 import { GoButton } from '../go-button';
+import { ParentCheck } from '../parent/ParentCheck';
 import { Logo } from './logo';
 import { runTitleLoop } from './loop';
 import type { JSX } from 'solid-js';
@@ -9,12 +10,15 @@ import type { JSX } from 'solid-js';
 // go button. The scene waits for the Child: nothing starts the level but the go button.
 // Before the first touch, the scene is a safe point for an app update (spec Module 9). The first touch also
 // unlocks the audio: src/sound listens to the first pointer events on the document.
+// A 3-second hold on the logo shows the parent check (spec Module 11).
 
 export type TitleProps = {
   /** The go button: start the level. */
   readonly onGo: () => void;
   /** Opens the sticker book. The book icon shows only when this is set. */
   readonly onOpenBook?: () => void;
+  /** The parent check is passed: open the parent area. */
+  readonly onParent: () => void;
 };
 
 /** The book icon: a closed book with a star on the cover. */
@@ -49,6 +53,7 @@ const watchSafePoint = (): void => {
 
 export const TitleScene = (props: TitleProps): JSX.Element => {
   let stage: HTMLElement | undefined;
+  const [checking, setChecking] = createSignal(false);
   onMount(() => {
     watchSafePoint();
     if (stage) {
@@ -58,7 +63,7 @@ export const TitleScene = (props: TitleProps): JSX.Element => {
   return (
     <main class="title">
       <header class="title-top">
-        <Logo />
+        <Logo onHold={() => setChecking(true)} />
         <Show when={props.onOpenBook}>{(open) => <BookButton onOpen={open()} />}</Show>
       </header>
       <section
@@ -75,6 +80,9 @@ export const TitleScene = (props: TitleProps): JSX.Element => {
         <div class="title-pals" />
       </section>
       <GoButton onGo={() => props.onGo()} />
+      <Show when={checking()}>
+        <ParentCheck onPass={() => props.onParent()} onClose={() => setChecking(false)} />
+      </Show>
     </main>
   );
 };

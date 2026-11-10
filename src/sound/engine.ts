@@ -21,6 +21,9 @@ let decoder: OfflineAudioContext | undefined;
 const loading = new Map<string, Promise<AudioBuffer>>();
 const ready = new Map<string, AudioBuffer>();
 
+/** The sound switch of the parent area. When it is off, no clip plays. */
+let soundOn = true;
+
 /** A resume outside a user gesture can fail. The next gesture tries again, so the failure needs no action. */
 const ignore = (): undefined => undefined;
 
@@ -105,9 +108,20 @@ const start = (ctx: AudioContext, shot: Shot): void => {
   source.start();
 };
 
+/** Turns all sound effects on or off (the sound switch of the parent area, spec Module 11). */
+export const setSoundOn = (on: boolean): void => {
+  soundOn = on;
+};
+
+/** True when the sound effects play. */
+export const isSoundOn = (): boolean => soundOn;
+
 /** Plays a clip at its gain. A rate above 1 plays it higher and shorter.
- * A clip that is not decoded yet does not play, because a late sound is wrong. */
+ * A clip that is not decoded yet does not play, because a late sound is wrong. No clip plays when the sound is off. */
 export const playClip = (clip: Clip, rate = 1): void => {
+  if (!soundOn) {
+    return;
+  }
   const buffer = ready.get(clip.file);
   if (!buffer) {
     loadClip(clip.file).catch(ignore);
