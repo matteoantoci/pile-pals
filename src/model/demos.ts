@@ -1,11 +1,11 @@
 import { legalMoves } from './moves';
-import type { Action, DemoKind, GameState } from './types';
+import type { DemoKind, GameState, LevelAction } from './types';
 
 // The demo hand and the hint hop (spec, user stories 24 to 29). The model chooses the move that the hand shows
 // and the card that hops. The UI shows them, and it starts the time without action (the model has no time).
 
 /** A move that the Child can do now (a move of `legalMoves`): the hint hop and the hand show it. */
-export type Hint = Action;
+export type Hint = LevelAction;
 
 /** A demo of the hand: the action that it teaches, and the move that it shows. */
 export type Demo = { readonly kind: DemoKind; readonly move: Hint };

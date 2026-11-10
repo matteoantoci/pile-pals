@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { apply, demoFor, dropCard, hintFor, nextLevel, placeAnchor, restore, sawDemo, snapshot, start } from './index';
+import { apply, demoFor, dropCard, go, hintFor, placeAnchor, restore, sawDemo, snapshot, start } from './index';
 import { openCards, playOut } from './test-player';
 import type { DemoKind, GameEvent, GameState } from './index';
 
@@ -87,7 +87,7 @@ describe('the demos of new actions', () => {
 describe('the seen demos', () => {
   it('go to the next level with the Child', () => {
     const level1 = sawDemo(start({ level: 1 }, 5), 'first');
-    const level2 = nextLevel(playOut(level1).end);
+    const level2 = apply(playOut(level1).end, go()).state;
     expect(level2.level).toBe(2);
     expect(level2.demos).toEqual(['first']);
   });
@@ -95,6 +95,11 @@ describe('the seen demos', () => {
   it('are a flag: a second look at the same demo changes nothing', () => {
     const once = sawDemo(start({ level: 1 }, 5), 'first');
     expect(sawDemo(once, 'first')).toBe(once);
+  });
+
+  it('raise the save version: a save of version 3 has no demo flags, and the Child starts a new game', () => {
+    const { demos: _demos, ...older } = start({ level: 1 }, 5);
+    expect(restore({ version: 3, state: older, progress: { level: 1 } })).toEqual({ ok: false, reason: 'version' });
   });
 
   it('are in the save data, so a demo does not show again after a launch', () => {

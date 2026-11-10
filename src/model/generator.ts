@@ -3,6 +3,7 @@ import { difficultyOf } from './difficulty';
 import { confusable, fitsOther, groupsOfType, safeThings, thingOf } from './fairness';
 import { canFinish } from './moves';
 import { mixSeed, randomFrom } from './random';
+import { EMPTY_BOOK } from './stickers';
 import type { CatalogCard, CatalogGroup } from './catalog';
 import type { Difficulty } from './difficulty';
 import type { Random } from './random';
@@ -185,7 +186,7 @@ const tryDeal = (level: number, seed: number, attempt: number): Deal => {
   const difficulty = difficultyOf(level);
   const random = randomFrom(mixSeed(seed, level, attempt));
   const laid = layOut(chooseSetup(difficulty, random), difficulty, random);
-  return canFinish({ level, seed, ...laid, demos: [] }) ? laid : tryDeal(level, seed, attempt + 1);
+  return canFinish({ level, seed, ...laid, book: EMPTY_BOOK, demos: [] }) ? laid : tryDeal(level, seed, attempt + 1);
 };
 
 /** Deals a level. The same level number and game seed always give the same deal. */

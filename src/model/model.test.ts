@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { apply, dropCard, nextLevel, start, tapDeck } from './index';
+import { apply, dropCard, start, tapDeck } from './index';
 import { openCards, playOut } from './test-player';
 import type { Card, GameEvent, GameState, Pile } from './index';
 
@@ -171,11 +171,11 @@ describe('a full level', () => {
     ]);
   });
 
-  it('gives levelComplete with the last card of the level, and not before', () => {
+  it('gives levelComplete with the last card of the level, and not before, then the sticker', () => {
     const { events, end } = playOut(firstLevel());
 
     expect(events.filter((event) => event.type === 'levelComplete')).toHaveLength(1);
-    expect(events.at(-1)).toEqual({ type: 'levelComplete' });
+    expect(events.slice(-2).map((event) => event.type)).toEqual(['levelComplete', 'stickerAwarded']);
     expect(end.table.every((stack) => stack.cards.length === 0)).toBe(true);
     expect(end.deck).toEqual([]);
     expect(end.dealt).toBeNull();
@@ -198,35 +198,11 @@ describe('a full level', () => {
             .map((p) => p.id)
             .toSorted()
             .join() ||
-        events.at(-1)?.type !== 'levelComplete' ||
+        events.at(-2)?.type !== 'levelComplete' ||
         end.table.some((stack) => stack.cards.length > 0)
       );
     });
 
     expect(wrong.map((s) => `level ${String(s.level)} seed ${String(s.seed)}`)).toEqual([]);
-  });
-});
-
-describe('nextLevel', () => {
-  it('deals the next level after levelComplete', () => {
-    const { end } = playOut(firstLevel());
-
-    const next = nextLevel(end);
-
-    expect(next.level).toBe(2);
-    expect(next.table.length).toBeGreaterThan(0);
-    expect(next.piles.every((pile) => pile.cards.length === 0)).toBe(true);
-  });
-
-  it('deals the same level as a new start of that level with the same seed', () => {
-    const { end } = playOut(start({ level: 6 }, 99));
-
-    expect(nextLevel(end)).toEqual(start({ level: 7 }, 99));
-  });
-
-  it('keeps a level that is not finished', () => {
-    const state = firstLevel();
-
-    expect(nextLevel(state)).toBe(state);
   });
 });

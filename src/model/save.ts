@@ -1,19 +1,31 @@
 // The save data of the game. All data is plain JSON, so localStorage and a save code can hold it.
 // The UI stores it after each resolved move (research/native-feel/shell.md §3).
 
-import type { Card, DemoKind, GameState, Pile, Progress, Stack, TableCard } from './types';
+import type {
+  Book,
+  Card,
+  DemoKind,
+  GameState,
+  Pile,
+  PlacedSticker,
+  Position,
+  Progress,
+  Stack,
+  TableCard,
+} from './types';
 
 /**
  * The schema version of `SaveData`. A save with another version is not read.
  * Raise this number when `restore` cannot read the data of the older version.
  */
-export const SAVE_VERSION = 2;
+export const SAVE_VERSION = 4;
 
 /**
  * The data of one save.
  * `state` is the level that the Child plays, whole: the deal, not only the seed.
- * `progress` is what the Child finished. Later tickets add the stickers and their positions on each page.
- * The flags of the demos that the Child already saw are in `state.demos`.
+ * `progress` is what the Child finished. The sticker book (the stickers, gold flags, and their places on each
+ * page) is in `state.book`, because `apply` changes it. The flags of the demos that the Child already saw are in
+ * `state.demos`.
  */
 export type SaveData = {
   readonly version: number;
@@ -88,12 +100,46 @@ const hasDeck = (value: unknown): value is { readonly deck: readonly Card[]; rea
   'dealt' in value &&
   (value.dealt === null || isCard(value.dealt));
 
-const DEMO_KINDS: readonly unknown[] = ['first', 'faceDown', 'anchor', 'deck'] satisfies readonly DemoKind[];
-
-/** The demos that the Child saw: a list of demo kinds. */
-const hasDemos = (value: unknown): value is { readonly demos: readonly DemoKind[] } =>
+const isPosition = (value: unknown): value is Position =>
   typeof value === 'object' &&
   value !== null &&
+  'x' in value &&
+  typeof value.x === 'number' &&
+  'y' in value &&
+  typeof value.y === 'number';
+
+/** The `pal` and `gold` fields of a sticker. */
+const isSticker = (value: unknown): value is { readonly pal: string; readonly gold: boolean } =>
+  typeof value === 'object' &&
+  value !== null &&
+  'pal' in value &&
+  typeof value.pal === 'string' &&
+  'gold' in value &&
+  typeof value.gold === 'boolean';
+
+const isPlaced = (value: unknown): value is PlacedSticker => isSticker(value) && 'at' in value && isPosition(value.at);
+
+/** The new sticker that waits for the Child, or null. Its place is null until the Child drags it. */
+const isAward = (value: unknown): value is Book['award'] =>
+  value === null || (isSticker(value) && 'at' in value && (value.at === null || isPosition(value.at)));
+
+const isBook = (value: unknown): value is Book =>
+  typeof value === 'object' &&
+  value !== null &&
+  'pages' in value &&
+  Array.isArray(value.pages) &&
+  value.pages.every((page) => Array.isArray(page) && page.every(isPlaced)) &&
+  'award' in value &&
+  isAward(value.award);
+
+const DEMO_KINDS: readonly unknown[] = ['first', 'faceDown', 'anchor', 'deck'] satisfies readonly DemoKind[];
+
+/** The fields that go with the Child from level to level: the sticker book and the demos that the Child saw. */
+const hasCarried = (value: unknown): value is Pick<GameState, 'book' | 'demos'> =>
+  typeof value === 'object' &&
+  value !== null &&
+  'book' in value &&
+  isBook(value.book) &&
   'demos' in value &&
   Array.isArray(value.demos) &&
   value.demos.every((kind) => DEMO_KINDS.includes(kind));
@@ -111,7 +157,7 @@ const isState = (value: unknown): value is GameState =>
   Array.isArray(value.piles) &&
   value.piles.every(isPile) &&
   hasDeck(value) &&
-  hasDemos(value);
+  hasCarried(value);
 
 const isProgress = (value: unknown): value is Progress =>
   typeof value === 'object' && value !== null && 'level' in value && typeof value.level === 'number';

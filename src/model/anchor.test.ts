@@ -205,7 +205,7 @@ describe('the dead-end check with category cards', () => {
         looseCards(end).length > 0 ||
         end.piles.some((pile) => pile.group === null) ||
         events.filter((event) => event.type === 'anchorPlaced').length !== emptySlots(state).length ||
-        events.at(-1)?.type !== 'levelComplete'
+        events.at(-2)?.type !== 'levelComplete'
       );
     });
 
