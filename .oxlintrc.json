@@ -7,5 +7,11 @@
   "ignorePatterns": ["dist/**", "dev-dist/**", "research/**", ".scratch/**"],
   "options": {
     "reportUnusedDisableDirectives": "error"
-  }
+  },
+  "overrides": [
+    {
+      "files": ["src/sound/levels.ts"],
+      "rules": { "max-lines": "off" }
+    }
+  ]
 }

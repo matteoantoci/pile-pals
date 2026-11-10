@@ -3,3 +3,7 @@ dist/
 dev-dist/
 *.tsbuildinfo
 .DS_Store
+
+# Download cache of scripts/audio/prep.py
+.cache/
+__pycache__/

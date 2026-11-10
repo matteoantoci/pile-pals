@@ -1,0 +1,204 @@
+{
+  "sections": [
+    {
+      "name": "Card sounds",
+      "slots": [
+        {
+          "id": "snap",
+          "name": "Snap",
+          "status": "doubt",
+          "pick": "kalimba-g4",
+          "candidates": ["kalimba-g4", "pizzicato-d6", "music-box-note"],
+          "why": "Three plucked notes with a different colour. The kalimba starts at once and its ring falls 20 dB in 0.15 s. The pizzicato is the short choice (0.36 s). Nobody listened yet."
+        },
+        {
+          "id": "lift",
+          "name": "Lift",
+          "status": "doubt",
+          "pick": "bubble-pop",
+          "candidates": ["bubble-pop", "card-slide-2", "card-slide-4"],
+          "why": "The spec names Bubble Pop for the lift. The two Kenney card slides have a short and sharp attack. Nobody listened yet."
+        },
+        {
+          "id": "wrong",
+          "name": "Wrong drop",
+          "status": "sure",
+          "pick": "boing-2",
+          "candidates": ["boing-2"],
+          "why": "The spec names Boing 2 from labrynth2. The Parent heard it in labrynth2."
+        },
+        {
+          "id": "flip",
+          "name": "Flip",
+          "status": "doubt",
+          "pick": "card-place-1",
+          "candidates": ["card-place-1", "card-place-2", "card-slide-5"],
+          "why": "Kenney card sounds with the shortest body (0.13 s to 0.24 s). The game has no flip yet (ticket 06)."
+        },
+        {
+          "id": "deck",
+          "name": "Deck tap",
+          "status": "doubt",
+          "pick": "cards-pack-take-out-1",
+          "candidates": ["cards-pack-take-out-1", "card-shove-1", "card-fan-1"],
+          "why": "Cards come out of the deck. The fan has a slow start (0.58 s to the peak). The game has no deck yet (ticket 06)."
+        },
+        {
+          "id": "group",
+          "name": "Group complete",
+          "status": "doubt",
+          "pick": "tada-fanfare-a",
+          "candidates": ["tada-fanfare-a", "victory-chime", "chimes-success-4"],
+          "why": "A short ta-da and two chimes. The ta-da has brass, as the level fanfare. The game has no group event yet (ticket 08)."
+        },
+        {
+          "id": "level",
+          "name": "Level complete",
+          "status": "sure",
+          "pick": "success-fanfare-trumpets",
+          "candidates": ["success-fanfare-trumpets"],
+          "why": "The spec names the labrynth2 fanfare, with the same cut at 3.7 s and the 0.5 s fade-out. The game has no level event yet (ticket 08)."
+        }
+      ]
+    }
+  ],
+  "clips": {
+    "kalimba-g4": {
+      "title": "G4 soft - kalimba",
+      "author": "hollandm",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/hollandm/sounds/691805/",
+      "source": "https://cdn.freesound.org/previews/691/691805_5309408-hq.mp3",
+      "note": "Thumb piano, soft G4 with a long ring."
+    },
+    "pizzicato-d6": {
+      "title": "Pizzicato D6.wav",
+      "author": "Shōtotsu",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/Sh%C5%8Dtotsu/sounds/688662/",
+      "source": "https://cdn.freesound.org/previews/688/688662_14999894-hq.mp3",
+      "note": "Plucked violin string, D6, short."
+    },
+    "music-box-note": {
+      "title": "Music box note",
+      "author": "thomasjaunism",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/thomasjaunism/sounds/218459/",
+      "source": "https://cdn.freesound.org/previews/218/218459_3344538-hq.mp3",
+      "note": "One music box comb note."
+    },
+    "bubble-pop": {
+      "title": "Bubble Pop",
+      "author": "YehawSnail",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/YehawSnail/sounds/683587/",
+      "source": "https://cdn.freesound.org/previews/683/683587_12375565-hq.mp3",
+      "note": "labrynth2 item.wav."
+    },
+    "card-slide-2": {
+      "title": "Casino Audio",
+      "author": "Kenney",
+      "licence": "CC0-1.0",
+      "page": "https://kenney.nl/assets/casino-audio",
+      "source": "kenney:casino-audio/Audio/card-slide-2.ogg",
+      "note": "card-slide-2.ogg, short tick."
+    },
+    "card-slide-4": {
+      "title": "Casino Audio",
+      "author": "Kenney",
+      "licence": "CC0-1.0",
+      "page": "https://kenney.nl/assets/casino-audio",
+      "source": "kenney:casino-audio/Audio/card-slide-4.ogg",
+      "note": "card-slide-4.ogg, short and bright."
+    },
+    "boing-2": {
+      "title": "Boing 2",
+      "author": "magnuswaker",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/magnuswaker/sounds/540790/",
+      "source": "https://cdn.freesound.org/previews/540/540790_11537497-hq.mp3",
+      "note": "labrynth2 wall.wav."
+    },
+    "card-place-1": {
+      "title": "Casino Audio",
+      "author": "Kenney",
+      "licence": "CC0-1.0",
+      "page": "https://kenney.nl/assets/casino-audio",
+      "source": "kenney:casino-audio/Audio/card-place-1.ogg",
+      "note": "card-place-1.ogg, short flick."
+    },
+    "card-place-2": {
+      "title": "Casino Audio",
+      "author": "Kenney",
+      "licence": "CC0-1.0",
+      "page": "https://kenney.nl/assets/casino-audio",
+      "source": "kenney:casino-audio/Audio/card-place-2.ogg",
+      "note": "card-place-2.ogg."
+    },
+    "card-slide-5": {
+      "title": "Casino Audio",
+      "author": "Kenney",
+      "licence": "CC0-1.0",
+      "page": "https://kenney.nl/assets/casino-audio",
+      "source": "kenney:casino-audio/Audio/card-slide-5.ogg",
+      "note": "card-slide-5.ogg, darker."
+    },
+    "cards-pack-take-out-1": {
+      "title": "Casino Audio",
+      "author": "Kenney",
+      "licence": "CC0-1.0",
+      "page": "https://kenney.nl/assets/casino-audio",
+      "source": "kenney:casino-audio/Audio/cards-pack-take-out-1.ogg",
+      "note": "cards-pack-take-out-1.ogg."
+    },
+    "card-shove-1": {
+      "title": "Casino Audio",
+      "author": "Kenney",
+      "licence": "CC0-1.0",
+      "page": "https://kenney.nl/assets/casino-audio",
+      "source": "kenney:casino-audio/Audio/card-shove-1.ogg",
+      "note": "card-shove-1.ogg, quick start."
+    },
+    "card-fan-1": {
+      "title": "Casino Audio",
+      "author": "Kenney",
+      "licence": "CC0-1.0",
+      "page": "https://kenney.nl/assets/casino-audio",
+      "source": "kenney:casino-audio/Audio/card-fan-1.ogg",
+      "note": "card-fan-1.ogg, slow start."
+    },
+    "tada-fanfare-a": {
+      "title": "Tada Fanfare A",
+      "author": "plasterbrain",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/plasterbrain/sounds/397355/",
+      "source": "https://cdn.freesound.org/previews/397/397355_4284968-hq.mp3",
+      "note": "Short brass ta-da."
+    },
+    "victory-chime": {
+      "title": "victory chime",
+      "author": "1bob",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/1bob/sounds/717771/",
+      "source": "https://cdn.freesound.org/previews/717/717771_11611892-hq.mp3",
+      "note": "Short chime, a little like a coin."
+    },
+    "chimes-success-4": {
+      "title": "GASP_Chimes_Success_4.wav",
+      "author": "Rob_Marion",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/Rob_Marion/sounds/541985/",
+      "source": "https://cdn.freesound.org/previews/541/541985_6856600-hq.mp3",
+      "note": "Chimes."
+    },
+    "success-fanfare-trumpets": {
+      "title": "Success Fanfare Trumpets.mp3",
+      "author": "FunWithSound",
+      "licence": "CC0-1.0",
+      "page": "https://freesound.org/people/FunWithSound/sounds/456966/",
+      "source": "https://cdn.freesound.org/previews/456/456966_6456158-hq.mp3",
+      "cut": { "start": 0, "duration": 3.7, "fadeOut": 0.5 },
+      "note": "labrynth2 goal.wav."
+    }
+  }
+}
