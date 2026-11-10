@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { apply, dropCard, start, tapDeck } from './index';
-import { openCards, playOut } from './test-player';
+import { apply, dropCard, openCards, start, tapDeck } from './index';
+import { playOut } from './test-player';
 import type { Card, GameEvent, GameState, Pile } from './index';
 
 const firstLevel = (): GameState => start({ level: 1 }, 1);

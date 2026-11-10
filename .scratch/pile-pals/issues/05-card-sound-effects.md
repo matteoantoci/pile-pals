@@ -60,3 +60,10 @@ Open:
 
 - Flip, deck, group complete, and level complete ship and have a slot, but the model has no `flipped`, `dealt`, `groupComplete`, or `levelComplete` event yet. Tickets 06 and 08 add a case to `playEventSound`.
 - The silent switch, the heal after a lock or a phone call, and the iPhone speaker level are device checks of ticket 16. The headless check (Chromium) showed one `AudioContext`, snap note 0 at rate 1 and note 1 at rate 1.1225, the wrong drop at −4.5 dB, the start after a suspended context, and `audioSession.type` set to `playback`.
+
+**2026-11-10, agent (branch `ticket/review-fixes`, code review 1).** The snap now uses the `-6 - TP` rule at each length, as the acceptance box says ("The snap and the pluck use this rule"). Before, `prep.py` chose the rule by the file length only, so the kalimba (2.5 s) got the `-1 - TP` limit. `gain_for` now gives the rule `pluck` to each snap candidate. The project has no other pluck slot: the snap is the pluck. Results of `python3 scripts/audio/prep.py`:
+
+- The kalimba gain goes from +8.2 dB to +3.2 dB, so its true peak is −6.0 dBTP. Its maximum momentary loudness M goes from −21.1 to −26.1 LUFS.
+- The snap limit lowers each other file to M ≤ −26.1 LUFS, so all sounds are about 5 dB quieter than before. The WAV files did not change (the gain is not in the file). Only `src/sound/levels.ts` changed.
+- An independent measurement of each shipped file (`ffmpeg -af ebur128=peak=true`, and `volume=<gain>dB,apad=whole_dur=0.4,ebur128=peak=true` for M) gives the I and TP of `levels.ts`, the snap at −6.0 dBTP, and no file above the M of the snap.
+- The level on the iPhone speaker stays a device check of ticket 16.

@@ -1,15 +1,15 @@
 import { createSignal, For, onCleanup, onMount, Show } from 'solid-js';
-import { apply, dropCard, isFinished, placeAnchor, tapDeck } from '../model';
+import { apply, dropCard, isFinished, openCards, placeAnchor, tapDeck } from '../model';
 import { watchLifecycle } from '../shell/lifecycle';
 import { saveGame } from '../shell/save';
-import { applyUpdateIfWaiting, checkForUpdate } from '../shell/update';
+import { checkForUpdate } from '../shell/update';
 import { RewardPage } from './book';
 import { celebrateLevel, parade } from './celebration';
 import { startCoach } from './coach';
 import { cancelDrag } from './drag';
 import { stillUrl } from './pictures';
 import { playEventSounds } from './sounds';
-import { raiseCard, TableView } from './table';
+import { hasDeck, raiseCard, TableView } from './table';
 import type { Action, CardId, GameState, Outcome, Pile, PileId } from '../model';
 import type { Coach } from './coach';
 import type { Hooks, Target } from './drag';
@@ -35,7 +35,7 @@ const pileTargets = (): readonly Target[] =>
  * A "place" is a stack of the table or the deck. The numbers keep the table within three rows of its size.
  */
 const sizeOf = (deal: GameState): string => {
-  const places = deal.table.length + (deal.deck.length > 0 ? 1 : 0);
+  const places = deal.table.length + (hasDeck(deal) ? 1 : 0);
   if (deal.piles.length > 3 || places > 12) {
     return 'small';
   }
@@ -55,12 +55,10 @@ const PileView = (props: { pile: Pile }): JSX.Element => (
 );
 
 /** The action of a drop: a category card goes on a slot, and a picture card goes on a pile. The model decides. */
-const dropAction = (state: GameState, cardId: CardId, pileId: PileId): Action => {
-  const open = [...state.table.flatMap((stack) => stack.cards), ...(state.dealt ? [state.dealt] : [])];
-  return open.some((card) => card.id === cardId && card.anchor)
+const dropAction = (state: GameState, cardId: CardId, pileId: PileId): Action =>
+  openCards(state).some((card) => card.id === cardId && card.anchor)
     ? placeAnchor(cardId, pileId)
     : dropCard(cardId, pileId);
-};
 
 /** What the hooks need from the board: the newest state, the way to draw it, the coach, and the book page. */
 type Game = {
@@ -108,7 +106,7 @@ const cardHooks = (game: Game, cardId: CardId): Hooks => {
 
 /** What the board draws, and the inputs of the table and of the sticker book page. */
 type Levels = {
-  readonly dealt: Accessor<GameState>;
+  readonly initial: Accessor<GameState>;
   readonly state: Accessor<GameState>;
   readonly reward: Accessor<boolean>;
   readonly hooksFor: (cardId: CardId) => Hooks;
@@ -154,7 +152,7 @@ const playLevels = (first: GameState): Levels => {
   };
 
   return {
-    dealt: () => first,
+    initial: () => first,
     state,
     reward,
     hooksFor: (cardId) => cardHooks(game, cardId),
@@ -174,7 +172,7 @@ const playLevels = (first: GameState): Levels => {
  * holds the next level, and the app shows the title scene (spec: level -> reward -> title scene).
  */
 export const Board = (props: { readonly initial: GameState; readonly onTitle: () => void }): JSX.Element => {
-  const { dealt, state, reward, hooksFor, onTapDeck, act, current, coach } = playLevels(props.initial);
+  const { initial, state, reward, hooksFor, onTapDeck, act, current, coach } = playLevels(props.initial);
   onMount(() => {
     const stop = watchLifecycle({
       hidden: () => {
@@ -191,19 +189,17 @@ export const Board = (props: { readonly initial: GameState; readonly onTitle: ()
       stop();
       coach.stop();
     });
-    // A safe point for a waiting update: the level starts and nobody has touched it yet.
-    applyUpdateIfWaiting();
     coach.rest();
   });
 
   // The table draws each dealt card in a fixed place. A card that left the table stays hidden in its place,
   // so the other cards do not move under the finger.
   return (
-    <main class="board" data-size={sizeOf(dealt())}>
+    <main class="board" data-size={sizeOf(initial())}>
       <section class="piles">
         <For each={state().piles}>{(pile) => <PileView pile={pile} />}</For>
       </section>
-      <TableView dealt={dealt} state={state} hooksFor={hooksFor} onTapDeck={onTapDeck} />
+      <TableView initial={initial} state={state} hooksFor={hooksFor} onTapDeck={onTapDeck} />
       <Show when={reward()}>
         <RewardPage book={state().book} act={act} done={props.onTitle} />
       </Show>

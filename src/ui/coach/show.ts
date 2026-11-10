@@ -1,7 +1,7 @@
-// The rounds of the demo hand. Numbers: note 04 ("Demo hand") and research/native-feel/motion.md.
+// The rounds of the demo hand. Numbers: research/native-feel/motion.md, and a slow spring (1.2 s, no bounce).
 // Ticket 16 tunes the felt values on the iPhone. Change a value here only.
 
-import { facePose, land, lift, settle, springTo, translate3d } from '../motion';
+import { canceled, facePose, land, lift, ORIGIN, settle, springTo, translate3d } from '../motion';
 import { cardOf, centreOf, copyOf, deckOf, handOf, pileFaceOf } from './parts';
 import type { Hint } from '../../model';
 import type { CardParts, Spring, Vec } from '../motion';
@@ -20,15 +20,12 @@ const FADE_MS = 250;
 const ROUND_GAP_MS = 700;
 /** The hand comes in from below and to the right of the point. */
 const COME_IN_FROM: Vec = { x: 40, y: 70 };
-const ORIGIN: Vec = { x: 0, y: 0 };
 const UP = facePose({});
 const PRESSED = facePose({ scale: 0.86 });
 const DECK_PRESSED = facePose({ scale: 0.95 });
 
 type Hand = { readonly hand: HTMLElement; readonly body: HTMLElement };
 type Round = () => Promise<void>;
-
-const canceled = (): void => undefined;
 
 /** Waits for the animation. A canceled animation rejects, so a stopped run ends here. */
 const done = (animation: Animation): Promise<unknown> => animation.finished;

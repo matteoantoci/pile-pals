@@ -18,8 +18,7 @@ Spec: [spec.md](../spec.md)
 
 ## Comments
 
-Built the sticker rules in the game model and the sticker book page in `src/ui/book/`. Shared notes:
-`~/.cache/pile-pals-impl/notes/11-sticker-book.md`.
+Built the sticker rules in the game model and the sticker book page in `src/ui/book/`.
 
 - **Model.** `GameState.book` holds the pages (a page is a list of placed stickers) and `award`, the new sticker
   that waits for `go`. The drop that gives `levelComplete` also gives `stickerAwarded` (and `bookComplete` at

@@ -1,8 +1,8 @@
 // The public interface of the game model. The UI and the tests import only from this file.
 // The model is pure TypeScript: no DOM, no time, no audio.
 
-export { dropCard, placeAnchor, tapDeck } from './apply';
-export { catalog, pictureOf } from './catalog';
+export { dropCard, openCards, placeAnchor, tapDeck } from './apply';
+export { catalog, palSize, pictureOf } from './catalog';
 export { apply, go, isFinished, placeSticker } from './game';
 export { demoFor, hintFor, sawDemo } from './demos';
 export type { Demo, Hint } from './demos';
@@ -15,7 +15,7 @@ export type { ParentProblem } from './parent';
 export { readSaveCode, saveCode } from './save-code';
 export type { TitlePile, TitleScene } from './title';
 export type { RestoreFailure, RestoreResult, RestoredGame, SaveData } from './save';
-export type { Catalog, CatalogCard, CatalogGroup, Picture } from './catalog';
+export type { Catalog, CatalogCard, CatalogGroup, PalSize, Picture } from './catalog';
 export type {
   Action,
   Book,

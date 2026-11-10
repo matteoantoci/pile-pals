@@ -1,4 +1,5 @@
 import data from './catalog.json';
+import sizes from './pal-sizes.json';
 import type { GroupId, PictureId } from './types';
 
 // The content catalog. research/content/build_content.py writes catalog.json. Do not edit it by hand.
@@ -59,3 +60,19 @@ export const pictureOf = (id: PictureId): Picture => {
   }
   return picture;
 };
+
+/**
+ * The real size of the thing of a pal: small (ant), middle (alarm clock), or large (airplane). A pal with no own
+ * sound plays the pop at a high, middle, or low pitch for its size.
+ */
+export type PalSize = 'S' | 'M' | 'L';
+
+const PAL_SIZES: readonly PalSize[] = ['S', 'M', 'L'];
+
+/** pal-sizes.json holds the tags by hand (ticket 13). Each pal of the catalog has one tag. */
+const sizeOf: ReadonlyMap<PictureId, PalSize> = new Map(
+  PAL_SIZES.flatMap((size) => sizes[size].map((id) => [id, size] as const))
+);
+
+/** The size tag of a pal, or null for a picture that is not a pal. */
+export const palSize = (id: PictureId): PalSize | null => sizeOf.get(id) ?? null;

@@ -1,23 +1,13 @@
 // The drag of one card. Rules from research/native-feel/motion.md:
-// - pointermove writes the transform of `.card` directly. No requestAnimationFrame, no framework state.
+// - pointermove writes the transform of `.card` directly (./hold.ts). No requestAnimationFrame, no framework state.
 // - The card has `touch-action: none` (styles.css) and takes the pointer with setPointerCapture.
 // - All other motion goes through ./motion: WAAPI on `transform` and `opacity` only.
 // - The drag knows no game rule. `Hooks.drop` asks the model.
 
-import {
-  freeze,
-  land,
-  LANDING,
-  lift,
-  releaseVelocity,
-  restPose,
-  RETURN,
-  shake,
-  springTo,
-  stop,
-  translate3d,
-} from './motion';
-import type { CardParts, Sample, Vec } from './motion';
+import { pointerHold } from './hold';
+import { canceled, land, LANDING, lift, ORIGIN, restPose, RETURN, shake, springTo, stop, translate3d } from './motion';
+import type { Holder, HoldEnd } from './hold';
+import type { CardParts, Vec } from './motion';
 
 /** A place where a card can land. `at` is the viewport point where the card centre lands. */
 export type Target = { readonly id: string; readonly at: Vec };
@@ -35,26 +25,12 @@ export type Hooks = {
 const MAGNET_PX = 120;
 /** At the target centre, the magnet moves the card half of the way to the target. */
 const MAX_PULL = 0.5;
-const SAMPLES = 8;
-const ORIGIN: Vec = { x: 0, y: 0 };
 
 type Piece = { readonly card: HTMLElement; readonly parts: CardParts };
 type Near = { readonly target: Target; readonly distance: number };
 
-/** A held card. `grab` is the finger minus the translate. `home` is the card centre at translate 0. */
-type Hold = { readonly pointer: number; readonly grab: Vec; readonly home: Vec; readonly targets: readonly Target[] };
-
-/** The values that the pointer listeners of one card share. `active` points at the drag that runs now. */
-type Drag = {
-  readonly piece: Piece;
-  hold: Hold | undefined;
-  raw: Vec;
-  at: Vec;
-  samples: Sample[];
-};
-
-/** A canceled animation rejects its `finished` promise. The next drag then owns the card. */
-const canceled = (): void => undefined;
+/** The drag that runs now: its card, and the hold that the shell can stop. */
+type Drag = { readonly piece: Piece; readonly holder: Holder };
 
 let active: Drag | undefined;
 
@@ -64,8 +40,8 @@ export const cancelDrag = (): void => {
   if (!drag) {
     return;
   }
-  drag.hold = undefined;
   active = undefined;
+  drag.holder.forget();
   stop(drag.piece.card);
   drag.piece.card.style.setProperty('transform', translate3d(ORIGIN));
   drag.piece.card.classList.remove('lifted');
@@ -80,9 +56,9 @@ const nearest = (targets: readonly Target[], center: Vec): Near | undefined =>
     .reduce<Near | undefined>((best, near) => (best && best.distance <= near.distance ? best : near), undefined);
 
 /** Gives the drawn translate. Near a target, the card moves part of the way from the finger to the target. */
-const pulled = (hold: Hold, raw: Vec): Vec => {
-  const center = { x: hold.home.x + raw.x, y: hold.home.y + raw.y };
-  const near = nearest(hold.targets, center);
+const pulled = (home: Vec, targets: readonly Target[], raw: Vec): Vec => {
+  const center = { x: home.x + raw.x, y: home.y + raw.y };
+  const near = nearest(targets, center);
   if (!near) {
     return raw;
   }
@@ -118,13 +94,13 @@ const snap = (piece: Piece, move: { from: Vec; to: Vec; velocity: Vec }, landed:
   Promise.all([spring.animation.finished, land(piece.parts, spring.crossing)]).then(landed, landed);
 };
 
-/** The card where the finger let go: the hold, the finger translate, the drawn translate, and the release speed. */
-type LetGo = { readonly hold: Hold; readonly raw: Vec; readonly at: Vec; readonly velocity: Vec };
+/** The end of a hold, and the targets that the drag read at `pointerdown`. */
+type LetGo = HoldEnd & { readonly targets: readonly Target[] };
 
 /** Picks the move after a release: no target in reach, a wrong drop, or a snap. */
 const release = (piece: Piece, letGo: LetGo, hooks: Hooks): void => {
-  const { hold, raw, at, velocity } = letGo;
-  const near = nearest(hold.targets, { x: hold.home.x + raw.x, y: hold.home.y + raw.y });
+  const { hold, raw, at, velocity, targets } = letGo;
+  const near = nearest(targets, { x: hold.home.x + raw.x, y: hold.home.y + raw.y });
   if (!near) {
     goHome(piece, at, velocity);
     return;
@@ -137,74 +113,27 @@ const release = (piece: Piece, letGo: LetGo, hooks: Hooks): void => {
   snap(piece, { from: at, to, velocity }, hooks.landed);
 };
 
-/** Lifts the card under the finger. Returns the hold and the translate where the card was. */
-const pickUp = (piece: Piece, event: PointerEvent, targets: readonly Target[]): { hold: Hold; from: Vec } => {
-  const { card } = piece;
-  const from = freeze(card);
-  lift(piece.parts);
-  card.setPointerCapture(event.pointerId);
-  card.classList.add('lifted');
-  const box = card.getBoundingClientRect();
-  const home = { x: box.left + box.width / 2 - from.x, y: box.top + box.height / 2 - from.y };
-  const grab = { x: event.clientX - from.x, y: event.clientY - from.y };
-  return { hold: { pointer: event.pointerId, grab, home, targets }, from };
-};
-
-/** The hold of a drag when the pointer of that hold goes up. */
-const endedHold = (drag: Drag, event: PointerEvent): Hold | undefined =>
-  event.pointerId === drag.hold?.pointer ? drag.hold : undefined;
-
-/** Forgets the drag when it ends, so the shell has nothing to cancel. */
-const forget = (drag: Drag): void => {
-  if (active === drag) {
-    active = undefined;
-  }
-};
-
 /** Makes the card draggable with one finger. */
 export const draggable = (card: HTMLElement, hooks: Hooks): void => {
   const piece = { card, parts: partsOf(card) };
-  const drag: Drag = { piece, hold: undefined, raw: ORIGIN, at: ORIGIN, samples: [] };
-
-  card.addEventListener('pointerdown', (event) => {
-    if (drag.hold) {
-      return;
-    }
-    const picked = pickUp(piece, event, hooks.targets());
-    drag.hold = picked.hold;
-    drag.raw = picked.from;
-    drag.at = picked.from;
-    drag.samples = [{ t: event.timeStamp, ...picked.from }];
-    active = drag;
-  });
-
-  card.addEventListener('pointermove', (event) => {
-    const { hold } = drag;
-    if (!hold || event.pointerId !== hold.pointer) {
-      return;
-    }
-    drag.raw = { x: event.clientX - hold.grab.x, y: event.clientY - hold.grab.y };
-    drag.at = pulled(hold, drag.raw);
-    drag.samples = [...drag.samples.slice(1 - SAMPLES), { t: event.timeStamp, ...drag.at }];
-    card.style.setProperty('transform', translate3d(drag.at));
-  });
-
-  card.addEventListener('pointerup', (event) => {
-    const ended = endedHold(drag, event);
-    drag.hold = ended ? undefined : drag.hold;
-    forget(drag);
-    if (ended) {
-      const velocity = releaseVelocity(drag.samples, event.timeStamp);
-      release(piece, { hold: ended, raw: drag.raw, at: drag.at, velocity }, hooks);
-    }
-  });
-
-  card.addEventListener('pointercancel', (event) => {
-    const ended = endedHold(drag, event);
-    drag.hold = ended ? undefined : drag.hold;
-    forget(drag);
-    if (ended) {
-      goHome(piece, drag.at, ORIGIN);
-    }
+  let targets: readonly Target[] = [];
+  const holder: Holder = pointerHold(card, {
+    start: () => {
+      lift(piece.parts);
+      targets = hooks.targets();
+      active = { piece, holder };
+    },
+    draw: (hold, raw) => pulled(hold.home, targets, raw),
+    end: (end) => {
+      // The drag ended, so the shell has nothing to cancel.
+      if (active?.piece === piece) {
+        active = undefined;
+      }
+      if (end.letGo) {
+        release(piece, { ...end, targets }, hooks);
+        return;
+      }
+      goHome(piece, end.at, ORIGIN);
+    },
   });
 };

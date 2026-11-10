@@ -130,6 +130,11 @@ html[data-restoring] * {
   height: var(--mini);
 }
 
+/* A completed group left the table in its parade (src/ui/celebration/parade.ts). The pile face stays. */
+.pile.paraded .pile-card {
+  visibility: hidden;
+}
+
 /*
  * The stacks of the table. The cards of a stack share one place: the card below peeks above the card on top of it.
  * A card that left the table keeps its place (`.gone`), so the other cards do not move.

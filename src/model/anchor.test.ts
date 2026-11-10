@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { apply, dropCard, placeAnchor, start } from './index';
-import { openCards, playOut } from './test-player';
+import { apply, dropCard, openCards, placeAnchor, start } from './index';
+import { playOut } from './test-player';
 import type { Card, GameState, Pile } from './index';
 
 // The category cards that the Child places (spec, Module 2). The tests use the public interface only.

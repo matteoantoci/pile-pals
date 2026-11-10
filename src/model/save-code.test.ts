@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { apply, placeAnchor, readSaveCode, saveCode, snapshot, start } from './index';
-import { openCards, playOut } from './test-player';
+import { apply, openCards, placeAnchor, readSaveCode, saveCode, snapshot, start } from './index';
+import { playOut } from './test-player';
 import type { GameState, RestoredGame } from './index';
 
 /** A level with an empty slot, a placed category card, face-down cards, and a deck. */
@@ -46,7 +46,6 @@ describe('readSaveCode', () => {
     const game = await read(await saveCode(snapshot(state)));
 
     expect(game.state).toEqual(state);
-    expect(game.progress).toEqual(snapshot(state).progress);
   });
 
   it('gives a game that plays the same as the original', async () => {

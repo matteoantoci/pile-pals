@@ -76,10 +76,13 @@ export type Book = {
 };
 
 /**
- * A demo of the hand. Each kind shows one action one time: `first` the first drop of the game, `faceDown` the drop
- * that uncovers a face-down card, `anchor` a category card that goes on an empty slot, and `deck` a tap on the deck.
+ * The demos of the hand, in the order that they show when two new actions come in the same level. Each kind shows
+ * one action one time: `first` the first drop of the game, `faceDown` the drop that uncovers a face-down card,
+ * `anchor` a category card that goes on an empty slot, and `deck` a tap on the deck.
  */
-export type DemoKind = 'first' | 'faceDown' | 'anchor' | 'deck';
+export const DEMO_KINDS = ['first', 'faceDown', 'anchor', 'deck'] as const;
+
+export type DemoKind = (typeof DEMO_KINDS)[number];
 
 /**
  * The level that the Child plays. It is plain data (no Map, no class, no function), so a save can keep it whole.

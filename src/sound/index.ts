@@ -2,7 +2,7 @@
 // The UI plays a slot for each model event. The game model has no audio.
 import { installAudio, playClip } from './engine';
 import { SHIPPED } from './levels';
-import palSizes from './pal-sizes.json';
+import type { PalSize } from '../model';
 import type { Clip } from './levels';
 
 export { isSoundOn, loadClip, playClip, setSoundOn } from './engine';
@@ -32,25 +32,21 @@ export const playSound = (slot: SoundSlot, note = 0): void => {
   playClip(SHIPPED[slot], slot === 'snap' ? noteRate(note) : 1);
 };
 
-/** The real size of a pal: small (ant), middle (cat), or large (elephant). src/sound/pal-sizes.json holds the tags. */
-export type PalSize = 'S' | 'M' | 'L';
-
 /** The playbackRate of the pop for each size: a fifth up for a small pal, a fifth down for a large pal. */
 export const POP_RATE: Readonly<Record<PalSize, number>> = { S: 1.5, M: 1, L: 2 / 3 };
 
-const SIZES: readonly PalSize[] = ['S', 'M', 'L'];
-const sizeOf: ReadonlyMap<string, PalSize> = new Map(
-  SIZES.flatMap((size) => palSizes[size].map((cardId) => [cardId, size] as const))
-);
 const shipped: Readonly<Record<string, Clip | undefined>> = SHIPPED;
 
-/** Plays the sound of a pal (title scene, parades, sticker book). The slot of an own sound is "pal-<card id>".
- * A pal with no own sound plays the pop at the rate of its size tag. A card with no tag plays the middle pop. */
-export const playPal = (cardId: string): void => {
+/**
+ * Plays the sound of a pal (title scene, parades, sticker book). The slot of an own sound is "pal-<card id>".
+ * A pal with no own sound plays the pop at the rate of its size tag (`palSize` of the game model). A card with no
+ * tag plays the middle pop.
+ */
+export const playPal = (cardId: string, size: PalSize | null): void => {
   const own = shipped[`pal-${cardId}`];
   if (own) {
     playClip(own);
     return;
   }
-  playClip(SHIPPED.pop, POP_RATE[sizeOf.get(cardId) ?? 'M']);
+  playClip(SHIPPED.pop, POP_RATE[size ?? 'M']);
 };

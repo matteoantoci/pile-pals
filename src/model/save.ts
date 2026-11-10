@@ -1,18 +1,8 @@
 // The save data of the game. All data is plain JSON, so localStorage and a save code can hold it.
 // The UI stores it after each resolved move (research/native-feel/shell.md §3).
 
-import type {
-  Book,
-  Card,
-  DemoKind,
-  GameState,
-  Pile,
-  PlacedSticker,
-  Position,
-  Progress,
-  Stack,
-  TableCard,
-} from './types';
+import { DEMO_KINDS } from './types';
+import type { Book, Card, DemoKind, GameState, Pile, PlacedSticker, Position, Stack, TableCard } from './types';
 
 /**
  * The schema version of `SaveData`. A save with another version is not read.
@@ -22,24 +12,22 @@ export const SAVE_VERSION = 4;
 
 /**
  * The data of one save.
- * `state` is the level that the Child plays, whole: the deal, not only the seed.
- * `progress` is what the Child finished. The sticker book (the stickers, gold flags, and their places on each
- * page) is in `state.book`, because `apply` changes it. The flags of the demos that the Child already saw are in
- * `state.demos`.
+ * `state` is the level that the Child plays, whole: the deal, not only the seed. The level number is
+ * `state.level`. The sticker book (the stickers, gold flags, and their places on each page) is in `state.book`,
+ * because `apply` changes it. The flags of the demos that the Child already saw are in `state.demos`.
+ * A save of an older build of this version can also hold a `progress` field. `restore` ignores it.
  */
 export type SaveData = {
   readonly version: number;
   readonly state: GameState;
-  readonly progress: Progress;
 };
 
 /** Why `restore` refused a save. `version`: a schema version that this build does not know. `shape`: not save data. */
 export type RestoreFailure = 'version' | 'shape';
 
-/** `restore` gives the state and the progress that the Child comes back to. */
+/** `restore` gives the state that the Child comes back to. */
 export type RestoredGame = {
   readonly state: GameState;
-  readonly progress: Progress;
 };
 
 export type RestoreResult =
@@ -132,7 +120,7 @@ const isBook = (value: unknown): value is Book =>
   'award' in value &&
   isAward(value.award);
 
-const DEMO_KINDS: readonly unknown[] = ['first', 'faceDown', 'anchor', 'deck'] satisfies readonly DemoKind[];
+const isDemoKind = (value: unknown): value is DemoKind => DEMO_KINDS.some((kind) => kind === value);
 
 /** The fields that go with the Child from level to level: the sticker book and the demos that the Child saw. */
 const hasCarried = (value: unknown): value is Pick<GameState, 'book' | 'demos'> =>
@@ -142,7 +130,7 @@ const hasCarried = (value: unknown): value is Pick<GameState, 'book' | 'demos'> 
   isBook(value.book) &&
   'demos' in value &&
   Array.isArray(value.demos) &&
-  value.demos.every((kind) => DEMO_KINDS.includes(kind));
+  value.demos.every(isDemoKind);
 
 /**
  * The checks of the fields of `GameState` that this build knows. A field of a later ticket passes
@@ -159,22 +147,14 @@ const isState = (value: unknown): value is GameState =>
   hasDeck(value) &&
   hasCarried(value);
 
-const isProgress = (value: unknown): value is Progress =>
-  typeof value === 'object' && value !== null && 'level' in value && typeof value.level === 'number';
-
 /** The version comes first: a save of an older build may fail the checks of the shape. */
 const isVersioned = (value: unknown): value is { readonly version: number } =>
   typeof value === 'object' && value !== null && 'version' in value && typeof value.version === 'number';
 
-const isSaveData = (value: { readonly version: number }): value is SaveData =>
-  'state' in value && isState(value.state) && 'progress' in value && isProgress(value.progress);
+const isSaveData = (value: { readonly version: number }): value is SaveData => 'state' in value && isState(value.state);
 
-/** The save data of one state. The progress is the level of the state until a ticket adds more to it. */
-export const snapshot = (state: GameState): SaveData => ({
-  version: SAVE_VERSION,
-  state,
-  progress: { level: state.level },
-});
+/** The save data of one state. */
+export const snapshot = (state: GameState): SaveData => ({ version: SAVE_VERSION, state });
 
 /**
  * Reads save data that comes from localStorage or from a save code. It never throws: a save that this build
@@ -190,5 +170,5 @@ export const restore = (save: unknown): RestoreResult => {
   if (!isSaveData(save)) {
     return { ok: false, reason: 'shape' };
   }
-  return { ok: true, state: save.state, progress: save.progress };
+  return { ok: true, state: save.state };
 };

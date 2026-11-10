@@ -2,6 +2,7 @@ import { For, Show } from 'solid-js';
 import { playSound } from '../sound';
 import { draggable } from './drag';
 import { flip } from './flip';
+import { canceled } from './motion';
 import { stillUrl } from './pictures';
 import type { Card, CardId, GameState, Stack } from '../model';
 import type { Hooks } from './drag';
@@ -11,9 +12,6 @@ import type { Accessor, JSX } from 'solid-js';
 // The card elements of a level stay in their places, so a card never moves under the finger:
 // a card that left the table keeps its place hidden (`.gone`), and a card that turns over stays in its stack.
 // The drag code owns the transform of `.card`. No JSX binding writes `transform` or `style` on a card.
-
-/** A canceled animation rejects its `finished` promise. The next animation then owns the card. */
-const canceled = (): void => undefined;
 
 /** Gives a card the drag and the lift sound. Only a card that the Child can pick up gets them. */
 const makeLive = (card: HTMLElement, hooks: Hooks): void => {
@@ -79,24 +77,28 @@ const DeckView = (props: {
     <div class="deck" classList={{ spent: props.state.deck.length === 0 }} onClick={props.onTap}>
       <div class="card-back" />
     </div>
-    <Show when={props.state.dealt}>
-      {(card) => <CardView card={card()} faceDown={false} gone={false} hooks={props.hooksFor(card().id)} live={true} />}
+    {/* Keyed: each new dealt card gets its own element, so its drag hooks send its own id. */}
+    <Show when={props.state.dealt} keyed>
+      {(card) => <CardView card={card} faceDown={false} gone={false} hooks={props.hooksFor(card.id)} live={true} />}
     </Show>
   </div>
 );
 
-/** The table of the level: the stacks and the deck. */
+/** True when the level has a deck place: a deck with cards, or the dealt card of a restored level with an empty deck. */
+export const hasDeck = (deal: GameState): boolean => deal.deck.length > 0 || deal.dealt !== null;
+
+/** The table of the level: the stacks and the deck. `initial` is the state that the board started with. */
 export const TableView = (props: {
-  readonly dealt: Accessor<GameState>;
+  readonly initial: Accessor<GameState>;
   readonly state: Accessor<GameState>;
   readonly hooksFor: (cardId: CardId) => Hooks;
   readonly onTapDeck: () => void;
 }): JSX.Element => (
   <section class="table">
-    <For each={props.dealt().table}>
+    <For each={props.initial().table}>
       {(stack) => <StackView stack={stack} state={props.state()} hooksFor={props.hooksFor} />}
     </For>
-    <Show when={props.dealt().deck.length > 0}>
+    <Show when={hasDeck(props.initial())}>
       <DeckView state={props.state()} hooksFor={props.hooksFor} onTap={props.onTapDeck} />
     </Show>
   </section>

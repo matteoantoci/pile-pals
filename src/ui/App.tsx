@@ -24,7 +24,7 @@ export const App = (props: { readonly restored: GameState | undefined }): JSX.El
   const [screen, setScreen] = createSignal<Screen>(restored ? { name: 'level', state: restored } : { name: 'title' });
 
   // The go button plays the saved level, or level 1 of a new game. The save gets the level before the board
-  // shows, so a reload for an update at the start of the level shows the same level again.
+  // shows, so a reload shows the same level again.
   const play = (): void => {
     const state = loadGame()?.state ?? start({ level: 1 }, newSeed());
     saveGame(state);

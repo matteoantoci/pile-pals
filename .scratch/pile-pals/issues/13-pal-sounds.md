@@ -30,7 +30,7 @@ Spec: [spec.md](../spec.md)
 
 - `src/sound/sounds.json` has a new section `Pals`: one `pop` slot and 41 pal slots. A pal slot id is `pal-<card id>`, and a clip id is `<card id>-<Freesound id>` (for example `dog-386766`). `python3 scripts/audio/prep.py` converts, cuts, and levels all files with the method of ticket 05. It writes `public/sounds/` (42 new shipped files, 7.5 MB with the card sounds), `public/listen/clips/` (the other candidates), `src/sound/levels.ts`, and the sound entries of `src/credits.json`.
 - `src/sound/pal-sizes.json`: the size tag of each of the 257 pals, in three lists `S`, `M`, `L` (100, 105, 52).
-- `playPal(cardId)` in `src/sound/index.ts`: the own sound of the pal (slot `pal-<card id>`), else the pop at `POP_RATE` for its size tag (`S` 1.5, `M` 1, `L` 2/3: a fifth up or down). Tickets 08, 10, and 11 call it. The note `~/.cache/pile-pals-impl/notes/13-pal-api.md` has the API.
+- `playPal(cardId)` in `src/sound/index.ts`: the own sound of the pal (slot `pal-<card id>`), else the pop at `POP_RATE` for its size tag (`S` 1.5, `M` 1, `L` 2/3: a fifth up or down). Tickets 08, 10, and 11 call it.
 - `/listen/` shows the pal rows with the card rows: all `doubt` rows first, then the `sure` rows. The pop row has three more buttons that play the pop at the S, M, and L rates.
 - `src/credits.test.ts` (Vitest, data only): each file in `public/pictures/`, `public/animations/`, and `public/sounds/` must match a `files` path of a credits entry (a file path, or a folder pattern such as `pictures/*`). It also fails for a credits path with no shipped file, for an unknown licence, and for a credit-required work with no title, author, page, or change. A file with no entry makes the test fail (checked with an extra empty file).
 - `src/sound/pal-sizes.test.ts` (data only): each pal of the catalog has exactly one size tag, and the file has no other id.
@@ -52,3 +52,5 @@ Open:
 - The Parent listens to the 26 `doubt` rows of the Pals section in ticket 17.
 - No game screen calls `playPal` yet. Tickets 08 (parades), 10 (title scene), and 11 (sticker book) call it.
 - The pal sound level on the iPhone speaker is a device check of ticket 16.
+
+**2026-11-10, agent (branch `ticket/review-fixes`, code review 1).** The size tags are now data of the game model, so the game model tests check them (spec, Testing Decisions). `src/sound/pal-sizes.json` moved to `src/model/pal-sizes.json`. The model exports `palSize(pictureId)`: `S`, `M`, `L`, or null for a picture that is not a pal. The UI gives the size to `playPal(cardId, size)`, so the sound module and the listening page do not load the catalog. `src/model/pal-sizes.test.ts` replaces `src/sound/pal-sizes.test.ts`. The snap rule of ticket 05 changed the snap level, so the pal sounds are about 5 dB quieter (see the ticket 05 comment).

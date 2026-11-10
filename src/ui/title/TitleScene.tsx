@@ -15,8 +15,8 @@ import type { JSX } from 'solid-js';
 export type TitleProps = {
   /** The go button: start the level. */
   readonly onGo: () => void;
-  /** Opens the sticker book. The book icon shows only when this is set. */
-  readonly onOpenBook?: () => void;
+  /** The book icon: open the sticker book. */
+  readonly onOpenBook: () => void;
   /** The parent check is passed: open the parent area. */
   readonly onParent: () => void;
 };
@@ -64,7 +64,7 @@ export const TitleScene = (props: TitleProps): JSX.Element => {
     <main class="title">
       <header class="title-top">
         <Logo onHold={() => setChecking(true)} />
-        <Show when={props.onOpenBook}>{(open) => <BookButton onOpen={open()} />}</Show>
+        <BookButton onOpen={() => props.onOpenBook()} />
       </header>
       <section
         class="title-stage"

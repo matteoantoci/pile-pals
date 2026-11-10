@@ -1,4 +1,4 @@
-import { cardsLeft, dropCard, placeAnchor, playMove, tapDeck } from './apply';
+import { cardsLeft, dropCard, openCards, placeAnchor, playMove, tapDeck } from './apply';
 import type { GameState, LevelAction } from './types';
 
 // The dead-end check of the level generator (spec, Module 2 "Dead-end check").
@@ -8,7 +8,7 @@ import type { GameState, LevelAction } from './types';
 
 /** The moves that the game allows in this state: the drops first, then the category cards, then the deck. */
 export const legalMoves = (state: GameState): readonly LevelAction[] => {
-  const open = [...state.table.flatMap((stack) => stack.cards.slice(-1)), ...(state.dealt ? [state.dealt] : [])];
+  const open = openCards(state);
   const drops = open.flatMap((card) =>
     state.piles.filter((pile) => pile.group === card.group).map((pile) => dropCard(card.id, pile.id))
   );

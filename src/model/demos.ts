@@ -1,4 +1,5 @@
 import { legalMoves } from './moves';
+import { DEMO_KINDS } from './types';
 import type { DemoKind, GameState, LevelAction } from './types';
 
 // The demo hand and the hint hop (spec, user stories 24 to 29). The model chooses the move that the hand shows
@@ -18,9 +19,6 @@ const SHOWS: Readonly<Record<DemoKind, (state: GameState, moves: readonly Hint[]
   deck: (_state, moves) => moves.find((move) => move.type === 'tapDeck'),
 };
 
-/** One action at a time: the order of the demos when two new actions come in the same level. */
-const ORDER: readonly DemoKind[] = ['first', 'faceDown', 'anchor', 'deck'];
-
 /** True when the card is on top of a stack and a face-down card is under it, so its move turns that card over. */
 const coversFaceDown = (state: GameState, cardId: string): boolean =>
   state.table.some((stack) => stack.cards.at(-1)?.id === cardId && stack.cards.some((card) => card.faceDown));
@@ -31,7 +29,7 @@ const coversFaceDown = (state: GameState, cardId: string): boolean =>
  */
 export const demoFor = (state: GameState): Demo | undefined => {
   const moves = legalMoves(state);
-  return ORDER.filter((kind) => !state.demos.includes(kind))
+  return DEMO_KINDS.filter((kind) => !state.demos.includes(kind))
     .map((kind) => ({ kind, move: SHOWS[kind](state, moves) }))
     .find((demo): demo is Demo => demo.move !== undefined);
 };

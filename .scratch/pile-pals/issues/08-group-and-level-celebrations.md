@@ -16,7 +16,7 @@ Spec: [spec.md](../spec.md)
 ## Comments
 
 Built `src/ui/celebration/` (public API in `index.ts`) and changed `src/ui/Board.tsx` and
-`src/ui/styles.css`. Shared notes for the next tickets: `~/.cache/pile-pals-impl/notes/08-celebrate.md`.
+`src/ui/styles.css`.
 
 - **Parade.** After `groupComplete`, `landed` shows the new state and `parade(pile)` makes a copy of each
   card of the group in a fixed layer above the board. The copies start at the pile pictures and walk off

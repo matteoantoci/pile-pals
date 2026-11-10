@@ -19,7 +19,7 @@ Spec: [spec.md](../spec.md)
 
 **Built (branch `ticket/04-drag-feel`):**
 
-- `src/ui/motion/`: the motion module. `spring.ts` has the spring sampler (`sampleSpring`, `springTo`, `releaseVelocity`). `primitives.ts` has `translate3d`, `facePose`, `stop`, `freeze`, and `settle`. `card.ts` has the card effects `lift`, `land`, and `shake`. The API and how to use it again (flip, parade, hint hop, demo hand) are in `~/.cache/pile-pals-impl/notes/04-motion.md`.
+- `src/ui/motion/`: the motion module. `spring.ts` has the spring sampler (`sampleSpring`, `springTo`, `releaseVelocity`). `primitives.ts` has `translate3d`, `facePose`, `stop`, `freeze`, and `settle`. `card.ts` has the card effects `lift`, `land`, and `shake`. `src/ui/motion/index.ts` is the public API for the flip, the parade, the hint hop, and the demo hand.
 - `src/ui/drag.ts`: lift at `pointerdown`, magnet pull in `pointermove`, and three moves at `pointerup`: snap, shake back, or spring back.
 - `src/ui/Board.tsx`: gives the pile faces as drop targets and sends `dropCard` for the nearest pile in reach. Each `.card` has a `.card-shadow` and a `.card-face`.
 - All numbers come from `research/native-feel/motion.md` ("Starting values for each moment"), except the magnet distance, which the research does not give.

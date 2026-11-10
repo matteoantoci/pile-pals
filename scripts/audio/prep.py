@@ -44,8 +44,13 @@ def floor_tenth(value):
     return math.floor(round(value * 10, 6)) / 10
 
 
-def gain_for(seconds, lufs, true_peak):
-    """Returns (gain in dB, rule). labrynth2 §9.6 step 2, and the short-file rule of ticket 05."""
+def gain_for(seconds, lufs, true_peak, pluck):
+    """Returns (gain in dB, rule). labrynth2 §9.6 step 2, and the short-file and pluck rules of ticket 05.
+
+    A snap candidate is the pluck: at each length, its gain sets the true peak to -6 dBTP.
+    """
+    if pluck:
+        return floor_tenth(-6 - true_peak), "pluck"
     if seconds < SHORT_SECONDS:
         return floor_tenth(-6 - true_peak), "short"
     gain = floor_tenth(-18 - lufs)
@@ -79,13 +84,13 @@ def load_manifest():
     return manifest, slots
 
 
-def process(clip_id, clip, folder):
+def process(clip_id, clip, folder, pluck):
     """Converts one clip and sets its gain. Returns its line of the level table."""
     out = PUBLIC / folder / f"{clip_id}.wav"
     tools.convert(tools.fetch(clip["source"], CACHE), out, clip.get("cut"))
     seconds = tools.seconds(out)
     lufs, true_peak = tools.loudness(out)
-    gain, rule = gain_for(seconds, lufs, true_peak)
+    gain, rule = gain_for(seconds, lufs, true_peak, pluck)
     return {
         "file": f"{folder}/{clip_id}.wav",
         "seconds": round(seconds, 3),
@@ -119,6 +124,7 @@ def clear_wav(folder):
 
 def build_levels(manifest, slots):
     picked = {slot["pick"] for slot in slots}
+    snaps = {c for slot in slots if slot["id"] == SNAP_SLOT for c in slot["candidates"]}
     clip_ids = list(dict.fromkeys(c for slot in slots for c in slot["candidates"]))
     # Download one at a time: two clips can come from the same Kenney zip.
     for clip_id in clip_ids:
@@ -127,12 +133,11 @@ def build_levels(manifest, slots):
     clear_wav(LISTEN_DIR)
     with ThreadPoolExecutor() as pool:
         jobs = {
-            c: pool.submit(process, c, manifest["clips"][c], SHIPPED_DIR if c in picked else LISTEN_DIR)
+            c: pool.submit(process, c, manifest["clips"][c], SHIPPED_DIR if c in picked else LISTEN_DIR, c in snaps)
             for c in clip_ids
         }
         levels = {c: job.result() for c, job in jobs.items()}
     # A snap candidate is not limited: it is the reference when the Parent picks it.
-    snaps = {c for slot in slots if slot["id"] == SNAP_SLOT for c in slot["candidates"]}
     snap_pick = next(slot["pick"] for slot in slots if slot["id"] == SNAP_SLOT)
     reference = levels[snap_pick]["maxMomentary"]
     for clip_id, level in levels.items():
