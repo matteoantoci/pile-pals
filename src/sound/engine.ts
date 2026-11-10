@@ -76,7 +76,7 @@ const download = async (file: string): Promise<AudioBuffer> => {
 };
 
 /** Loads and decodes a file one time. After a failure, the next call tries again. */
-export const loadClip = (file: string): Promise<AudioBuffer> => {
+const loadClip = (file: string): Promise<AudioBuffer> => {
   const known = loading.get(file);
   if (known) {
     return known;
