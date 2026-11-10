@@ -1,10 +1,11 @@
 import { batch, createSignal, For } from 'solid-js';
 import { apply, dropCard, nextLevel, start } from '../model';
 import { playSound } from '../sound';
+import { celebrateLevel, parade } from './celebration';
 import { draggable } from './drag';
 import { stillUrl } from './pictures';
 import { playEventSounds } from './sounds';
-import type { Card, GameState, Pile } from '../model';
+import type { Card, GameEvent, GameState, Pile, PileId } from '../model';
 import type { Hooks, Target } from './drag';
 import type { Accessor, JSX } from 'solid-js';
 
@@ -22,6 +23,10 @@ const pileTargets = (): readonly Target[] =>
     const box = face.getBoundingClientRect();
     return [{ id, at: { x: box.left + box.width / 2, y: box.top + box.height / 2 } }];
   });
+
+/** The pile of the group that a drop completed, or undefined when the drop completed no group. */
+const completedPile = (events: readonly GameEvent[]): PileId | undefined =>
+  events.find((event) => event.type === 'groupComplete')?.pileId;
 
 /** The card size of the board. A level with more piles and cards gets smaller cards, so that all fit on the screen. */
 const sizeOf = (deal: GameState): string => {
@@ -55,7 +60,8 @@ const playLevels = (): {
   // so the pile shows the card only at the end of its spring.
   let model = dealt();
 
-  // When the last card of the level lands, the next level replaces the table. Ticket 08 adds the celebration first.
+  // When the last card of the level lands, the celebration plays, then the next level replaces the table.
+  // Ticket 11 puts the sticker book in the `afterCelebration` hook of `celebrateLevel`.
   const dealNext = (): void => {
     model = nextLevel(model);
     batch(() => {
@@ -67,16 +73,29 @@ const playLevels = (): {
   const hooksFor = (card: Card): Hooks => {
     // True when the drop of this card finished the level.
     let last = false;
+    // The pile of the group that the drop completed, if it completed one.
+    let completed: PileId | undefined;
     return {
       targets: pileTargets,
       drop: (pileId) => {
         const outcome = apply(model, dropCard(card.id, pileId));
         model = outcome.state;
         last = outcome.events.some((event) => event.type === 'levelComplete');
+        completed = completedPile(outcome.events);
         playEventSounds(outcome.events);
         return outcome.events.some((event) => event.type === 'snapped');
       },
-      landed: () => (last ? dealNext() : setState(model)),
+      landed: () => {
+        // The pile shows its new card before the parade copies read their places from the screen.
+        setState(model);
+        const pile = completed === undefined ? undefined : model.piles.find((item) => item.id === completed);
+        if (pile !== undefined) {
+          parade(pile);
+        }
+        if (last) {
+          celebrateLevel(dealNext);
+        }
+      },
     };
   };
   return { dealt, state, hooksFor };
