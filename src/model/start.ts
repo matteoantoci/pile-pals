@@ -1,25 +1,26 @@
-import type { Card, GameState, GroupId, Pile, Progress } from './types';
+import type { Card, GameState, GroupId, PictureId, Pile, Progress } from './types';
 
-// One fixed level with 2 piles and placeholder emoji pictures.
-// The level generator (ticket 03) replaces this level. Ticket 02 replaces the pictures.
+// One fixed level with 2 piles: fruit and birds. The pictures are Noto 2D stills from the content catalog.
+// The level generator (ticket 03) replaces this level.
+// Each card here is a member of its own group and fits no other group of this level (content-model.md §5).
 
 const FRUIT: GroupId = 'fruit';
-const ANIMALS: GroupId = 'animals';
+const BIRDS: GroupId = 'birds';
 
-const card = (id: string, group: GroupId, picture: string): Card => ({ id, group, picture });
+const card = (picture: PictureId, group: GroupId): Card => ({ id: picture, group, picture });
 
-const pile = (group: GroupId, picture: string): Pile => ({ id: group, group, picture, cards: [] });
+const pile = (group: GroupId, picture: PictureId): Pile => ({ id: group, group, picture, cards: [] });
 
 const TABLE: readonly Card[] = [
-  card('banana', FRUIT, '🍌'),
-  card('cat', ANIMALS, '🐱'),
-  card('grapes', FRUIT, '🍇'),
-  card('rabbit', ANIMALS, '🐰'),
-  card('pear', FRUIT, '🍐'),
-  card('bear', ANIMALS, '🐻'),
+  card('cherries', FRUIT),
+  card('baby-chick', BIRDS),
+  card('grapes', FRUIT),
+  card('dove', BIRDS),
+  card('blueberries', FRUIT),
+  card('blackbird', BIRDS),
 ];
 
-const PILES: readonly Pile[] = [pile(FRUIT, '🍎'), pile(ANIMALS, '🐶')];
+const PILES: readonly Pile[] = [pile(FRUIT, 'red-apple'), pile(BIRDS, 'bird')];
 
 /** Deals the level for the progress. The state keeps the seed for the level generator. */
 export const start = (progress: Progress, seed: number): GameState => ({

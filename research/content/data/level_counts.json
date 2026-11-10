@@ -171,10 +171,10 @@
    "groups": 2,
    "combinations": 55,
    "blocked_confusable": 11,
-   "valid_n3": 44,
-   "log10_deals_n3": 12.6,
-   "valid_n5": 44,
-   "log10_deals_n5": 16.7
+   "valid_n3": 43,
+   "log10_deals_n3": 12.4,
+   "valid_n5": 37,
+   "log10_deals_n5": 16.3
   },
   {
    "type": "colour",
@@ -182,10 +182,10 @@
    "groups": 3,
    "combinations": 165,
    "blocked_confusable": 85,
-   "valid_n3": 80,
-   "log10_deals_n3": 17.8,
-   "valid_n5": 80,
-   "log10_deals_n5": 23.3
+   "valid_n3": 74,
+   "log10_deals_n3": 17.6,
+   "valid_n5": 65,
+   "log10_deals_n5": 23.1
   },
   {
    "type": "colour",
@@ -193,10 +193,10 @@
    "groups": 4,
    "combinations": 330,
    "blocked_confusable": 261,
-   "valid_n3": 69,
-   "log10_deals_n3": 22.2,
-   "valid_n5": 69,
-   "log10_deals_n5": 29.1
+   "valid_n3": 60,
+   "log10_deals_n3": 22.3,
+   "valid_n5": 58,
+   "log10_deals_n5": 29.2
   },
   {
    "type": "shape",
@@ -205,19 +205,19 @@
    "combinations": 1,
    "blocked_confusable": 0,
    "valid_n3": 1,
-   "log10_deals_n3": 8.8,
+   "log10_deals_n3": 9.0,
    "valid_n5": 1,
-   "log10_deals_n5": 11.1
+   "log10_deals_n5": 11.4
   }
  ],
  "totals": {
-  "valid_setups_n3": 27544,
-  "valid_setups_k2_n3": 651,
-  "valid_setups_k3_n3": 4355,
-  "valid_setups_k4_n3": 22538,
-  "valid_setups_n5": 11692,
-  "valid_setups_k2_n5": 438,
-  "valid_setups_k3_n5": 2246,
-  "valid_setups_k4_n5": 9008
+  "valid_setups_n3": 27528,
+  "valid_setups_k2_n3": 650,
+  "valid_setups_k3_n3": 4349,
+  "valid_setups_k4_n3": 22529,
+  "valid_setups_n5": 11659,
+  "valid_setups_k2_n5": 431,
+  "valid_setups_k3_n5": 2231,
+  "valid_setups_k4_n5": 8997
  }
 }

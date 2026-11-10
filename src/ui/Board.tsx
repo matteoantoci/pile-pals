@@ -2,8 +2,9 @@ import { createSignal, For } from 'solid-js';
 import { apply, dropCard, start } from '../model';
 import { playSound } from '../sound';
 import { draggable } from './drag';
+import { stillUrl } from './pictures';
 import { playEventSounds } from './sounds';
-import type { Card } from '../model';
+import type { Card, Pile } from '../model';
 import type { Hooks, Target } from './drag';
 import type { JSX } from 'solid-js';
 
@@ -21,6 +22,18 @@ const pileTargets = (): readonly Target[] =>
     const box = face.getBoundingClientRect();
     return [{ id, at: { x: box.left + box.width / 2, y: box.top + box.height / 2 } }];
   });
+
+/** A category pile: the anchor picture on its face, and the cards that landed on it. */
+const PileView = (props: { pile: Pile }): JSX.Element => (
+  <div class="pile" data-pile={props.pile.id}>
+    <div class="pile-face">
+      <img src={stillUrl(props.pile.picture)} alt="" />
+    </div>
+    <div class="pile-cards">
+      <For each={props.pile.cards}>{(card) => <img class="pile-card" src={stillUrl(card.picture)} alt="" />}</For>
+    </div>
+  </div>
+);
 
 export const Board = (): JSX.Element => {
   const dealt = start({ level: 1 }, 1);
@@ -45,16 +58,7 @@ export const Board = (): JSX.Element => {
   return (
     <main class="board">
       <section class="piles">
-        <For each={state().piles}>
-          {(pile) => (
-            <div class="pile" data-pile={pile.id}>
-              <div class="pile-face">{pile.picture}</div>
-              <div class="pile-cards">
-                <For each={pile.cards}>{(card) => <span class="pile-card">{card.picture}</span>}</For>
-              </div>
-            </div>
-          )}
-        </For>
+        <For each={state().piles}>{(pile) => <PileView pile={pile} />}</For>
       </section>
       <section class="table">
         <For each={dealt.table}>
@@ -66,7 +70,9 @@ export const Board = (): JSX.Element => {
               onPointerDown={() => playSound('lift')}
             >
               <div class="card-shadow" />
-              <div class="card-face">{card.picture}</div>
+              <div class="card-face">
+                <img src={stillUrl(card.picture)} alt="" />
+              </div>
             </div>
           )}
         </For>

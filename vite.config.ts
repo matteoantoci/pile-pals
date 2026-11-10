@@ -32,8 +32,11 @@ export default defineConfig({
         theme_color: TABLE,
       },
       workbox: {
-        // The shipped sounds (public/sounds/) are in the precache, so the game plays them offline.
-        globPatterns: ['**/*.{js,css,html,svg,png,webmanifest,wav}'],
+        // wav: the shipped sounds (public/sounds/). webp and avif: the card pictures and the animation
+        // loops of public/ (research/content/build_content.py). txt: their licence and credit files.
+        // Each file is below the default limit of 2 MiB (maximumFileSizeToCacheInBytes), so the precache
+        // holds all of them.
+        globPatterns: ['**/*.{js,css,html,svg,png,webp,avif,txt,webmanifest,wav}'],
         // The listening page and its clips (public/listen/) are only for the Parent: no precache,
         // and no fallback to the game page for a navigation to /listen/.
         globIgnores: ['listen/**'],
