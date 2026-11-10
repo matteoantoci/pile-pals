@@ -26,6 +26,10 @@ export type Progress = {
   readonly level: number;
 };
 
+/**
+ * The level that the Child plays. It is plain data (no Map, no class, no function), so a save can keep it whole.
+ * `seed` is the seed of the game: the same seed and level number always give the same deal.
+ */
 export type GameState = {
   readonly level: number;
   readonly seed: number;
@@ -52,6 +56,15 @@ export type GameEvent =
   | {
       readonly type: 'rejected';
       readonly cardId: CardId;
+    }
+  /** The last card of the group is on its pile. */
+  | {
+      readonly type: 'groupComplete';
+      readonly pileId: PileId;
+    }
+  /** The last card of the level is on its pile. `nextLevel` then deals the next level. */
+  | {
+      readonly type: 'levelComplete';
     };
 
 export type Outcome = {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { apply, dropCard, start } from './index';
-import type { Card, GameState, Pile } from './index';
+import { apply, dropCard, nextLevel, start } from './index';
+import type { Card, GameEvent, GameState, Pile } from './index';
 
 const firstLevel = (): GameState => start({ level: 1 }, 1);
 
@@ -19,6 +19,21 @@ const pileFor = (state: GameState, card: Card, fits: boolean): Pile => {
   }
   return pile;
 };
+
+/** The events of each drop, in order, and the state after the last drop. */
+type Play = { readonly drops: readonly (readonly GameEvent[])[]; readonly end: GameState };
+
+/** Drops the cards on their piles, one after the other. */
+const play = (state: GameState, cards: readonly Card[]): Play =>
+  cards.reduce<Play>(
+    ({ drops, end }, card) => {
+      const outcome = apply(end, dropCard(card.id, pileFor(end, card, true).id));
+      return { drops: [...drops, outcome.events], end: outcome.state };
+    },
+    { drops: [], end: state }
+  );
+
+const playAll = (state: GameState): Play => play(state, state.table);
 
 describe('dropCard', () => {
   it('rejects a card on the wrong pile and keeps the same state', () => {
@@ -69,5 +84,81 @@ describe('dropCard', () => {
 
     expect(again.events).toEqual([{ type: 'rejected', cardId: card.id }]);
     expect(again.state).toBe(once.state);
+  });
+});
+
+describe('a full level', () => {
+  it('gives groupComplete with the last card of a group, and not before', () => {
+    const state = firstLevel();
+    const pile = state.piles[0];
+    const group = state.table.filter((card) => card.group === pile?.group);
+
+    const { drops } = play(state, group);
+
+    expect(drops.map((events) => events.map((event) => event.type))).toEqual([
+      ['snapped'],
+      ['snapped'],
+      ['snapped', 'groupComplete'],
+    ]);
+    expect(drops.at(-1)).toEqual([
+      { type: 'snapped', cardId: group.at(-1)?.id, pileId: pile?.id, noteIndex: 2 },
+      { type: 'groupComplete', pileId: pile?.id },
+    ]);
+  });
+
+  it('gives levelComplete with the last card of the level, and not before', () => {
+    const { drops, end } = playAll(firstLevel());
+
+    expect(drops.flat().filter((event) => event.type === 'levelComplete')).toHaveLength(1);
+    expect(drops.at(-1)?.at(-1)).toEqual({ type: 'levelComplete' });
+    expect(end.table).toEqual([]);
+  });
+
+  it('plays each level to the end, over many seeds and level numbers', () => {
+    const states = [1, 2, 3, 5, 8, 13, 21].flatMap((seed) =>
+      Array.from({ length: 20 }, (_, i) => start({ level: i + 1 }, seed))
+    );
+    const wrong = states.filter((state) => {
+      const events = playAll(state).drops.flat();
+      const notes = state.piles.map((pile) =>
+        events.flatMap((e) => (e.type === 'snapped' && e.pileId === pile.id ? [e.noteIndex] : []))
+      );
+      const completed = events.flatMap((e) => (e.type === 'groupComplete' ? [e.pileId] : []));
+      return (
+        notes.some((indexes) => indexes.some((note, i) => note !== i)) ||
+        completed.toSorted().join() !==
+          state.piles
+            .map((p) => p.id)
+            .toSorted()
+            .join() ||
+        events.at(-1)?.type !== 'levelComplete'
+      );
+    });
+
+    expect(wrong.map((s) => `level ${String(s.level)} seed ${String(s.seed)}`)).toEqual([]);
+  });
+});
+
+describe('nextLevel', () => {
+  it('deals the next level after levelComplete', () => {
+    const { end } = playAll(firstLevel());
+
+    const next = nextLevel(end);
+
+    expect(next.level).toBe(2);
+    expect(next.table.length).toBeGreaterThan(0);
+    expect(next.piles.every((pile) => pile.cards.length === 0)).toBe(true);
+  });
+
+  it('deals the same level as a new start of that level with the same seed', () => {
+    const { end } = playAll(start({ level: 6 }, 99));
+
+    expect(nextLevel(end)).toEqual(start({ level: 7 }, 99));
+  });
+
+  it('keeps a level that is not finished', () => {
+    const state = firstLevel();
+
+    expect(nextLevel(state)).toBe(state);
   });
 });

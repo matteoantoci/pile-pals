@@ -3,7 +3,7 @@
 
 export { apply, dropCard } from './apply';
 export { catalog, pictureOf } from './catalog';
-export { start } from './start';
+export { nextLevel, start } from './start';
 export type { Catalog, CatalogCard, CatalogGroup, Picture } from './catalog';
 export type {
   Action,

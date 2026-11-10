@@ -1,0 +1,181 @@
+import { describe, expect, it } from 'vitest';
+import { catalog, pictureOf, start } from './index';
+import type { CatalogCard, CatalogGroup, GameState, GroupId, PictureId } from './index';
+
+// The level generator, tested over many seeds and level numbers with the real catalog.
+// The rules come from the spec (Module 2) and from research/native-feel/content-model.md §5.
+
+const SEEDS = Array.from({ length: 100 }, (_, i) => 7919 * i + 1);
+const LEVELS = Array.from({ length: 30 }, (_, i) => i + 1);
+const FIRST_TEN = LEVELS.slice(0, 10);
+
+const levels: readonly GameState[] = SEEDS.flatMap((seed) => LEVELS.map((level) => start({ level }, seed)));
+/** Levels 1 to 10 show all category cards on their piles at the start (spec, Module 2). */
+const earlyLevels = levels.filter((state) => state.level <= 10);
+const laterLevels = levels.filter((state) => state.level > 10);
+
+const groupOf = (id: GroupId): CatalogGroup => {
+  const group = catalog.groups.find((g) => g.id === id);
+  if (!group) {
+    throw new Error(`The catalog has no group "${id}".`);
+  }
+  return group;
+};
+
+const cardOf = (picture: PictureId): CatalogCard | undefined => catalog.cards.find((c) => c.id === picture);
+
+/** The groups where a child could put the picture: member groups and maybe groups. */
+const fits = (picture: PictureId): readonly GroupId[] => {
+  const card = cardOf(picture);
+  return card ? [...card.groups, ...card.maybe] : [];
+};
+
+/** Each card and each pile of the level: its picture and the group that it shows. */
+const shown = (state: GameState): readonly { readonly picture: PictureId; readonly group: GroupId }[] => [
+  ...state.table,
+  ...state.piles,
+];
+
+const cardsPerGroup = (state: GameState): readonly number[] =>
+  state.piles.map((pile) => state.table.filter((card) => card.group === pile.group).length);
+
+const describeLevel = (state: GameState): string =>
+  `level ${String(state.level)} seed ${String(state.seed)}: ${state.piles.map((p) => p.group).join(', ')}`;
+
+const typesOf = (states: readonly GameState[]): ReadonlySet<string> =>
+  new Set(states.flatMap((state) => state.piles.map((p) => groupOf(p.group).type)));
+
+describe('the fairness rule, over many seeds and level numbers', () => {
+  it('shows groups of one association type in each level', () => {
+    const mixed = levels.filter((state) => new Set(state.piles.map((p) => groupOf(p.group).type)).size !== 1);
+
+    expect(mixed.map(describeLevel)).toEqual([]);
+  });
+
+  it('deals each card only to a group where the card is a member', () => {
+    const wrong = levels.flatMap((state) =>
+      state.table.filter((card) => !cardOf(card.picture)?.groups.includes(card.group)).map((c) => c.picture)
+    );
+
+    expect(wrong).toEqual([]);
+  });
+
+  it('shows no card and no category card that fits a second shown group', () => {
+    const unfair = levels.flatMap((state) =>
+      shown(state)
+        .filter((item) => state.piles.some((p) => p.group !== item.group && fits(item.picture).includes(p.group)))
+        .map((item) => `${describeLevel(state)}: ${item.picture}`)
+    );
+
+    expect(unfair).toEqual([]);
+  });
+
+  it('never shows two confusable groups together', () => {
+    const confused = levels.filter((state) =>
+      state.piles.some((pile) => state.piles.some((other) => groupOf(pile.group).confusable.includes(other.group)))
+    );
+
+    expect(confused.map(describeLevel)).toEqual([]);
+  });
+
+  it('shows at most one picture of each thing', () => {
+    const twice = levels.filter((state) => {
+      // A picture that is not a card (a heart) is its own thing.
+      const things = shown(state).map((item) => cardOf(item.picture)?.thing ?? item.picture);
+      return new Set(things).size !== things.length;
+    });
+
+    expect(twice.map(describeLevel)).toEqual([]);
+  });
+
+  it('gives each group of a level the same number of cards, from 3 to 5', () => {
+    const uneven = levels.filter((state) => {
+      const counts = new Set(cardsPerGroup(state));
+      return counts.size !== 1 || [...counts].some((n) => n < 3 || n > 5);
+    });
+
+    expect(uneven.map(describeLevel)).toEqual([]);
+  });
+
+  it('shows a catalog still picture on each card and each pile', () => {
+    const stills = levels.flatMap((state) => shown(state).map((item) => pictureOf(item.picture).still));
+
+    expect(stills.filter((still) => !/^pictures\/[a-z0-9-]+\.webp$/u.test(still))).toEqual([]);
+  });
+});
+
+describe('the difficulty', () => {
+  it('gives level 1 two piles with 3 cards each', () => {
+    const first = SEEDS.map((seed) => start({ level: 1 }, seed));
+
+    expect(new Set(first.map((state) => state.piles.length))).toEqual(new Set([2]));
+    expect(new Set(first.flatMap(cardsPerGroup))).toEqual(new Set([3]));
+  });
+
+  it('shows 2 to 4 piles, in levels 1 to 10 and after level 10', () => {
+    expect(new Set(earlyLevels.map((state) => state.piles.length))).toEqual(new Set([2, 3, 4]));
+    expect(new Set(laterLevels.map((state) => state.piles.length))).toEqual(new Set([2, 3, 4]));
+  });
+
+  it('never makes level 1 to 10 easier than the level before', () => {
+    const easier = SEEDS.filter((seed) => {
+      const sizes = FIRST_TEN.map((level) => start({ level }, seed)).map((s) => [s.piles.length, s.table.length]);
+      return sizes.some(([piles = 0, cards = 0], i) => {
+        const [lastPiles = 0, lastCards = 0] = sizes[i - 1] ?? [];
+        return piles < lastPiles || (piles === lastPiles && cards < lastCards);
+      });
+    });
+
+    expect(easier).toEqual([]);
+  });
+
+  it('gives level 10 more piles and more cards than level 1', () => {
+    const first = start({ level: 1 }, 1);
+    const tenth = start({ level: 10 }, 1);
+
+    expect(tenth.piles.length).toBeGreaterThan(first.piles.length);
+    expect(tenth.table.length).toBeGreaterThan(first.table.length);
+  });
+
+  it('gives later levels up to 5 cards for each group', () => {
+    expect(Math.max(...levels.flatMap(cardsPerGroup))).toBe(5);
+  });
+
+  it('starts each pile with its category card and no other card', () => {
+    const notEmpty = levels.filter((state) => state.piles.some((pile) => pile.cards.length > 0));
+
+    expect(notEmpty.map(describeLevel)).toEqual([]);
+  });
+});
+
+describe('the seed', () => {
+  it('gives the same level for the same progress and seed', () => {
+    expect(start({ level: 4 }, 42)).toEqual(start({ level: 4 }, 42));
+  });
+
+  it('gives different groups for different seeds', () => {
+    const sets = new Set(
+      SEEDS.map((seed) =>
+        start({ level: 1 }, seed)
+          .piles.map((p) => p.group)
+          .toSorted()
+          .join()
+      )
+    );
+
+    expect(sets.size).toBeGreaterThan(SEEDS.length / 2);
+  });
+
+  it('shows each association type of the catalog, in levels 1 to 10 and after level 10', () => {
+    const all = new Set(catalog.groups.map((g) => g.type));
+
+    expect(typesOf(earlyLevels)).toEqual(all);
+    expect(typesOf(laterLevels)).toEqual(all);
+  });
+
+  it('keeps the deal as plain data that survives a JSON copy', () => {
+    const state = start({ level: 7 }, 3);
+
+    expect(JSON.parse(JSON.stringify(state))).toEqual(state);
+  });
+});
