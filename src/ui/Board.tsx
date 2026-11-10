@@ -5,11 +5,13 @@ import { saveGame } from '../shell/save';
 import { applyUpdateIfWaiting, checkForUpdate } from '../shell/update';
 import { RewardPage } from './book';
 import { celebrateLevel, parade } from './celebration';
+import { startCoach } from './coach';
 import { cancelDrag } from './drag';
 import { stillUrl } from './pictures';
 import { playEventSounds } from './sounds';
 import { raiseCard, TableView } from './table';
 import type { Action, CardId, GameState, Outcome, Pile, PileId } from '../model';
+import type { Coach } from './coach';
 import type { Hooks, Target } from './drag';
 import type { Accessor, JSX } from 'solid-js';
 
@@ -60,11 +62,12 @@ const dropAction = (state: GameState, cardId: CardId, pileId: PileId): Action =>
     : dropCard(cardId, pileId);
 };
 
-/** What the hooks need from the board: the newest state, the way to draw it, and the sticker book page. */
+/** What the hooks need from the board: the newest state, the way to draw it, the coach, and the book page. */
 type Game = {
   readonly current: () => GameState;
   readonly move: (state: GameState) => void;
   readonly show: () => void;
+  readonly rest: () => void;
   readonly showReward: () => void;
 };
 
@@ -96,7 +99,9 @@ const cardHooks = (game: Game, cardId: CardId): Hooks => {
       saveGame(game.current());
       if (last) {
         celebrateLevel(game.showReward);
+        return;
       }
+      game.rest();
     },
   };
 };
@@ -110,6 +115,7 @@ type Levels = {
   readonly onTapDeck: () => void;
   readonly act: (action: Action) => Outcome;
   readonly current: () => GameState;
+  readonly coach: Coach;
 };
 
 /** The level that the board shows. `first` is the saved level, or a new game (App.tsx reads the save). */
@@ -130,10 +136,20 @@ const playLevels = (first: GameState): Levels => {
     return outcome;
   };
 
+  // The coach shows the demos and the hints. A seen demo goes in the state and in the save at once.
+  const coach = startCoach({
+    current: () => model,
+    record: (next) => {
+      model = next;
+      saveGame(model);
+    },
+  });
+
   const game: Game = {
     current: () => model,
     move: (next) => (model = next),
     show: () => setState(model),
+    rest: coach.rest,
     showReward: () => setReward(true),
   };
 
@@ -145,9 +161,11 @@ const playLevels = (first: GameState): Levels => {
     onTapDeck: () => {
       act(tapDeck());
       setState(model);
+      coach.rest();
     },
     act,
     current: () => model,
+    coach,
   };
 };
 
@@ -156,18 +174,26 @@ const playLevels = (first: GameState): Levels => {
  * holds the next level, and the app shows the title scene (spec: level -> reward -> title scene).
  */
 export const Board = (props: { readonly initial: GameState; readonly onTitle: () => void }): JSX.Element => {
-  const { dealt, state, reward, hooksFor, onTapDeck, act, current } = playLevels(props.initial);
+  const { dealt, state, reward, hooksFor, onTapDeck, act, current, coach } = playLevels(props.initial);
   onMount(() => {
     const stop = watchLifecycle({
       hidden: () => {
+        coach.pause();
         cancelDrag();
         saveGame(current());
       },
-      visible: checkForUpdate,
+      visible: () => {
+        checkForUpdate();
+        coach.rest();
+      },
     });
-    onCleanup(stop);
+    onCleanup(() => {
+      stop();
+      coach.stop();
+    });
     // A safe point for a waiting update: the level starts and nobody has touched it yet.
     applyUpdateIfWaiting();
+    coach.rest();
   });
 
   // The table draws each dealt card in a fixed place. A card that left the table stays hidden in its place,

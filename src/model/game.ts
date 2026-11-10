@@ -13,15 +13,16 @@ export const go = (): Action => ({ type: 'go' });
 export const isFinished = (state: GameState): boolean => cardsLeft(state).length === 0;
 
 /**
- * The next level after a finished level, with the same game seed. The new sticker stays on the page:
- * at the place where the Child put it, or at a free spot. A level that is not finished stays.
+ * The next level after a finished level, with the same game seed and the same seen demos. The new sticker stays
+ * on the page: at the place where the Child put it, or at a free spot. A level that is not finished stays.
  */
 const goOn = (state: GameState): Outcome => {
   if (!isFinished(state)) {
     return { state, events: [] };
   }
   const pasted = paste(state.book);
-  return { state: { ...start({ level: state.level + 1 }, state.seed), book: pasted.book }, events: pasted.events };
+  const next = { ...start({ level: state.level + 1 }, state.seed), book: pasted.book, demos: state.demos };
+  return { state: next, events: pasted.events };
 };
 
 /** Applies one action. A rejected action returns the same state object. */

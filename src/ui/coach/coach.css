@@ -1,0 +1,56 @@
+/*
+ * The demo hand and the card copy that it moves (src/ui/coach). The layer is above the parade (z-index 1500) and
+ * below the sticker book page (z-index 1600). It lets each touch go through to the board.
+ * Only WAAPI animates these elements: no CSS transitions.
+ */
+.demo {
+  position: fixed;
+  inset: 0;
+  z-index: 1550;
+  pointer-events: none;
+}
+
+.card.demo-card {
+  position: fixed;
+  margin-left: calc(var(--card-w) / -2);
+  margin-top: calc(var(--card-h) / -2);
+}
+
+/* The card hides while its copy moves. It still gets the touch, so the Child can pick it up at once. */
+.card.demo-source {
+  opacity: 0;
+}
+
+/* The fingertip (20, 3 in the 48 by 64 box) is on the point of the transform. The hand is above the copy. */
+.demo-hand {
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 48px;
+  height: 64px;
+  margin-left: -20px;
+  margin-top: -3px;
+  opacity: 0;
+  will-change: transform;
+  transform: translate3d(0px, 0px, 0);
+}
+
+.demo-hand-body {
+  transform-origin: 20px 3px;
+}
+
+.demo-hand-body svg {
+  display: block;
+}
+
+.demo-hand-line {
+  fill: none;
+  stroke: #263238;
+  stroke-width: 5;
+  stroke-linejoin: round;
+}
+
+.demo-hand-fill {
+  fill: #fff;
+}

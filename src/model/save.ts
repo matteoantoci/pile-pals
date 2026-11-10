@@ -1,19 +1,31 @@
 // The save data of the game. All data is plain JSON, so localStorage and a save code can hold it.
 // The UI stores it after each resolved move (research/native-feel/shell.md §3).
 
-import type { Book, Card, GameState, Pile, PlacedSticker, Position, Progress, Stack, TableCard } from './types';
+import type {
+  Book,
+  Card,
+  DemoKind,
+  GameState,
+  Pile,
+  PlacedSticker,
+  Position,
+  Progress,
+  Stack,
+  TableCard,
+} from './types';
 
 /**
  * The schema version of `SaveData`. A save with another version is not read.
  * Raise this number when `restore` cannot read the data of the older version.
  */
-export const SAVE_VERSION = 3;
+export const SAVE_VERSION = 4;
 
 /**
  * The data of one save.
  * `state` is the level that the Child plays, whole: the deal, not only the seed.
  * `progress` is what the Child finished. The sticker book (the stickers, gold flags, and their places on each
- * page) is in `state.book`, because `apply` changes it. A later ticket adds the flags of the demos.
+ * page) is in `state.book`, because `apply` changes it. The flags of the demos that the Child already saw are in
+ * `state.demos`.
  */
 export type SaveData = {
   readonly version: number;
@@ -120,6 +132,18 @@ const isBook = (value: unknown): value is Book =>
   'award' in value &&
   isAward(value.award);
 
+const DEMO_KINDS: readonly unknown[] = ['first', 'faceDown', 'anchor', 'deck'] satisfies readonly DemoKind[];
+
+/** The fields that go with the Child from level to level: the sticker book and the demos that the Child saw. */
+const hasCarried = (value: unknown): value is Pick<GameState, 'book' | 'demos'> =>
+  typeof value === 'object' &&
+  value !== null &&
+  'book' in value &&
+  isBook(value.book) &&
+  'demos' in value &&
+  Array.isArray(value.demos) &&
+  value.demos.every((kind) => DEMO_KINDS.includes(kind));
+
 /**
  * The checks of the fields of `GameState` that this build knows. A field of a later ticket passes
  * without a check; `restore` then keeps it in the state as it is.
@@ -133,8 +157,7 @@ const isState = (value: unknown): value is GameState =>
   Array.isArray(value.piles) &&
   value.piles.every(isPile) &&
   hasDeck(value) &&
-  'book' in value &&
-  isBook(value.book);
+  hasCarried(value);
 
 const isProgress = (value: unknown): value is Progress =>
   typeof value === 'object' && value !== null && 'level' in value && typeof value.level === 'number';

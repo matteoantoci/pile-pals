@@ -47,7 +47,7 @@ describe('snapshot', () => {
 
     const save = snapshot(state);
 
-    expect(save.version).toBe(3);
+    expect(save.version).toBe(4);
     expect(save.state).toEqual(state);
     expect(save.progress.level).toBe(state.level);
   });
@@ -120,7 +120,7 @@ describe('restore', () => {
   });
 
   it('rejects an unknown schema version, and a save of version 2 that has no sticker book', () => {
-    const save = { ...snapshot(firstLevel()), version: 4 };
+    const save = { ...snapshot(firstLevel()), version: 5 };
     const { book: _book, ...oldState } = firstLevel();
     const old = { version: 2, state: oldState, progress: { level: 1 } };
 
@@ -157,7 +157,7 @@ describe('restore', () => {
 
   it('rejects data that is not a save', () => {
     const state = firstLevel();
-    const noState = { version: 3, progress: { level: 1 } };
+    const noState = { version: 4, progress: { level: 1 } };
     const badCard = { ...snapshot(state), state: { ...state, table: [{ id: 1 }] } };
     const noPiles = { ...snapshot(state), state: { ...state, piles: 'none' } };
     const badProgress = { ...snapshot(state), progress: {} };
