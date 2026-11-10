@@ -5,9 +5,7 @@ import { SHIPPED } from './levels';
 import type { PalSize } from '../model';
 import type { Clip } from './levels';
 
-export { audioNeedsTap, isSoundOn, loadClip, playClip, setSoundOn } from './engine';
-export { CLIPS } from './levels';
-export type { Clip, ClipLevel } from './levels';
+export { audioNeedsTap, isSoundOn, setSoundOn } from './engine';
 
 /** A sound slot. scripts/audio/prep.py writes the shipped file of each slot from src/sound/sounds.json. */
 export type SoundSlot = keyof typeof SHIPPED;
@@ -16,7 +14,7 @@ export type SoundSlot = keyof typeof SHIPPED;
 const SCALE = [0, 2, 4, 5, 7, 9, 11] as const;
 
 /** The playbackRate of snap note n: each card on a pile plays the next note of the major scale. */
-export const noteRate = (note: number): number => {
+const noteRate = (note: number): number => {
   const octave = Math.floor(note / SCALE.length);
   const step = SCALE[note % SCALE.length] ?? 0;
   return 2 ** ((12 * octave + step) / 12);
@@ -33,7 +31,7 @@ export const playSound = (slot: SoundSlot, note = 0): void => {
 };
 
 /** The playbackRate of the pop for each size: a fifth up for a small pal, a fifth down for a large pal. */
-export const POP_RATE: Readonly<Record<PalSize, number>> = { S: 1.5, M: 1, L: 2 / 3 };
+const POP_RATE: Readonly<Record<PalSize, number>> = { S: 1.5, M: 1, L: 2 / 3 };
 
 const shipped: Readonly<Record<string, Clip | undefined>> = SHIPPED;
 

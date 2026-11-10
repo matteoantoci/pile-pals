@@ -8,15 +8,6 @@ const TABLE = '#2F6F4E';
 export default defineConfig({
   // GitHub Pages serves the app from https://<user>.github.io/pile-pals/.
   base: '/pile-pals/',
-  build: {
-    rolldownOptions: {
-      // The listening page /listen/ of ticket 05 is a second page. Its code goes to listen/, out of the precache.
-      input: { index: 'index.html', listen: 'listen/index.html' },
-      output: {
-        entryFileNames: (chunk) => (chunk.name === 'listen' ? 'listen/[name]-[hash].js' : 'assets/[name]-[hash].js'),
-      },
-    },
-  },
   plugins: [
     solid(),
     VitePWA({
@@ -37,10 +28,6 @@ export default defineConfig({
         // Each file is below the default limit of 2 MiB (maximumFileSizeToCacheInBytes), so the precache
         // holds all of them.
         globPatterns: ['**/*.{js,css,html,svg,png,webp,avif,txt,webmanifest,wav}'],
-        // The listening page and its clips (public/listen/) are only for the Parent: no precache,
-        // and no fallback to the game page for a navigation to /listen/.
-        globIgnores: ['listen/**'],
-        navigateFallbackDenylist: [/\/listen\//],
       },
     }),
   ],

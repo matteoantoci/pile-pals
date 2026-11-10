@@ -18,7 +18,7 @@ export type ClipLevel = {
   readonly truePeak: number;
   /**
    * The rule that set the gain: -18 - I ('loudness'), -1 - TP ('peak'), -6 - TP for a file below 0.4 s ('short'),
-   * or -6 - TP for a snap candidate at each length ('pluck').
+   * or -6 - TP for the snap at each length ('pluck').
    */
   readonly rule: 'loudness' | 'peak' | 'short' | 'pluck';
   /** The decrease in dB that keeps the file from being louder than the snap. */
@@ -45,12 +45,12 @@ def _object(fields):
 def write_levels(path, levels, slots):
     clips = "\n".join(f"  {_ts(clip_id)}: {_object(level)}," for clip_id, level in levels.items())
     shipped = "\n".join(
-        f"  {_ts(slot['id'])}: {_object({k: levels[slot['pick']][k] for k in ('file', 'gainDb')})},"
-        for slot in slots
+        f"  {_ts(slot_id)}: {_object({k: levels[clip_id][k] for k in ('file', 'gainDb')})},"
+        for slot_id, clip_id in slots.items()
     )
     path.write_text(
         LEVELS_HEADER
-        + "\n/** One line for each processed file: the shipped files and the listening page candidates. */\n"
+        + "\n/** One line for each shipped file. */\n"
         + "export const CLIPS: Readonly<Record<string, ClipLevel>> = {\n"
         + clips
         + "\n};\n\n/** The shipped file of each slot. */\nexport const SHIPPED = {\n"
@@ -80,8 +80,6 @@ def write_credits(path, manifest, levels):
     credits = json.loads(path.read_text())
     works = {}
     for clip_id, level in levels.items():
-        if not level["file"].startswith("sounds/"):
-            continue
         clip = manifest["clips"][clip_id]
         key = (clip["title"], clip["author"], clip["licence"], clip["page"])
         work = works.setdefault(key, {"files": [], "changes": []})
@@ -106,11 +104,11 @@ def write_credits(path, manifest, levels):
 
 
 def print_report(levels, slots):
-    picks = {slot["pick"]: slot["id"] for slot in slots}
+    picks = {clip_id: slot_id for slot_id, clip_id in slots.items()}
     print(f"{'clip':28} {'slot':24} {'s':>6} {'I':>6} {'TP':>6} {'rule':9} {'gain':>6} {'snap':>5} {'M':>6}")
     for clip_id, level in levels.items():
         print(
-            f"{clip_id:28} {picks.get(clip_id, '-'):24} {level['seconds']:6.3f} {level['lufs']:6.1f}"
+            f"{clip_id:28} {picks[clip_id]:24} {level['seconds']:6.3f} {level['lufs']:6.1f}"
             f" {level['truePeak']:6.1f} {level['rule']:9} {level['gainDb']:6.1f}"
             f" {-level['snapLimitDb']:5.1f} {level['maxMomentary']:6.1f}"
         )

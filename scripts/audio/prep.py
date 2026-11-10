@@ -2,11 +2,9 @@
 
 Needs Python 3.11 or later and ffmpeg 6 or later. No pip package.
 
-Reads src/sound/sounds.json (the slots, their candidates, and the source of each clip). For each clip:
-downloads the source into .cache/audio/, converts and cuts it, measures it, and sets the play gain.
-Then it writes:
-- public/sounds/<id>.wav for each clip that a slot picks. The game ships and precaches these files.
-- public/listen/clips/<id>.wav for the other candidates. Only the listening page plays them.
+Reads src/sound/sounds.json (the clip of each slot, and the source of each clip). For each clip: downloads the
+source into .cache/audio/, converts and cuts it, measures it, and sets the play gain. Then it writes:
+- public/sounds/<id>.wav for each clip. The game ships and precaches these files.
 - src/sound/levels.ts, the table of the measured values and the gains.
 - the "sound" entries of src/credits.json. The script keeps all other entries.
 """
@@ -27,7 +25,6 @@ LEVELS = ROOT / "src/sound/levels.ts"
 CREDITS = ROOT / "src/credits.json"
 PUBLIC = ROOT / "public"
 SHIPPED_DIR = "sounds"
-LISTEN_DIR = "listen/clips"
 CACHE = ROOT / ".cache/audio"
 CATALOG = ROOT / "src/model/catalog.json"
 
@@ -47,7 +44,7 @@ def floor_tenth(value):
 def gain_for(seconds, lufs, true_peak, pluck):
     """Returns (gain in dB, rule). labrynth2 §9.6 step 2, and the short-file and pluck rules of ticket 05.
 
-    A snap candidate is the pluck: at each length, its gain sets the true peak to -6 dBTP.
+    The snap is the pluck: at each length, its gain sets the true peak to -6 dBTP.
     """
     if pluck:
         return floor_tenth(-6 - true_peak), "pluck"
@@ -59,40 +56,39 @@ def gain_for(seconds, lufs, true_peak, pluck):
     return gain, "loudness"
 
 
+def unique_keys(pairs):
+    keys = [key for key, _ in pairs]
+    if len(keys) != len(set(keys)):
+        sys.exit("sounds.json: two keys of one object are the same.")
+    return dict(pairs)
+
+
 def load_manifest():
-    manifest = json.loads(MANIFEST.read_text())
+    manifest = json.loads(MANIFEST.read_text(), object_pairs_hook=unique_keys)
     licences = json.loads(CREDITS.read_text())["licences"]
-    slots = [slot for section in manifest["sections"] for slot in section["slots"]]
-    ids = [slot["id"] for slot in slots]
-    if len(ids) != len(set(ids)):
-        sys.exit("sounds.json: two slots have the same id.")
-    if SNAP_SLOT not in ids:
+    slots = manifest["slots"]
+    if SNAP_SLOT not in slots:
         sys.exit(f"sounds.json: the {SNAP_SLOT} slot is missing. The level rule needs it.")
-    for slot in slots:
-        if slot["pick"] not in slot["candidates"]:
-            sys.exit(f"sounds.json: slot {slot['id']} picks a clip that is not a candidate.")
-        if slot["status"] not in ("sure", "doubt"):
-            sys.exit(f"sounds.json: slot {slot['id']} has a status that is not sure or doubt.")
     pals = {card["id"] for card in json.loads(CATALOG.read_text())["cards"] if card["animation"]}
-    for slot_id in ids:
+    for slot_id in slots:
         if slot_id.startswith(PAL_PREFIX) and slot_id.removeprefix(PAL_PREFIX) not in pals:
             sys.exit(f"sounds.json: slot {slot_id} is not a pal of src/model/catalog.json.")
-    for clip_id in {c for slot in slots for c in slot["candidates"]}:
+    for clip_id in set(slots.values()):
         clip = manifest["clips"].get(clip_id)
         if clip is None or clip["licence"] not in licences:
             sys.exit(f"sounds.json: clip {clip_id} is missing or has a licence that credits.json does not know.")
     return manifest, slots
 
 
-def process(clip_id, clip, folder, pluck):
+def process(clip_id, clip, pluck):
     """Converts one clip and sets its gain. Returns its line of the level table."""
-    out = PUBLIC / folder / f"{clip_id}.wav"
+    out = PUBLIC / SHIPPED_DIR / f"{clip_id}.wav"
     tools.convert(tools.fetch(clip["source"], CACHE), out, clip.get("cut"))
     seconds = tools.seconds(out)
     lufs, true_peak = tools.loudness(out)
     gain, rule = gain_for(seconds, lufs, true_peak, pluck)
     return {
-        "file": f"{folder}/{clip_id}.wav",
+        "file": f"{SHIPPED_DIR}/{clip_id}.wav",
         "seconds": round(seconds, 3),
         "lufs": lufs,
         "truePeak": true_peak,
@@ -116,32 +112,26 @@ def apply_snap_limit(level, reference):
     sys.exit(f"{level['file']}: the snap limit did not converge.")
 
 
-def clear_wav(folder):
-    (PUBLIC / folder).mkdir(parents=True, exist_ok=True)
-    for old in (PUBLIC / folder).glob("*.wav"):
+def clear_wav():
+    (PUBLIC / SHIPPED_DIR).mkdir(parents=True, exist_ok=True)
+    for old in (PUBLIC / SHIPPED_DIR).glob("*.wav"):
         old.unlink()
 
 
 def build_levels(manifest, slots):
-    picked = {slot["pick"] for slot in slots}
-    snaps = {c for slot in slots if slot["id"] == SNAP_SLOT for c in slot["candidates"]}
-    clip_ids = list(dict.fromkeys(c for slot in slots for c in slot["candidates"]))
+    snap = slots[SNAP_SLOT]
+    clip_ids = list(dict.fromkeys(slots.values()))
     # Download one at a time: two clips can come from the same Kenney zip.
     for clip_id in clip_ids:
         tools.fetch(manifest["clips"][clip_id]["source"], CACHE)
-    clear_wav(SHIPPED_DIR)
-    clear_wav(LISTEN_DIR)
+    clear_wav()
     with ThreadPoolExecutor() as pool:
-        jobs = {
-            c: pool.submit(process, c, manifest["clips"][c], SHIPPED_DIR if c in picked else LISTEN_DIR, c in snaps)
-            for c in clip_ids
-        }
+        jobs = {c: pool.submit(process, c, manifest["clips"][c], c == snap) for c in clip_ids}
         levels = {c: job.result() for c, job in jobs.items()}
-    # A snap candidate is not limited: it is the reference when the Parent picks it.
-    snap_pick = next(slot["pick"] for slot in slots if slot["id"] == SNAP_SLOT)
-    reference = levels[snap_pick]["maxMomentary"]
+    # The snap is the reference: it is not limited.
+    reference = levels[snap]["maxMomentary"]
     for clip_id, level in levels.items():
-        if clip_id not in snaps:
+        if clip_id != snap:
             apply_snap_limit(level, reference)
     return levels
 
