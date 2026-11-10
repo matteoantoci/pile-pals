@@ -29,11 +29,14 @@ PUBLIC = ROOT / "public"
 SHIPPED_DIR = "sounds"
 LISTEN_DIR = "listen/clips"
 CACHE = ROOT / ".cache/audio"
+CATALOG = ROOT / "src/model/catalog.json"
 
 # The rising snap is the loudest sound. No other file has a higher momentary loudness.
 SNAP_SLOT = "snap"
 # Below 0.4 s, ebur128 cannot measure the integrated loudness I.
 SHORT_SECONDS = 0.4
+# The slot of a pal sound is "pal-<card id>" (src/sound/index.ts, playPal). A pal is a card with an animation.
+PAL_PREFIX = "pal-"
 
 
 def floor_tenth(value):
@@ -65,6 +68,10 @@ def load_manifest():
             sys.exit(f"sounds.json: slot {slot['id']} picks a clip that is not a candidate.")
         if slot["status"] not in ("sure", "doubt"):
             sys.exit(f"sounds.json: slot {slot['id']} has a status that is not sure or doubt.")
+    pals = {card["id"] for card in json.loads(CATALOG.read_text())["cards"] if card["animation"]}
+    for slot_id in ids:
+        if slot_id.startswith(PAL_PREFIX) and slot_id.removeprefix(PAL_PREFIX) not in pals:
+            sys.exit(f"sounds.json: slot {slot_id} is not a pal of src/model/catalog.json.")
     for clip_id in {c for slot in slots for c in slot["candidates"]}:
         clip = manifest["clips"].get(clip_id)
         if clip is None or clip["licence"] not in licences:

@@ -104,10 +104,10 @@ def write_credits(path, manifest, levels):
 
 def print_report(levels, slots):
     picks = {slot["pick"]: slot["id"] for slot in slots}
-    print(f"{'clip':24} {'slot':6} {'s':>6} {'I':>6} {'TP':>6} {'rule':9} {'gain':>6} {'snap':>5} {'M':>6}")
+    print(f"{'clip':28} {'slot':24} {'s':>6} {'I':>6} {'TP':>6} {'rule':9} {'gain':>6} {'snap':>5} {'M':>6}")
     for clip_id, level in levels.items():
         print(
-            f"{clip_id:24} {picks.get(clip_id, '-'):6} {level['seconds']:6.3f} {level['lufs']:6.1f}"
+            f"{clip_id:28} {picks.get(clip_id, '-'):24} {level['seconds']:6.3f} {level['lufs']:6.1f}"
             f" {level['truePeak']:6.1f} {level['rule']:9} {level['gainDb']:6.1f}"
             f" {-level['snapLimitDb']:5.1f} {level['maxMomentary']:6.1f}"
         )
