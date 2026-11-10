@@ -1,7 +1,7 @@
 // The listening page /listen/ (ticket 05). The Parent listens to each candidate at its game level and picks
 // keep or replace. Copy answers gives one line for each slot, as the labrynth2 listening pages.
 // The data is src/sound/sounds.json (the slots) and src/sound/levels.ts (the files and gains).
-import { CLIPS, installSound, loadClip, noteRate, playClip } from '../sound';
+import { CLIPS, installSound, loadClip, noteRate, playClip, POP_RATE } from '../sound';
 import manifestJson from '../sound/sounds.json';
 import type { ClipLevel } from '../sound';
 
@@ -64,6 +64,13 @@ const button = (label: string, onClick: () => void): HTMLButtonElement => {
 
 const playButtons = (slot: Slot, level: ClipLevel): HTMLElement[] => {
   const play = button('Play', () => playClip(level));
+  if (slot.id === 'pop') {
+    // The game plays the pop at the rate of the size tag of the pal (src/sound/pal-sizes.json).
+    const sizes = Object.entries(POP_RATE).map(([size, rate]) =>
+      button(`Play for a pal of size ${size}`, () => playClip(level, rate))
+    );
+    return [play, ...sizes];
+  }
   if (slot.id !== 'snap') {
     return [play];
   }
