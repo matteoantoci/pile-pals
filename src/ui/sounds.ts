@@ -22,6 +22,13 @@ const playEventSound = (event: GameEvent): void => {
     case 'levelComplete':
       playSound('level');
       break;
+    case 'stickerPlaced':
+      playSound('snap');
+      break;
+    case 'stickerAwarded':
+    case 'bookComplete':
+      // These come with the level fanfare. The sticker book page plays the pal of the new sticker when it opens.
+      break;
   }
 };
 

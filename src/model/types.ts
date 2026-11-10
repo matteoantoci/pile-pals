@@ -38,6 +38,34 @@ export type Progress = {
   readonly level: number;
 };
 
+/** A point on a page of the sticker book: x from 0 (left) to 1 (right), y from 0 (top) to 1 (bottom). */
+export type Position = {
+  readonly x: number;
+  readonly y: number;
+};
+
+/** A sticker of the book: a pal of the catalog, in its normal or its gold version. */
+export type Sticker = {
+  /** The picture id of the pal. */
+  readonly pal: PictureId;
+  readonly gold: boolean;
+};
+
+/** A sticker on a page, at the place where the Child put it. */
+export type PlacedSticker = Sticker & {
+  readonly at: Position;
+};
+
+/**
+ * The sticker book. It goes with the Child from level to level; the deal of a level does not depend on it.
+ * `pages` holds the pages in order, the current page last. The new sticker goes on the current page.
+ * `award` is the new sticker of the finished level until `go`. Its `at` is null until the Child drags it.
+ */
+export type Book = {
+  readonly pages: readonly (readonly PlacedSticker[])[];
+  readonly award: (Sticker & { readonly at: Position | null }) | null;
+};
+
 /**
  * The level that the Child plays. It is plain data (no Map, no class, no function), so a save can keep it whole.
  * `seed` is the seed of the game: the same seed and level number always give the same deal.
@@ -51,6 +79,8 @@ export type GameState = {
   readonly deck: readonly Card[];
   /** The face-up card that the last tap of the deck gave, or null. */
   readonly dealt: Card | null;
+  /** The sticker book of the Child. */
+  readonly book: Book;
 };
 
 /** Each action is one input from the Child. Add new actions to this union. */
@@ -63,7 +93,19 @@ export type Action =
   /** The Child taps the deck. */
   | {
       readonly type: 'tapDeck';
+    }
+  /** The Child puts the new sticker at this place of the book page. */
+  | {
+      readonly type: 'placeSticker';
+      readonly position: Position;
+    }
+  /** The Child taps the green arrow button of the book page: the sticker stays, and the next level starts. */
+  | {
+      readonly type: 'go';
     };
+
+/** The actions of the play on the table. The sticker actions come after the level. */
+export type LevelAction = Exclude<Action, { readonly type: 'placeSticker' | 'go' }>;
 
 /** Each event is one thing that the UI shows or plays. Add new events to this union. */
 export type GameEvent =
@@ -92,9 +134,24 @@ export type GameEvent =
       readonly type: 'groupComplete';
       readonly pileId: PileId;
     }
-  /** The last card of the level is on its pile. `nextLevel` then deals the next level. */
+  /** The last card of the level is on its pile. The sticker book page comes next. */
   | {
       readonly type: 'levelComplete';
+    }
+  /** The Child gets a new sticker for the finished level. `stickerId` is the picture id of the pal. */
+  | {
+      readonly type: 'stickerAwarded';
+      readonly stickerId: PictureId;
+      readonly gold: boolean;
+    }
+  /** The new sticker is at this place of the page: the Child put it there, or `go` put it there by itself. */
+  | {
+      readonly type: 'stickerPlaced';
+      readonly at: Position;
+    }
+  /** The Child has all stickers of the book. */
+  | {
+      readonly type: 'bookComplete';
     };
 
 export type Outcome = {

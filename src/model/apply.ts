@@ -1,10 +1,21 @@
-import type { Action, Card, CardId, GameEvent, GameState, GroupId, Outcome, PileId, Stack, TableCard } from './types';
+import type {
+  Card,
+  CardId,
+  GameEvent,
+  GameState,
+  GroupId,
+  LevelAction,
+  Outcome,
+  PileId,
+  Stack,
+  TableCard,
+} from './types';
 
 /** The Child drops the card on the pile. */
-export const dropCard = (cardId: CardId, pileId: PileId): Action => ({ type: 'dropCard', cardId, pileId });
+export const dropCard = (cardId: CardId, pileId: PileId): LevelAction => ({ type: 'dropCard', cardId, pileId });
 
 /** The Child taps the deck for the next card. */
-export const tapDeck = (): Action => ({ type: 'tapDeck' });
+export const tapDeck = (): LevelAction => ({ type: 'tapDeck' });
 
 /** The cards that are not on a pile yet: the cards of the stacks, the deck, and the dealt card. */
 export const cardsLeft = (state: GameState): readonly Card[] => [
@@ -91,8 +102,8 @@ const tap = (state: GameState): Outcome => {
   return { state: { ...state, deck, dealt: top }, events: [{ type: 'dealt' }] };
 };
 
-/** Applies one action. A rejected action returns the same state object. */
-export const apply = (state: GameState, action: Action): Outcome => {
+/** Plays one move of the level. A rejected move returns the same state object. `apply` (game.ts) adds the sticker. */
+export const playMove = (state: GameState, action: LevelAction): Outcome => {
   switch (action.type) {
     case 'dropCard':
       return drop(state, action.cardId, action.pileId);
