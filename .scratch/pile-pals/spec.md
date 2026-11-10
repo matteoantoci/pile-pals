@@ -151,7 +151,7 @@ Screens: title scene → level → reward (the sticker book page) → title scen
    - Animated files are AVIF or WebP, which always start at frame 0. Frame 0 is not always the rest pose. The pipeline therefore reads the `rest` marker from each Lottie file and encodes the loop again so that it starts at the rest frame. No Lottie player ships in the game.
    - For a card with an animated twin, the still picture is the rest frame of the animation. So the swap from still to animation shows no jump.
    - Output: one catalog file that the game model imports, plus the optimised picture and animation files.
-5. **Missing pictures.** 10 things have no emoji: towel, rubber duck, starfish, seahorse, excavator, crane, dump truck, sweater, pyjamas, pacifier. Make them with Grok Imagine (`grok-imagine-image-2.0` edits with 3 Noto 2D reference pictures) and remove the background with rembg and BiRefNet. These cards get no animation.
+5. **Missing pictures: not in version 1.** 10 things have no emoji: towel, rubber duck, starfish, seahorse, excavator, crane, dump truck, sweater, pyjamas, pacifier. Their groups already have enough cards, so the game ships no generated pictures (ticket 15, `wontfix`).
 6. **Board UI.** Draws the table, the piles, the deck, and the slots. Drag rules from `research/native-feel/motion.md`:
    - Write the `transform` directly in `pointermove`. Use `touch-action: none` and `setPointerCapture`. Never use `touch-action: manipulation`.
    - Animate only `transform` and `opacity`, with WAAPI `element.animate()`. Use no Motion library and no CSS transitions on cards.
@@ -162,8 +162,9 @@ Screens: title scene → level → reward (the sticker book page) → title scen
    - Card actions: Kenney Casino Audio (CC0) for slide, place, flip, and deck sounds. Open the pack and confirm the files before use.
    - Effects reused from labrynth2: Boing 2 (wrong drop), Bubble Pop (lift or sticker), Success Fanfare Trumpets (level complete), all CC0.
    - Rising snap notes: one recorded pluck played at a higher `playbackRate` for each card on the pile.
-   - Pal sounds: the 13 labrynth2 animal sounds, plus Freesound CC0 sounds for about 30 more pals, downloaded as `-hq.mp3` preview files (no login). The other pals get a short "pop" at a pitch for their size.
-   - The Parent chooses the sounds on a listening page with keep and replace buttons, as in labrynth2.
+   - Pal sounds: the 13 labrynth2 animal sounds, plus Freesound CC0 sounds for about 30 more pals, downloaded as `-hq.mp3` preview files (no login).
+   - The agent chooses a first sound for each slot and marks it `sure` or `doubt`. The first choice ships. The Parent listens only to the `doubt` slots on a listening page with keep and replace buttons, as in labrynth2.
+   - Pals with no own sound play a pop. The agent tags each pal `S`, `M`, or `L` for its real size, and the pop pitch follows the tag.
    - Set `navigator.audioSession.type = "playback"` and test whether the silent switch then allows sound.
 9. **Shell.** From `research/native-feel/shell.md`:
    - Start image and background colour so that no white flash shows.
@@ -193,7 +194,7 @@ The save data holds a schema version, the current level number, the full current
 - Motion, sound, drag feel, and the shell are not tested by code. The Parent tests them on the iPhone 12 with iOS 26. Device checks:
   1. Does the silent switch mute the game?
   2. Do 8 animated stickers play smoothly during a drag?
-  3. Is the total offline download size acceptable?
+  3. Is the total offline download size at most 150 MB?
 
 ## Out of Scope
 
