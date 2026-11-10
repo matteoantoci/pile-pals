@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { apply, dropCard, restore, snapshot, start } from './index';
+import { openCards } from './test-player';
 import type { Card, GameEvent, GameState, Pile, RestoredGame } from './index';
 
 const firstLevel = (): GameState => start({ level: 1 }, 1);
@@ -26,7 +27,7 @@ type Play = { readonly drops: readonly (readonly GameEvent[])[]; readonly end: G
 
 /** Drops each card on a pile of the given kind, one after the other. */
 const play = (state: GameState, fits: boolean): Play =>
-  state.table.reduce<Play>(
+  openCards(state).reduce<Play>(
     ({ drops, end }, card) => {
       const outcome = apply(end, dropCard(card.id, pileFor(end, card, fits).id));
       return { drops: [...drops, outcome.events], end: outcome.state };
@@ -87,7 +88,7 @@ describe('restore', () => {
 
   it('rejects a save after a move with the same result', () => {
     const state = start({ level: 3 }, 7);
-    const card = state.table[0];
+    const card = openCards(state)[0];
     if (!card) {
       throw new Error('The level has no card on the table.');
     }

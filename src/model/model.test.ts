@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { apply, dropCard, nextLevel, start } from './index';
+import { apply, dropCard, nextLevel, start, tapDeck } from './index';
+import { openCards, playOut } from './test-player';
 import type { Card, GameEvent, GameState, Pile } from './index';
 
 const firstLevel = (): GameState => start({ level: 1 }, 1);
 
 const firstCard = (state: GameState): Card => {
-  const card = state.table[0];
+  const card = openCards(state)[0];
   if (!card) {
     throw new Error('The level has no card on the table.');
   }
@@ -33,8 +34,6 @@ const play = (state: GameState, cards: readonly Card[]): Play =>
     { drops: [], end: state }
   );
 
-const playAll = (state: GameState): Play => play(state, state.table);
-
 describe('dropCard', () => {
   it('rejects a card on the wrong pile and keeps the same state', () => {
     const state = firstLevel();
@@ -55,7 +54,7 @@ describe('dropCard', () => {
     const result = apply(state, dropCard(card.id, right.id));
 
     expect(result.events).toEqual([{ type: 'snapped', cardId: card.id, pileId: right.id, noteIndex: 0 }]);
-    expect(result.state.table.map((c) => c.id)).not.toContain(card.id);
+    expect(openCards(result.state).map((c) => c.id)).not.toContain(card.id);
     expect(result.state.piles.find((p) => p.id === right.id)?.cards.map((c) => c.id)).toEqual([card.id]);
   });
 
@@ -63,7 +62,7 @@ describe('dropCard', () => {
     const state = firstLevel();
     const card = firstCard(state);
     const right = pileFor(state, card, true);
-    const next = state.table.find((c) => c.id !== card.id && c.group === card.group);
+    const next = openCards(state).find((c) => c.id !== card.id && c.group === card.group);
     if (!next) {
       throw new Error('The level has only one card in the group.');
     }
@@ -85,13 +84,79 @@ describe('dropCard', () => {
     expect(again.events).toEqual([{ type: 'rejected', cardId: card.id }]);
     expect(again.state).toBe(once.state);
   });
+
+  it('rejects a card that has a card on top of it', () => {
+    const state = start({ level: 11 }, 5);
+    const buried = state.table.flatMap((stack) => stack.cards).find((card) => card.faceDown);
+    if (!buried) {
+      throw new Error('The level has no face-down card.');
+    }
+
+    const result = apply(state, dropCard(buried.id, pileFor(state, buried, true).id));
+
+    expect(result.events).toEqual([{ type: 'rejected', cardId: buried.id }]);
+    expect(result.state).toBe(state);
+  });
+});
+
+describe('tapDeck', () => {
+  it('gives the top card of the deck and takes it from the deck', () => {
+    const state = start({ level: 11 }, 5);
+    const top = state.deck.at(-1);
+    if (!top) {
+      throw new Error('The level has no deck.');
+    }
+
+    const result = apply(state, tapDeck());
+
+    expect(result.events).toEqual([{ type: 'dealt' }]);
+    expect(result.state.dealt).toEqual(top);
+    expect(result.state.deck).toHaveLength(state.deck.length - 1);
+  });
+
+  it('puts the face-up card at the bottom of the deck, so no card gets lost', () => {
+    const state = start({ level: 11 }, 5);
+    const first = state.deck.at(-1);
+    if (!first) {
+      throw new Error('The level has no deck.');
+    }
+    const once = apply(state, tapDeck()).state;
+    const twice = apply(once, tapDeck()).state;
+
+    expect(twice.deck).toHaveLength(state.deck.length - 1);
+    expect(twice.deck[0]?.id).toBe(first.id);
+    expect(twice.dealt?.id).toBe(state.deck.at(-2)?.id);
+  });
+
+  it('starts the deck again after its last card', () => {
+    const state = start({ level: 11 }, 5);
+    const turn = state.deck.reduce<{ state: GameState; shown: readonly string[] }>(
+      (turned, _, index) => {
+        const next = apply(turned.state, tapDeck()).state;
+        return { state: next, shown: [...turned.shown, next.dealt?.id ?? `no card ${String(index)}`] };
+      },
+      { state, shown: [] }
+    );
+
+    expect(turn.shown).toEqual(state.deck.map((card) => card.id).toReversed());
+    expect(apply(turn.state, tapDeck()).state.dealt?.id).toBe(state.deck.at(-1)?.id);
+  });
+
+  it('changes nothing on a level without a deck', () => {
+    const state = firstLevel();
+
+    const result = apply(state, tapDeck());
+
+    expect(result.events).toEqual([]);
+    expect(result.state).toBe(state);
+  });
 });
 
 describe('a full level', () => {
   it('gives groupComplete with the last card of a group, and not before', () => {
     const state = firstLevel();
     const pile = state.piles[0];
-    const group = state.table.filter((card) => card.group === pile?.group);
+    const group = openCards(state).filter((card) => card.group === pile?.group);
 
     const { drops } = play(state, group);
 
@@ -107,11 +172,13 @@ describe('a full level', () => {
   });
 
   it('gives levelComplete with the last card of the level, and not before', () => {
-    const { drops, end } = playAll(firstLevel());
+    const { events, end } = playOut(firstLevel());
 
-    expect(drops.flat().filter((event) => event.type === 'levelComplete')).toHaveLength(1);
-    expect(drops.at(-1)?.at(-1)).toEqual({ type: 'levelComplete' });
-    expect(end.table).toEqual([]);
+    expect(events.filter((event) => event.type === 'levelComplete')).toHaveLength(1);
+    expect(events.at(-1)).toEqual({ type: 'levelComplete' });
+    expect(end.table.every((stack) => stack.cards.length === 0)).toBe(true);
+    expect(end.deck).toEqual([]);
+    expect(end.dealt).toBeNull();
   });
 
   it('plays each level to the end, over many seeds and level numbers', () => {
@@ -119,7 +186,7 @@ describe('a full level', () => {
       Array.from({ length: 20 }, (_, i) => start({ level: i + 1 }, seed))
     );
     const wrong = states.filter((state) => {
-      const events = playAll(state).drops.flat();
+      const { events, end } = playOut(state);
       const notes = state.piles.map((pile) =>
         events.flatMap((e) => (e.type === 'snapped' && e.pileId === pile.id ? [e.noteIndex] : []))
       );
@@ -131,7 +198,8 @@ describe('a full level', () => {
             .map((p) => p.id)
             .toSorted()
             .join() ||
-        events.at(-1)?.type !== 'levelComplete'
+        events.at(-1)?.type !== 'levelComplete' ||
+        end.table.some((stack) => stack.cards.length > 0)
       );
     });
 
@@ -141,7 +209,7 @@ describe('a full level', () => {
 
 describe('nextLevel', () => {
   it('deals the next level after levelComplete', () => {
-    const { end } = playAll(firstLevel());
+    const { end } = playOut(firstLevel());
 
     const next = nextLevel(end);
 
@@ -151,7 +219,7 @@ describe('nextLevel', () => {
   });
 
   it('deals the same level as a new start of that level with the same seed', () => {
-    const { end } = playAll(start({ level: 6 }, 99));
+    const { end } = playOut(start({ level: 6 }, 99));
 
     expect(nextLevel(end)).toEqual(start({ level: 7 }, 99));
   });

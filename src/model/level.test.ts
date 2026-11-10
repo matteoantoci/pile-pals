@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { catalog, pictureOf, start } from './index';
-import type { CatalogCard, CatalogGroup, GameState, GroupId, PictureId } from './index';
+import type { CatalogCard, CatalogGroup, GameState, GroupId, PictureId, TableCard } from './index';
 
 // The level generator, tested over many seeds and level numbers with the real catalog.
 // The rules come from the spec (Module 2) and from research/native-feel/content-model.md §5.
@@ -30,14 +30,23 @@ const fits = (picture: PictureId): readonly GroupId[] => {
   return card ? [...card.groups, ...card.maybe] : [];
 };
 
+/** The cards of the stacks of the level, in the order of the stacks. */
+const tableCards = (state: GameState): readonly TableCard[] => state.table.flatMap((stack) => stack.cards);
+
+/** The cards of the level that the Child can see now or after a tap of the deck. */
+const levelCards = (state: GameState): readonly { readonly picture: PictureId; readonly group: GroupId }[] => [
+  ...tableCards(state),
+  ...state.deck,
+];
+
 /** Each card and each pile of the level: its picture and the group that it shows. */
 const shown = (state: GameState): readonly { readonly picture: PictureId; readonly group: GroupId }[] => [
-  ...state.table,
+  ...levelCards(state),
   ...state.piles,
 ];
 
 const cardsPerGroup = (state: GameState): readonly number[] =>
-  state.piles.map((pile) => state.table.filter((card) => card.group === pile.group).length);
+  state.piles.map((pile) => levelCards(state).filter((card) => card.group === pile.group).length);
 
 const describeLevel = (state: GameState): string =>
   `level ${String(state.level)} seed ${String(state.seed)}: ${state.piles.map((p) => p.group).join(', ')}`;
@@ -54,8 +63,21 @@ describe('the fairness rule, over many seeds and level numbers', () => {
 
   it('deals each card only to a group where the card is a member', () => {
     const wrong = levels.flatMap((state) =>
-      state.table.filter((card) => !cardOf(card.picture)?.groups.includes(card.group)).map((c) => c.picture)
+      tableCards(state)
+        .filter((card) => !cardOf(card.picture)?.groups.includes(card.group))
+        .map((card) => card.picture)
     );
+
+    expect(wrong).toEqual([]);
+  });
+
+  it('deals the deck from the cards of the level, each card one time', () => {
+    const wrong = levels
+      .filter((state) => {
+        const ids = [...tableCards(state), ...state.deck].map((card) => card.id);
+        return new Set(ids).size !== ids.length;
+      })
+      .map(describeLevel);
 
     expect(wrong).toEqual([]);
   });
@@ -119,7 +141,7 @@ describe('the difficulty', () => {
 
   it('never makes level 1 to 10 easier than the level before', () => {
     const easier = SEEDS.filter((seed) => {
-      const sizes = FIRST_TEN.map((level) => start({ level }, seed)).map((s) => [s.piles.length, s.table.length]);
+      const sizes = FIRST_TEN.map((level) => start({ level }, seed)).map((s) => [s.piles.length, tableCards(s).length]);
       return sizes.some(([piles = 0, cards = 0], i) => {
         const [lastPiles = 0, lastCards = 0] = sizes[i - 1] ?? [];
         return piles < lastPiles || (piles === lastPiles && cards < lastCards);
@@ -134,7 +156,7 @@ describe('the difficulty', () => {
     const tenth = start({ level: 10 }, 1);
 
     expect(tenth.piles.length).toBeGreaterThan(first.piles.length);
-    expect(tenth.table.length).toBeGreaterThan(first.table.length);
+    expect(tableCards(tenth).length).toBeGreaterThan(tableCards(first).length);
   });
 
   it('gives later levels up to 5 cards for each group', () => {

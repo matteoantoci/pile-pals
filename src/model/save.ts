@@ -1,7 +1,7 @@
 // The save data of the game. All data is plain JSON, so localStorage and a save code can hold it.
 // The UI stores it after each resolved move (research/native-feel/shell.md §3).
 
-import type { Card, GameState, Pile, Progress } from './types';
+import type { Card, GameState, Pile, Progress, Stack, TableCard } from './types';
 
 /**
  * The schema version of `SaveData`. A save with another version is not read.
@@ -55,6 +55,18 @@ const isPile = (value: unknown): value is Pile =>
   Array.isArray(value.cards) &&
   value.cards.every(isCard);
 
+const isTableCard = (value: unknown): value is TableCard =>
+  isCard(value) && 'faceDown' in value && typeof value.faceDown === 'boolean';
+
+const isStack = (value: unknown): value is Stack =>
+  typeof value === 'object' &&
+  value !== null &&
+  'id' in value &&
+  typeof value.id === 'string' &&
+  'cards' in value &&
+  Array.isArray(value.cards) &&
+  value.cards.every(isTableCard);
+
 /** The `level` and `seed` of a state. */
 const isLevelSeed = (value: unknown): value is { readonly level: number; readonly seed: number } =>
   typeof value === 'object' &&
@@ -64,6 +76,15 @@ const isLevelSeed = (value: unknown): value is { readonly level: number; readonl
   'seed' in value &&
   typeof value.seed === 'number';
 
+const hasDeck = (value: unknown): value is { readonly deck: readonly Card[]; readonly dealt: Card | null } =>
+  typeof value === 'object' &&
+  value !== null &&
+  'deck' in value &&
+  Array.isArray(value.deck) &&
+  value.deck.every(isCard) &&
+  'dealt' in value &&
+  (value.dealt === null || isCard(value.dealt));
+
 /**
  * The checks of the fields of `GameState` that this build knows. A field of a later ticket passes
  * without a check; `restore` then keeps it in the state as it is.
@@ -72,10 +93,11 @@ const isState = (value: unknown): value is GameState =>
   isLevelSeed(value) &&
   'table' in value &&
   Array.isArray(value.table) &&
-  value.table.every(isCard) &&
+  value.table.every(isStack) &&
   'piles' in value &&
   Array.isArray(value.piles) &&
-  value.piles.every(isPile);
+  value.piles.every(isPile) &&
+  hasDeck(value);
 
 const isProgress = (value: unknown): value is Progress =>
   typeof value === 'object' && value !== null && 'level' in value && typeof value.level === 'number';

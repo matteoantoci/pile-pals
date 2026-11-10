@@ -10,6 +10,12 @@ const playEventSound = (event: GameEvent): void => {
     case 'rejected':
       playSound('wrong');
       break;
+    case 'flipped':
+      playSound('flip');
+      break;
+    case 'dealt':
+      playSound('deck');
+      break;
     case 'groupComplete':
       playSound('group');
       break;
