@@ -1,6 +1,8 @@
 import { createSignal, For } from 'solid-js';
 import { apply, dropCard, start } from '../model';
+import { playSound } from '../sound';
 import { draggable } from './drag';
+import { playEventSounds } from './sounds';
 import type { Card } from '../model';
 import type { Hooks, Target } from './drag';
 import type { JSX } from 'solid-js';
@@ -32,6 +34,7 @@ export const Board = (): JSX.Element => {
     drop: (pileId) => {
       const outcome = apply(model, dropCard(card.id, pileId));
       model = outcome.state;
+      playEventSounds(outcome.events);
       return outcome.events.some((event) => event.type === 'snapped');
     },
     landed: () => setState(model),
@@ -60,6 +63,7 @@ export const Board = (): JSX.Element => {
               class="card"
               classList={{ gone: !state().table.includes(card) }}
               ref={(el) => draggable(el, hooksFor(card))}
+              onPointerDown={() => playSound('lift')}
             >
               <div class="card-shadow" />
               <div class="card-face">{card.picture}</div>
