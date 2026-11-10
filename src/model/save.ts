@@ -1,7 +1,7 @@
 // The save data of the game. All data is plain JSON, so localStorage and a save code can hold it.
 // The UI stores it after each resolved move (research/native-feel/shell.md §3).
 
-import type { Card, GameState, Pile, Progress, Stack, TableCard } from './types';
+import type { Card, DemoKind, GameState, Pile, Progress, Stack, TableCard } from './types';
 
 /**
  * The schema version of `SaveData`. A save with another version is not read.
@@ -12,8 +12,8 @@ export const SAVE_VERSION = 2;
 /**
  * The data of one save.
  * `state` is the level that the Child plays, whole: the deal, not only the seed.
- * `progress` is what the Child finished. Later tickets add the stickers, their positions on each page,
- * and the flags of the demos that the Child already saw.
+ * `progress` is what the Child finished. Later tickets add the stickers and their positions on each page.
+ * The flags of the demos that the Child already saw are in `state.demos`.
  */
 export type SaveData = {
   readonly version: number;
@@ -88,6 +88,16 @@ const hasDeck = (value: unknown): value is { readonly deck: readonly Card[]; rea
   'dealt' in value &&
   (value.dealt === null || isCard(value.dealt));
 
+const DEMO_KINDS: readonly unknown[] = ['first', 'faceDown', 'anchor', 'deck'] satisfies readonly DemoKind[];
+
+/** The demos that the Child saw: a list of demo kinds. */
+const hasDemos = (value: unknown): value is { readonly demos: readonly DemoKind[] } =>
+  typeof value === 'object' &&
+  value !== null &&
+  'demos' in value &&
+  Array.isArray(value.demos) &&
+  value.demos.every((kind) => DEMO_KINDS.includes(kind));
+
 /**
  * The checks of the fields of `GameState` that this build knows. A field of a later ticket passes
  * without a check; `restore` then keeps it in the state as it is.
@@ -100,7 +110,8 @@ const isState = (value: unknown): value is GameState =>
   'piles' in value &&
   Array.isArray(value.piles) &&
   value.piles.every(isPile) &&
-  hasDeck(value);
+  hasDeck(value) &&
+  hasDemos(value);
 
 const isProgress = (value: unknown): value is Progress =>
   typeof value === 'object' && value !== null && 'level' in value && typeof value.level === 'number';

@@ -48,6 +48,12 @@ export type Progress = {
 };
 
 /**
+ * A demo of the hand. Each kind shows one action one time: `first` the first drop of the game, `faceDown` the drop
+ * that uncovers a face-down card, `anchor` a category card that goes on an empty slot, and `deck` a tap on the deck.
+ */
+export type DemoKind = 'first' | 'faceDown' | 'anchor' | 'deck';
+
+/**
  * The level that the Child plays. It is plain data (no Map, no class, no function), so a save can keep it whole.
  * `seed` is the seed of the game: the same seed and level number always give the same deal.
  */
@@ -60,6 +66,8 @@ export type GameState = {
   readonly deck: readonly Card[];
   /** The face-up card that the last tap of the deck gave, or null. */
   readonly dealt: Card | null;
+  /** The demos that the Child saw. They go with the Child from level to level, so a demo shows one time only. */
+  readonly demos: readonly DemoKind[];
 };
 
 /** Each action is one input from the Child. Add new actions to this union. */

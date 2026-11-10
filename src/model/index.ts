@@ -3,6 +3,8 @@
 
 export { apply, dropCard, placeAnchor, tapDeck } from './apply';
 export { catalog, pictureOf } from './catalog';
+export { demoFor, hintFor, sawDemo } from './demos';
+export type { Demo, Hint } from './demos';
 export { restore, SAVE_VERSION, snapshot } from './save';
 export { nextLevel, start } from './start';
 export { titleScene } from './title';
@@ -13,6 +15,7 @@ export type {
   Action,
   Card,
   CardId,
+  DemoKind,
   GameEvent,
   GameState,
   GroupId,

@@ -185,7 +185,7 @@ const tryDeal = (level: number, seed: number, attempt: number): Deal => {
   const difficulty = difficultyOf(level);
   const random = randomFrom(mixSeed(seed, level, attempt));
   const laid = layOut(chooseSetup(difficulty, random), difficulty, random);
-  return canFinish({ level, seed, ...laid }) ? laid : tryDeal(level, seed, attempt + 1);
+  return canFinish({ level, seed, ...laid, demos: [] }) ? laid : tryDeal(level, seed, attempt + 1);
 };
 
 /** Deals a level. The same level number and game seed always give the same deal. */
