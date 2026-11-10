@@ -3,19 +3,21 @@
 export type CardId = string;
 export type PileId = string;
 export type GroupId = string;
+/** The id of a picture in the content catalog. `pictureOf(id)` gives the files. */
+export type PictureId = string;
 
 /** A picture card. `group` is the one pile of the level that accepts the card. */
 export type Card = {
   readonly id: CardId;
   readonly group: GroupId;
-  readonly picture: string;
+  readonly picture: PictureId;
 };
 
 /** A category pile. `cards` holds the cards on the pile, the first card at the bottom. */
 export type Pile = {
   readonly id: PileId;
   readonly group: GroupId;
-  readonly picture: string;
+  readonly picture: PictureId;
   readonly cards: readonly Card[];
 };
 

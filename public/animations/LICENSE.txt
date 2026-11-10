@@ -1,0 +1,5 @@
+Animations: Noto Emoji Animation by Google, CC BY 4.0,
+https://googlefonts.github.io/noto-emoji-animation/
+https://creativecommons.org/licenses/by/4.0/
+Changes: each loop starts at the frame with the marker 'rest', made smaller (256 px),
+30 frames per second, saved as animated AVIF or WebP.

@@ -1,7 +1,5 @@
 {
  "fluent_emoji_folders": 1595,
- "folders_with_3d_png": 1595,
- "3d_png_files_including_skin_tones": 3144,
  "folders_with_skin_tones": 310,
  "metadata_fields": {
   "cldr": 1595,
@@ -54,18 +52,31 @@
   "Activities": 45,
   "Smileys & Emotion": 20
  },
- "noto_3d_512_files": 4007,
- "kept_cards_with_noto_3d_512": 564,
- "fluent_folders_with_noto_3d_512": 1595,
- "noto_files_not_in_fluent": 2412,
+ "kept_cards_with_animation": 268,
+ "rest_marker": {
+  "rest": 250,
+  "other case": 6,
+  "none": 12
+ },
+ "noto_2d_512_files": 3750,
+ "noto_files_not_in_fluent": 2155,
  "noto_files_not_in_fluent_by_kind": {
-  "skin-tone variant": 2050,
-  "flag": 288,
-  "single emoji": 37,
-  "joined sequence (families, couples)": 37
+  "skin-tone variant": 2045,
+  "single emoji": 47,
+  "joined sequence (families, couples)": 37,
+  "flag": 26
  },
  "noto_only_concrete_items": 13,
- "kept_cards_with_at_least_one_tag": 542,
+ "shipped_cards": 535,
+ "anchor_only_pictures": 12,
+ "pals": 257,
+ "animation_bytes_by_format": {
+  "avif": 16032760,
+  "webp": 107909502
+ },
+ "animation_format": "avif",
+ "content_bytes": 21828262,
+ "kept_cards_with_at_least_one_tag": 535,
  "categories": 84,
  "categories_by_type": {
   "kind": 29,
@@ -85,6 +96,7 @@
   "polar",
   "shopping",
   "hops",
-  "crawls"
+  "crawls",
+  "purple"
  ]
 }

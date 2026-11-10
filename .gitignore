@@ -3,3 +3,5 @@ dist/
 dev-dist/
 *.tsbuildinfo
 .DS_Store
+research/content/.build/
+__pycache__/

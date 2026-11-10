@@ -22,7 +22,10 @@ export default defineConfig({
         background_color: TABLE,
         theme_color: TABLE,
       },
-      workbox: { globPatterns: ['**/*.{js,css,html,svg,png,webmanifest}'] },
+      // webp and avif: the card pictures and the animation loops in public/ (research/content/build_content.py).
+      // txt: their licence and credit files. Each file is less than the default limit of 2 MiB
+      // (maximumFileSizeToCacheInBytes), so the precache holds all of them.
+      workbox: { globPatterns: ['**/*.{js,css,html,svg,png,webp,avif,txt,webmanifest}'] },
     }),
   ],
 });

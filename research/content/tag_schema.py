@@ -328,21 +328,31 @@ SHAPE_ANCHORS = {"round": "Red circle", "long": "Pencil"}
 # and the faces are reserved for the feelings type.
 NO_COLOUR_GROUPS = {"People & Body", "Smileys & Emotion"}
 
-# Corrections after looking at the colour contact sheets (data/sheets/*.png).
+# Corrections after looking at the colour contact sheets (data/sheets/*.png),
+# which now draw the Noto 2D stills that the game ships.
 # None = keep out of every colour group (several colours, or a colour word a
-# child would not use for it, such as "gold" or "beige").
+# child would not use for it, such as "gold" or "peach").
 COLOUR_OVERRIDES = {
-    "Birthday cake": None, "Hamster": None, "Lion": None, "Soft ice cream": None, "Shortcake": None,
-    "Garlic": None, "Flatbread": None, "Giraffe": None, "Leopard": None, "Zebra": None, "Badger": None,
-    "Blueberries": None, "Cooking": None, "Mobile phone": None, "Fallen leaf": None, "Shrimp": None,
-    "Night with stars": None, "Vertical traffic light": None, "Candy": None, "Crown": None, "Coin": None,
-    "Sandwich": None, "House": None, "School": None, "Meat on bone": None, "Potted plant": None,
-    "Nest with eggs": None, "Mouse trap": None, "Custard": None, "Oyster": None, "Waffle": None,
-    "Womans hat": None, "Carousel horse": None, "Cat": None, "Dumpling": None, "Mosquito": None,
-    "Blowfish": None, "Hot dog": None, "Pear": None, "Rooster": None, "Sled": None, "Womans sandal": None,
+    # Several colours, or no colour word that a child uses:
+    "Artist palette": None, "Avocado": None, "Axe": None, "Bouquet": None, "Butterfly": None,
+    "Pot of food": None, "Watermelon": None, "Peach": None, "Egg": None, "Bowl with spoon": None,
+    "Paintbrush": None, "Kiwi fruit": None, "Birthday cake": None, "Hamster": None, "Lion": None,
+    "Soft ice cream": None, "Shortcake": None, "Garlic": None, "Flatbread": None, "Giraffe": None,
+    "Leopard": None, "Zebra": None, "Badger": None, "Blueberries": None, "Cooking": None,
+    "Mobile phone": None, "Fallen leaf": None, "Shrimp": None, "Night with stars": None,
+    "Vertical traffic light": None, "Candy": None, "Crown": None, "Coin": None, "Sandwich": None,
+    "House": None, "School": None, "Meat on bone": None, "Potted plant": None, "Nest with eggs": None,
+    "Mouse trap": None, "Custard": None, "Oyster": None, "Waffle": None, "Womans hat": None,
+    "Carousel horse": None, "Cat": None, "Dumpling": None, "Mosquito": None, "Blowfish": None,
+    "Hot dog": None, "Pear": None, "Rooster": None, "Sled": None, "Womans sandal": None,
     "Hamburger": None, "Locked": None, "Sponge": None, "Sports medal": None, "Rainbow": None,
+    "Fireworks": None, "Sparkler": None, "Unicorn": None,
+    # One clear colour that the computed main colour misses (a green top on an
+    # orange carrot, wood that comes out red):
     "Coconut": "brown", "Pretzel": "brown", "Sunglasses": "black", "Bikini": "pink", "Taxi": "yellow",
-    "Ear of corn": "yellow", "Blackbird": "black", "Fireworks": None, "Sparkler": None, "Unicorn": None,
+    "Ear of corn": "yellow", "Blackbird": "black", "Violin": "brown", "Guitar": "brown",
+    "Womans boot": "brown", "Camel": "brown", "Peanuts": "brown", "Basketball": "orange",
+    "Carrot": "orange", "French fries": "yellow",
 }
 
 # Shape corrections after looking at the shape contact sheets.

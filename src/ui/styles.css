@@ -4,6 +4,8 @@
   --bottom-reserve: max(env(safe-area-inset-bottom), 34px);
   --card-w: 96px;
   --card-h: 128px;
+  /* 80 CSS px = 240 device px on an iPhone 12 (3x). The pictures are 256 px (research/content/pictures.py). */
+  --picture: 80px;
 }
 
 html {
@@ -73,8 +75,12 @@ img {
   height: var(--card-h);
   border-radius: 14px;
   background: #fff;
-  font-size: 64px;
-  line-height: 1;
+}
+
+.pile-face img,
+.card-face img {
+  width: var(--picture);
+  height: var(--picture);
 }
 
 .pile-face {
@@ -86,7 +92,11 @@ img {
   flex-wrap: wrap;
   justify-content: center;
   min-height: 40px;
-  font-size: 32px;
+}
+
+.pile-card {
+  width: 32px;
+  height: 32px;
 }
 
 /* The drag writes the transform of .card. Effects (ticket 04) animate .card-face. */
