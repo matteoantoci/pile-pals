@@ -1,0 +1,43 @@
+#!/bin/sh
+#
+# Pre-commit checks. Git finds this file through core.hooksPath. The
+# `prepare` script in package.json sets core.hooksPath on `pnpm install`.
+# No hook library is used.
+#
+# The checks run cheapest first. The hook stops at the first failure.
+# `pnpm check` runs the same file without a commit.
+
+set -eu
+
+cd "$(git rev-parse --show-toplevel)"
+
+BIN=node_modules/.bin
+
+if [ ! -d "$BIN" ]; then
+  printf 'pre-commit: node_modules is missing. Run pnpm install.\n'
+  exit 1
+fi
+
+# step <label> <binary> [args...]
+step() {
+  label=$1
+  tool=$2
+  shift 2
+  printf '  %-20s' "$label"
+  if output=$("$BIN/$tool" "$@" 2>&1); then
+    printf 'ok\n'
+    return 0
+  fi
+  printf 'FAILED\n\n%s\n\npre-commit: %s failed.\n' "$output" "$label"
+  exit 1
+}
+
+printf 'pre-commit:\n'
+step 'format' oxfmt --check .
+step 'lint' oxlint
+# The typescript preset needs --type-aware and oxlint-tsgolint. Without them its rules do not run.
+step 'lint (type-aware)' oxlint --type-aware
+step 'types' tsc --noEmit
+# Without --passWithNoTests, vitest fails when no test file exists.
+step 'tests' vitest run --passWithNoTests
+printf 'pre-commit: all checks passed.\n'
