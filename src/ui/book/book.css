@@ -124,3 +124,22 @@
   width: 56px;
   height: 56px;
 }
+
+/* An empty book: one dashed place for each sticker of the page (src/ui/book/page.tsx). The grid has the
+ * columns and rows of the sticker places of the model, so a later sticker lands where its place was. */
+.book-spots {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  place-items: center;
+}
+
+.book-spot {
+  width: calc(var(--sticker) * 0.9);
+  height: calc(var(--sticker) * 0.9);
+  border: 4px dashed #e2d4b2;
+  border-radius: 50%;
+  background: #f8eed6;
+}

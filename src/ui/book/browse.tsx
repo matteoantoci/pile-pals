@@ -32,9 +32,10 @@ const IconButton = (props: {
 const BookBrowser = (props: { readonly pages: Pages; readonly close: () => void }): JSX.Element => {
   const last = props.pages.length - 1;
   const [index, setIndex] = createSignal(last);
+  const empty = props.pages.every((page) => page.length === 0);
   return (
     <div class="book browse">
-      <PageView stickers={props.pages[index()] ?? []} />
+      <PageView stickers={props.pages[index()] ?? []} empty={empty} />
       <div class="book-bar">
         <IconButton
           class="book-turn"
