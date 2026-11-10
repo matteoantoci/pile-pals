@@ -31,7 +31,7 @@ const CardView = (props: {
 }): JSX.Element => (
   <div
     class="card"
-    classList={{ gone: props.gone }}
+    classList={{ gone: props.gone, anchor: props.card.anchor }}
     data-card={props.card.id}
     ref={(el) => {
       el.setAttribute('data-face', props.faceDown ? 'down' : 'up');

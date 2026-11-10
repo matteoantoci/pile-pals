@@ -1,9 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { apply, dropCard, restore, snapshot, start } from './index';
-import { openCards } from './test-player';
-import type { Card, GameEvent, GameState, Pile, RestoredGame } from './index';
+import { apply, dropCard, placeAnchor, restore, snapshot, start } from './index';
+import { openCards, playOut } from './test-player';
+import type { Card, GameEvent, GameState, Pile, RestoredGame, Stack } from './index';
 
 const firstLevel = (): GameState => start({ level: 1 }, 1);
+
+/** A stack as a save of version 1 holds it: its cards have no `anchor` field. */
+const versionOneStack = ({ id, cards }: Stack): unknown => ({
+  id,
+  cards: cards.map(({ id: cardId, group, picture, faceDown }) => ({ id: cardId, group, picture, faceDown })),
+});
 
 /** A restored state, or a failure that fails the test with the reason. */
 const restored = (save: unknown): RestoredGame => {
@@ -41,7 +47,7 @@ describe('snapshot', () => {
 
     const save = snapshot(state);
 
-    expect(save.version).toBe(1);
+    expect(save.version).toBe(2);
     expect(save.state).toEqual(state);
     expect(save.progress.level).toBe(state.level);
   });
@@ -102,14 +108,41 @@ describe('restore', () => {
   });
 
   it('rejects an unknown schema version', () => {
-    const save = { ...snapshot(firstLevel()), version: 2 };
+    const save = { ...snapshot(firstLevel()), version: 3 };
 
     expect(restore(save)).toEqual({ ok: false, reason: 'version' });
   });
 
+  it('rejects a save of version 1, which has no category cards on the table', () => {
+    const state = firstLevel();
+    const older = {
+      version: 1,
+      state: { ...state, table: state.table.map(versionOneStack) },
+      progress: { level: 1 },
+    };
+
+    expect(restore(older)).toEqual({ ok: false, reason: 'version' });
+  });
+
+  it('keeps the empty slots and the placed category cards, and plays the same', () => {
+    const state = start({ level: 16 }, 3);
+    const anchor = openCards(state).find((card) => card.anchor);
+    const slot = state.piles.find((pile) => pile.group === null);
+    if (!anchor || !slot) {
+      throw new Error('The level has no open category card or no empty slot.');
+    }
+    const placed = apply(state, placeAnchor(anchor.id, slot.id)).state;
+
+    const back = restored(JSON.parse(JSON.stringify(snapshot(placed))) as unknown).state;
+
+    expect(back).toEqual(placed);
+    expect(back.piles.some((pile) => pile.group === null)).toBe(true);
+    expect(playOut(back)).toEqual(playOut(placed));
+  });
+
   it('rejects data that is not a save', () => {
     const state = firstLevel();
-    const noState = { version: 1, progress: { level: 1 } };
+    const noState = { version: 2, progress: { level: 1 } };
     const badCard = { ...snapshot(state), state: { ...state, table: [{ id: 1 }] } };
     const noPiles = { ...snapshot(state), state: { ...state, piles: 'none' } };
     const badProgress = { ...snapshot(state), progress: {} };

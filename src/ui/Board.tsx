@@ -1,5 +1,5 @@
-import { batch, createSignal, For, onMount } from 'solid-js';
-import { apply, dropCard, nextLevel, tapDeck } from '../model';
+import { batch, createSignal, For, onMount, Show } from 'solid-js';
+import { apply, dropCard, nextLevel, placeAnchor, tapDeck } from '../model';
 import { watchLifecycle } from '../shell/lifecycle';
 import { saveGame } from '../shell/save';
 import { applyUpdateIfWaiting, checkForUpdate } from '../shell/update';
@@ -8,7 +8,7 @@ import { cancelDrag } from './drag';
 import { stillUrl } from './pictures';
 import { playEventSounds } from './sounds';
 import { raiseCard, TableView } from './table';
-import type { CardId, GameState, Pile, PileId } from '../model';
+import type { Action, CardId, GameState, Pile, PileId } from '../model';
 import type { Hooks, Target } from './drag';
 import type { Accessor, JSX } from 'solid-js';
 
@@ -39,17 +39,25 @@ const sizeOf = (deal: GameState): string => {
   return deal.piles.length > 2 || places > 6 ? 'medium' : 'large';
 };
 
-/** A category pile: the anchor picture on its face, and the cards that landed on it. */
+/** A category pile: the anchor picture on its face, and the cards that landed on it. An empty slot has no picture. */
 const PileView = (props: { pile: Pile }): JSX.Element => (
-  <div class="pile" data-pile={props.pile.id}>
+  <div class="pile" classList={{ slot: props.pile.picture === null }} data-pile={props.pile.id}>
     <div class="pile-face">
-      <img src={stillUrl(props.pile.picture)} alt="" />
+      <Show when={props.pile.picture}>{(picture) => <img src={stillUrl(picture())} alt="" />}</Show>
     </div>
     <div class="pile-cards">
       <For each={props.pile.cards}>{(card) => <img class="pile-card" src={stillUrl(card.picture)} alt="" />}</For>
     </div>
   </div>
 );
+
+/** The action of a drop: a category card goes on a slot, and a picture card goes on a pile. The model decides. */
+const dropAction = (state: GameState, cardId: CardId, pileId: PileId): Action => {
+  const open = [...state.table.flatMap((stack) => stack.cards), ...(state.dealt ? [state.dealt] : [])];
+  return open.some((card) => card.id === cardId && card.anchor)
+    ? placeAnchor(cardId, pileId)
+    : dropCard(cardId, pileId);
+};
 
 /** What the hooks need from the board: the newest state, the way to draw it, and the next level. */
 type Game = {
@@ -67,13 +75,13 @@ const cardHooks = (game: Game, cardId: CardId): Hooks => {
   return {
     targets: pileTargets,
     drop: (pileId) => {
-      const outcome = apply(game.current(), dropCard(cardId, pileId));
+      const outcome = apply(game.current(), dropAction(game.current(), cardId, pileId));
       last = outcome.events.some((event) => event.type === 'levelComplete');
       completed = outcome.events.find((event) => event.type === 'groupComplete')?.pileId;
       flips = outcome.events.flatMap((event) => (event.type === 'flipped' ? [event.cardId] : []));
       playEventSounds(outcome.events);
       game.move(outcome.state);
-      return outcome.events.some((event) => event.type === 'snapped');
+      return outcome.events.some((event) => event.type === 'snapped' || event.type === 'anchorPlaced');
     },
     landed: () => {
       flips.forEach((flipped) => raiseCard(flipped, (id) => cardHooks(game, id)));
