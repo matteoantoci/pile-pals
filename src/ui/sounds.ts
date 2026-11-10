@@ -1,11 +1,15 @@
 import { playSound } from '../sound';
 import type { GameEvent } from '../model';
 
-/** Plays the sound slot of one model event. A new event type gets its case here (ticket 06). */
+/** Plays the sound slot of one model event. A new event type gets its case here. */
 const playEventSound = (event: GameEvent): void => {
   switch (event.type) {
     case 'snapped':
       playSound('snap', event.noteIndex);
+      break;
+    case 'anchorPlaced':
+      // A category card on its slot sounds like the first card on a pile.
+      playSound('snap', 0);
       break;
     case 'rejected':
       playSound('wrong');

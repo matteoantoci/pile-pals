@@ -105,6 +105,19 @@ html[data-restoring] * {
   background: #f4e9d2;
 }
 
+/*
+ * A category card has the colour of a pile face, so the Child sees that it goes on a slot.
+ * An empty slot shows no picture: it waits for a category card.
+ */
+.card.anchor .card-face {
+  background: #f4e9d2;
+}
+
+.pile.slot .pile-face {
+  background: rgb(255 255 255 / 0.15);
+  box-shadow: inset 0 0 0 var(--pile-line) rgb(244 233 210 / 0.6);
+}
+
 .pile-cards {
   display: flex;
   flex-wrap: wrap;

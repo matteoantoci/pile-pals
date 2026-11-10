@@ -33,37 +33,44 @@ const fits = (picture: PictureId): readonly GroupId[] => {
 /** The cards of the stacks of the level, in the order of the stacks. */
 const tableCards = (state: GameState): readonly TableCard[] => state.table.flatMap((stack) => stack.cards);
 
-/** The cards of the level that the Child can see now or after a tap of the deck. */
-const levelCards = (state: GameState): readonly { readonly picture: PictureId; readonly group: GroupId }[] => [
-  ...tableCards(state),
-  ...state.deck,
+/** A picture that the level shows, and the group that it shows. */
+type Shown = { readonly picture: PictureId; readonly group: GroupId };
+
+/** The picture cards of the level that the Child can see now or after a tap of the deck. No category card. */
+const levelCards = (state: GameState): readonly Shown[] =>
+  [...tableCards(state), ...state.deck].filter((card) => !card.anchor);
+
+/** The category card of each group: on its pile, or on the table or in the deck when the Child places it. */
+const categoryCards = (state: GameState): readonly Shown[] => [
+  ...state.piles.flatMap(({ group, picture }) => (group === null || picture === null ? [] : [{ group, picture }])),
+  ...[...tableCards(state), ...state.deck].filter((card) => card.anchor),
 ];
 
-/** Each card and each pile of the level: its picture and the group that it shows. */
-const shown = (state: GameState): readonly { readonly picture: PictureId; readonly group: GroupId }[] => [
-  ...levelCards(state),
-  ...state.piles,
-];
+/** The groups of the level, one for each category card. */
+const groupsOf = (state: GameState): readonly GroupId[] => categoryCards(state).map((card) => card.group);
+
+/** Each card and each category card of the level. */
+const shown = (state: GameState): readonly Shown[] => [...levelCards(state), ...categoryCards(state)];
 
 const cardsPerGroup = (state: GameState): readonly number[] =>
-  state.piles.map((pile) => levelCards(state).filter((card) => card.group === pile.group).length);
+  groupsOf(state).map((group) => levelCards(state).filter((card) => card.group === group).length);
 
 const describeLevel = (state: GameState): string =>
-  `level ${String(state.level)} seed ${String(state.seed)}: ${state.piles.map((p) => p.group).join(', ')}`;
+  `level ${String(state.level)} seed ${String(state.seed)}: ${groupsOf(state).join(', ')}`;
 
 const typesOf = (states: readonly GameState[]): ReadonlySet<string> =>
-  new Set(states.flatMap((state) => state.piles.map((p) => groupOf(p.group).type)));
+  new Set(states.flatMap((state) => groupsOf(state).map((group) => groupOf(group).type)));
 
 describe('the fairness rule, over many seeds and level numbers', () => {
   it('shows groups of one association type in each level', () => {
-    const mixed = levels.filter((state) => new Set(state.piles.map((p) => groupOf(p.group).type)).size !== 1);
+    const mixed = levels.filter((state) => new Set(groupsOf(state).map((group) => groupOf(group).type)).size !== 1);
 
     expect(mixed.map(describeLevel)).toEqual([]);
   });
 
-  it('deals each card only to a group where the card is a member', () => {
+  it('deals each picture card only to a group where the card is a member', () => {
     const wrong = levels.flatMap((state) =>
-      tableCards(state)
+      levelCards(state)
         .filter((card) => !cardOf(card.picture)?.groups.includes(card.group))
         .map((card) => card.picture)
     );
@@ -85,7 +92,7 @@ describe('the fairness rule, over many seeds and level numbers', () => {
   it('shows no card and no category card that fits a second shown group', () => {
     const unfair = levels.flatMap((state) =>
       shown(state)
-        .filter((item) => state.piles.some((p) => p.group !== item.group && fits(item.picture).includes(p.group)))
+        .filter((item) => groupsOf(state).some((group) => group !== item.group && fits(item.picture).includes(group)))
         .map((item) => `${describeLevel(state)}: ${item.picture}`)
     );
 
@@ -94,7 +101,7 @@ describe('the fairness rule, over many seeds and level numbers', () => {
 
   it('never shows two confusable groups together', () => {
     const confused = levels.filter((state) =>
-      state.piles.some((pile) => state.piles.some((other) => groupOf(pile.group).confusable.includes(other.group)))
+      groupsOf(state).some((group) => groupsOf(state).some((other) => groupOf(group).confusable.includes(other)))
     );
 
     expect(confused.map(describeLevel)).toEqual([]);
@@ -163,7 +170,7 @@ describe('the difficulty', () => {
     expect(Math.max(...levels.flatMap(cardsPerGroup))).toBe(5);
   });
 
-  it('starts each pile with its category card and no other card', () => {
+  it('starts each pile and each slot with no card on it', () => {
     const notEmpty = levels.filter((state) => state.piles.some((pile) => pile.cards.length > 0));
 
     expect(notEmpty.map(describeLevel)).toEqual([]);
@@ -178,8 +185,7 @@ describe('the seed', () => {
   it('gives different groups for different seeds', () => {
     const sets = new Set(
       SEEDS.map((seed) =>
-        start({ level: 1 }, seed)
-          .piles.map((p) => p.group)
+        groupsOf(start({ level: 1 }, seed))
           .toSorted()
           .join()
       )

@@ -6,7 +6,13 @@ export const dropCard = (cardId: CardId, pileId: PileId): Action => ({ type: 'dr
 /** The Child taps the deck for the next card. */
 export const tapDeck = (): Action => ({ type: 'tapDeck' });
 
-/** The cards that are not on a pile yet: the cards of the stacks, the deck, and the dealt card. */
+/** The Child puts the category card on the empty slot. */
+export const placeAnchor = (cardId: CardId, slotId: PileId): Action => ({ type: 'placeAnchor', cardId, slotId });
+
+/**
+ * The cards that are not on a pile yet: the cards of the stacks, the deck, and the dealt card.
+ * It includes the category cards that are not on a slot yet.
+ */
 export const cardsLeft = (state: GameState): readonly Card[] => [
   ...state.table.flatMap((stack) => stack.cards),
   ...state.deck,
@@ -54,7 +60,10 @@ const take = (state: GameState, taken: Found): { readonly state: GameState; read
   };
 };
 
-/** Drops the card on the pile. A card goes only on the pile of its group, and only from the top of its stack. */
+/**
+ * Drops the card on the pile. A card goes only on the pile of its group, and only from the top of its stack.
+ * An empty slot has no group, so it accepts no card.
+ */
 const drop = (state: GameState, cardId: CardId, pileId: PileId): Outcome => {
   const taken = found(state, cardId);
   const target = state.piles.find((pile) => pile.id === pileId);
@@ -62,7 +71,7 @@ const drop = (state: GameState, cardId: CardId, pileId: PileId): Outcome => {
     return { state, events: [{ type: 'rejected', cardId }] };
   }
   const moved = take(state, taken);
-  const card = { id: taken.card.id, group: taken.card.group, picture: taken.card.picture };
+  const card: Card = { id: taken.card.id, group: taken.card.group, picture: taken.card.picture, anchor: false };
   const next: GameState = {
     ...moved.state,
     piles: moved.state.piles.map((pile) => (pile === target ? { ...pile, cards: [...pile.cards, card] } : pile)),
@@ -75,6 +84,30 @@ const drop = (state: GameState, cardId: CardId, pileId: PileId): Outcome => {
       ...flip,
       ...completions(next, card.group, pileId),
     ],
+  };
+};
+
+/**
+ * Puts the category card on the empty slot. The slot then shows the picture of the card and accepts the cards of its
+ * group. Any empty slot accepts any category card, so a category card always has a free slot.
+ */
+const place = (state: GameState, cardId: CardId, slotId: PileId): Outcome => {
+  const taken = found(state, cardId);
+  const slot = state.piles.find((pile) => pile.id === slotId);
+  if (!taken?.card.anchor || slot?.group !== null) {
+    return { state, events: [{ type: 'rejected', cardId }] };
+  }
+  const moved = take(state, taken);
+  const { group, picture } = taken.card;
+  const flip: readonly GameEvent[] = moved.flipped ? [{ type: 'flipped', cardId: moved.flipped }] : [];
+  return {
+    state: {
+      ...moved.state,
+      piles: moved.state.piles.map((pile) =>
+        pile === slot ? { id: slot.id, group, picture, cards: slot.cards } : pile
+      ),
+    },
+    events: [{ type: 'anchorPlaced', cardId, pileId: slotId }, ...flip],
   };
 };
 
@@ -98,6 +131,8 @@ export const apply = (state: GameState, action: Action): Outcome => {
       return drop(state, action.cardId, action.pileId);
     case 'tapDeck':
       return tap(state);
+    case 'placeAnchor':
+      return place(state, action.cardId, action.slotId);
     default: {
       // A new member of the `Action` union must get its case above. This line keeps the switch complete.
       const unhandled: never = action;

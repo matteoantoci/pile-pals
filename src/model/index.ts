@@ -1,7 +1,7 @@
 // The public interface of the game model. The UI and the tests import only from this file.
 // The model is pure TypeScript: no DOM, no time, no audio.
 
-export { apply, dropCard, tapDeck } from './apply';
+export { apply, dropCard, placeAnchor, tapDeck } from './apply';
 export { catalog, pictureOf } from './catalog';
 export { restore, SAVE_VERSION, snapshot } from './save';
 export { nextLevel, start } from './start';

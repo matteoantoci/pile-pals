@@ -7,7 +7,7 @@ import type { Card, GameState, Pile, Progress, Stack, TableCard } from './types'
  * The schema version of `SaveData`. A save with another version is not read.
  * Raise this number when `restore` cannot read the data of the older version.
  */
-export const SAVE_VERSION = 1;
+export const SAVE_VERSION = 2;
 
 /**
  * The data of one save.
@@ -34,26 +34,29 @@ export type RestoreResult =
   | ({ readonly ok: true } & RestoredGame)
   | { readonly ok: false; readonly reason: RestoreFailure };
 
-/** The `id` and `group` fields of a card or a pile, after the check that the value is an object. */
-const isWithId = (value: unknown): value is { readonly id: string; readonly group: string } =>
-  typeof value === 'object' &&
-  value !== null &&
-  'id' in value &&
-  typeof value.id === 'string' &&
-  'group' in value &&
-  typeof value.group === 'string';
+/** The `id` field of a card or a pile, after the check that the value is an object. */
+const isWithId = (value: unknown): value is { readonly id: string } =>
+  typeof value === 'object' && value !== null && 'id' in value && typeof value.id === 'string';
 
 /** A type guard narrows, so `restore` gives typed data after each check. */
 const isCard = (value: unknown): value is Card =>
-  isWithId(value) && 'picture' in value && typeof value.picture === 'string';
-
-const isPile = (value: unknown): value is Pile =>
   isWithId(value) &&
+  'group' in value &&
+  typeof value.group === 'string' &&
   'picture' in value &&
   typeof value.picture === 'string' &&
-  'cards' in value &&
-  Array.isArray(value.cards) &&
-  value.cards.every(isCard);
+  'anchor' in value &&
+  typeof value.anchor === 'boolean';
+
+/** A slot with a category card has a group and a picture. An empty slot has neither. */
+const isPileFace = (value: { readonly id: string }): value is Pick<Pile, 'id' | 'group' | 'picture'> =>
+  'group' in value &&
+  'picture' in value &&
+  ((typeof value.group === 'string' && typeof value.picture === 'string') ||
+    (value.group === null && value.picture === null));
+
+const isPile = (value: unknown): value is Pile =>
+  isWithId(value) && isPileFace(value) && 'cards' in value && Array.isArray(value.cards) && value.cards.every(isCard);
 
 const isTableCard = (value: unknown): value is TableCard =>
   isCard(value) && 'faceDown' in value && typeof value.faceDown === 'boolean';

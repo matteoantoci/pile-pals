@@ -7,11 +7,16 @@ export type GroupId = string;
 /** The id of a picture in the content catalog. `pictureOf(id)` gives the files. */
 export type PictureId = string;
 
-/** A picture card. `group` is the one pile of the level that accepts the card. */
+/**
+ * A picture card. `group` is the one pile of the level that accepts the card.
+ * A category card (`anchor: true`) shows the picture of its group. The Child puts it on an empty slot with
+ * `placeAnchor`, and then the slot accepts the cards of that group.
+ */
 export type Card = {
   readonly id: CardId;
   readonly group: GroupId;
   readonly picture: PictureId;
+  readonly anchor: boolean;
 };
 
 /** A card on the table. `faceDown` cards show their back: the card below the top card of a stack. */
@@ -25,11 +30,15 @@ export type Stack = {
   readonly cards: readonly TableCard[];
 };
 
-/** A category pile. `cards` holds the cards on the pile, the first card at the bottom. */
+/**
+ * A slot for one category pile. `cards` holds the cards on the pile, the first card at the bottom.
+ * An empty slot has no category card yet: its `group` and `picture` are null, and it accepts no card.
+ * `placeAnchor` puts a category card on it and sets the group and the picture of that card.
+ */
 export type Pile = {
   readonly id: PileId;
-  readonly group: GroupId;
-  readonly picture: PictureId;
+  readonly group: GroupId | null;
+  readonly picture: PictureId | null;
   readonly cards: readonly Card[];
 };
 
@@ -63,6 +72,12 @@ export type Action =
   /** The Child taps the deck. */
   | {
       readonly type: 'tapDeck';
+    }
+  /** The Child puts a category card on an empty slot. */
+  | {
+      readonly type: 'placeAnchor';
+      readonly cardId: CardId;
+      readonly slotId: PileId;
     };
 
 /** Each event is one thing that the UI shows or plays. Add new events to this union. */
@@ -86,6 +101,12 @@ export type GameEvent =
   /** The deck gave the card that is now face-up on the table. */
   | {
       readonly type: 'dealt';
+    }
+  /** The category card is on the slot. The slot now accepts the cards of its group. */
+  | {
+      readonly type: 'anchorPlaced';
+      readonly cardId: CardId;
+      readonly pileId: PileId;
     }
   /** The last card of the group is on its pile. */
   | {
