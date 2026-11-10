@@ -1,5 +1,5 @@
 import { createSignal, Show } from 'solid-js';
-import { isAudioRunning, isSoundOn } from '../sound';
+import { audioNeedsTap, isSoundOn } from '../sound';
 import { GoButton } from './go-button';
 import type { JSX } from 'solid-js';
 
@@ -7,7 +7,7 @@ import type { JSX } from 'solid-js';
 // it (a restore at launch, or a return from the background) is covered by the go button. Its tap starts the
 // sound (the unlock listeners of src/sound), and the first touch on the board is then a normal drag.
 
-const needsTap = (): boolean => isSoundOn() && !isAudioRunning();
+const needsTap = (): boolean => isSoundOn() && audioNeedsTap();
 
 export type SoundGate = {
   /** Call at mount: runs `onReady` now, or after the tap if the go button shows. */

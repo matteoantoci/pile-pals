@@ -28,7 +28,7 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      # The same five checks as the pre-commit hook.
+      # The same six checks as the pre-commit hook.
       - run: pnpm check
       - run: pnpm build
       - uses: actions/configure-pages@v6

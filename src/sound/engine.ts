@@ -13,8 +13,12 @@ declare global {
 
 /** A sound that waits longer than this for the context to start is too late. It does not play. */
 const LATE_MS = 200;
-/** The heal waits this long for the audio clock to move. Design value of shell.md: tune it on the device. */
-const CLOCK_WAIT_MS = 150;
+
+/**
+ * True after a return from the background. iOS can give back a context that stays silent, and a resume
+ * outside a tap can fail, so the next tap closes the old context and starts a new one.
+ */
+let stale = false;
 
 let context: AudioContext | undefined;
 let decoder: OfflineAudioContext | undefined;
@@ -27,54 +31,35 @@ let soundOn = true;
 /** A resume outside a user gesture can fail. The next gesture tries again, so the failure needs no action. */
 const ignore = (): undefined => undefined;
 
+/** iOS can drop the audio session type in the background, so each new context sets it again. */
 const audio = (): AudioContext => {
+  if (!context && navigator.audioSession) {
+    navigator.audioSession.type = 'playback';
+  }
   context ??= new AudioContext();
   return context;
 };
 
-/** Starts the context, or ends an "interrupted" state. Call it from a user gesture. */
+/** Starts the context, or ends an "interrupted" state. After a return from the background, it replaces the
+ * context first. Call it from a user gesture. */
 export const unlockAudio = (): void => {
+  if (stale) {
+    stale = false;
+    context?.close().catch(ignore);
+    context = undefined;
+  }
   const ctx = audio();
   if (ctx.state !== 'running') {
     ctx.resume().catch(ignore);
   }
 };
 
-/** True when the context plays now. iOS starts or resumes it only in a tap: the end of a drag does not count. */
-export const isAudioRunning = (): boolean => context?.state === 'running';
-
-const wait = (ms: number): Promise<void> =>
-  new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-
-/** On return to the foreground: resume. If the clock does not move, suspend and resume.
- * If the clock still does not move, close the context. The next sound makes a new one. */
-export const healAudio = async (): Promise<void> => {
-  const ctx = context;
-  if (!ctx || ctx.state === 'closed') {
-    return;
-  }
-  if (ctx.state !== 'running') {
-    ctx.resume().catch(ignore);
-    return;
-  }
-  const before = ctx.currentTime;
-  await wait(CLOCK_WAIT_MS);
-  if (ctx.currentTime !== before) {
-    return;
-  }
-  await ctx.suspend();
-  await ctx.resume();
-  await wait(CLOCK_WAIT_MS);
-  if (ctx.currentTime === before && context === ctx) {
-    context = undefined;
-    await ctx.close();
-  }
-};
+/** True when the sound can start only in a tap: no context yet, a return from the background, or a stopped
+ * context. iOS starts or resumes the context only in a tap, and the end of a drag is not a tap. */
+export const audioNeedsTap = (): boolean => !context || stale || context.state !== 'running';
 
 /** An AudioBuffer works in each AudioContext. So an offline context decodes before the first touch,
- * and the buffers stay good after the heal makes a new context. */
+ * and the buffers stay good after the unlock makes a new context. */
 const decode = (data: ArrayBuffer): Promise<AudioBuffer> => {
   decoder ??= new OfflineAudioContext(1, 1, 44_100);
   return decoder.decodeAudioData(data);
@@ -147,7 +132,13 @@ export const playClip = (clip: Clip, rate = 1): void => {
     .catch(ignore);
 };
 
-/** Call one time at start. Sets the audio session, preloads the clips, and unlocks and heals the context. */
+const markStale = (): void => {
+  if (context) {
+    stale = true;
+  }
+};
+
+/** Call one time at start. Sets the audio session, preloads the clips, and unlocks the context on each gesture. */
 export const installAudio = (clips: readonly Clip[]): void => {
   // "playback" (spec Module 8), not the "ambient" of shell.md: iOS can then play with the silent switch on.
   if (navigator.audioSession) {
@@ -159,9 +150,16 @@ export const installAudio = (clips: readonly Clip[]): void => {
   // For a mouse, pointerdown is a user gesture. For a touch, only pointerup is (HTML user activation).
   document.addEventListener('pointerdown', unlockAudio, { capture: true, passive: true });
   document.addEventListener('pointerup', unlockAudio, { capture: true, passive: true });
+  // This listener comes before the listener of the board, so the board sees the stale context.
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') {
-      healAudio().catch(ignore);
+      markStale();
+    }
+  });
+  // A page that comes back from the back-forward cache keeps its old context too.
+  window.addEventListener('pageshow', (event) => {
+    if (event.persisted) {
+      markStale();
     }
   });
 };
