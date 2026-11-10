@@ -139,7 +139,7 @@ describe('the dead-end check', () => {
         end.table.some((stack) => stack.cards.length > 0) ||
         end.deck.length > 0 ||
         end.dealt !== null ||
-        events.at(-1)?.type !== 'levelComplete'
+        events.at(-2)?.type !== 'levelComplete'
       );
     });
 
