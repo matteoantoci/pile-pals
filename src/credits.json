@@ -1,0 +1,70 @@
+{
+  "licences": {
+    "CC0-1.0": {
+      "name": "CC0 1.0 (public domain)",
+      "url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "creditRequired": false
+    },
+    "CC-BY-4.0": {
+      "name": "CC BY 4.0",
+      "url": "https://creativecommons.org/licenses/by/4.0/",
+      "creditRequired": true
+    }
+  },
+  "entries": [
+    {
+      "kind": "sound",
+      "title": "Boing 2",
+      "author": "magnuswaker",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/magnuswaker/sounds/540790/",
+      "files": ["sounds/boing-2.wav"],
+      "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "Bubble Pop",
+      "author": "YehawSnail",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/YehawSnail/sounds/683587/",
+      "files": ["sounds/bubble-pop.wav"],
+      "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "Casino Audio",
+      "author": "Kenney",
+      "licence": "CC0-1.0",
+      "url": "https://kenney.nl/assets/casino-audio",
+      "files": ["sounds/card-place-1.wav", "sounds/cards-pack-take-out-1.wav"],
+      "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "G4 soft - kalimba",
+      "author": "hollandm",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/hollandm/sounds/691805/",
+      "files": ["sounds/kalimba-g4.wav"],
+      "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "Success Fanfare Trumpets.mp3",
+      "author": "FunWithSound",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/FunWithSound/sounds/456966/",
+      "files": ["sounds/success-fanfare-trumpets.wav"],
+      "change": "Cut 0:00.0 to 0:03.7 of the source file, with a 0.5 s fade-out. Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    },
+    {
+      "kind": "sound",
+      "title": "Tada Fanfare A",
+      "author": "plasterbrain",
+      "licence": "CC0-1.0",
+      "url": "https://freesound.org/people/plasterbrain/sounds/397355/",
+      "files": ["sounds/tada-fanfare-a.wav"],
+      "change": "Converted to mono WAV, 16-bit, 44.1 kHz, and removed the silence at the start."
+    }
+  ]
+}

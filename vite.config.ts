@@ -8,6 +8,15 @@ const TABLE = '#2F6F4E';
 export default defineConfig({
   // GitHub Pages serves the app from https://<user>.github.io/pile-pals/.
   base: '/pile-pals/',
+  build: {
+    rolldownOptions: {
+      // The listening page /listen/ of ticket 05 is a second page. Its code goes to listen/, out of the precache.
+      input: { index: 'index.html', listen: 'listen/index.html' },
+      output: {
+        entryFileNames: (chunk) => (chunk.name === 'listen' ? 'listen/[name]-[hash].js' : 'assets/[name]-[hash].js'),
+      },
+    },
+  },
   plugins: [
     solid(),
     VitePWA({
@@ -22,10 +31,17 @@ export default defineConfig({
         background_color: TABLE,
         theme_color: TABLE,
       },
-      // webp and avif: the card pictures and the animation loops in public/ (research/content/build_content.py).
-      // txt: their licence and credit files. Each file is less than the default limit of 2 MiB
-      // (maximumFileSizeToCacheInBytes), so the precache holds all of them.
-      workbox: { globPatterns: ['**/*.{js,css,html,svg,png,webp,avif,txt,webmanifest}'] },
+      workbox: {
+        // wav: the shipped sounds (public/sounds/). webp and avif: the card pictures and the animation
+        // loops of public/ (research/content/build_content.py). txt: their licence and credit files.
+        // Each file is below the default limit of 2 MiB (maximumFileSizeToCacheInBytes), so the precache
+        // holds all of them.
+        globPatterns: ['**/*.{js,css,html,svg,png,webp,avif,txt,webmanifest,wav}'],
+        // The listening page and its clips (public/listen/) are only for the Parent: no precache,
+        // and no fallback to the game page for a navigation to /listen/.
+        globIgnores: ['listen/**'],
+        navigateFallbackDenylist: [/\/listen\//],
+      },
     }),
   ],
 });
