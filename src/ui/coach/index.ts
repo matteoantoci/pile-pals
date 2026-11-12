@@ -1,6 +1,6 @@
 // The coach of the board: the demo hand and the hint hop (spec, user stories 24 to 29).
 // The model chooses the demo and the hint move. The coach owns the time: the idle time, the hops, the hand.
-// The first touch of the Child stops a demo or a hop at once. The hint bulb (src/ui/top-bar.tsx) calls `hint`.
+// The first touch of the Child stops a demo or a hop at once.
 
 import { demoFor, hintFor, sawDemo } from '../../model';
 import { hop } from './hop';
@@ -28,8 +28,6 @@ export type CoachGame = {
 export type Coach = {
   /** The board is at rest: a level starts, or a move is done. A new demo shows, else the idle time starts. */
   readonly rest: () => void;
-  /** The hint bulb: hops the card or the deck of the hint now, and starts the time with no action again. */
-  readonly hint: () => void;
   /** Stops the demo, the hops, and the timer (the page goes hidden). `rest` starts them again. */
   readonly pause: () => void;
   /** Removes the coach from the page. */
@@ -146,20 +144,10 @@ export const startCoach = (game: CoachGame): Coach => {
     stage.later(DEMO_DELAY_MS, demo);
   };
 
-  // The bulb costs nothing: each tap hops the hint, and the hops and the hand of the idle time start again.
-  const hintNow = (): void => {
-    pause();
-    const move = hintFor(game.current());
-    if (move) {
-      hop(move);
-    }
-    stage.later(IDLE_MS, hint);
-  };
-
   const stop = (): void => {
     pause();
     unlisten();
   };
 
-  return { rest, hint: hintNow, pause, stop };
+  return { rest, pause, stop };
 };

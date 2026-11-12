@@ -11,9 +11,11 @@
   /* The back of a face-down card and of the deck: blue chevrons with a white edge. */
   --back: #1d8be7;
   --back-chevron: #43a7f7;
-  /* A category card: the gold frame and the gold crown. */
+  /* A category card: the gold frame and the gold crown with a dark outline and one red jewel. */
   --gold: #f5b400;
   --gold-line: 4px;
+  --crown-line: #4a3000;
+  --crown-jewel: #e53935;
   /* An empty slot: a dark green box in the table, with a faint crown in a lighter green. */
   --slot: #027335;
   --slot-crown: #0e9e54;
@@ -23,9 +25,15 @@
   /* The layout of the board (spec, "Board layout"). The card size comes from these values (see .board). */
   --side: 10px;
   --gap: 8px;
-  /* The free space above the deck row, for the top bar, and below the columns, for the hint bulb. */
+  /* The free space above the deck row, for the top bar, and a small margin below the columns. #app keeps the safe area
+   * at the bottom (--bottom-reserve). */
   --top-space: 56px;
-  --bottom-space: 80px;
+  --bottom-space: 12px;
+  /*
+   * The space above a row of cards, as a part of the card width. The crown of a card in the row goes up into it, so
+   * the crowns of the first row stay clear of the top bar, and the crowns of a row stay clear of the row above.
+   */
+  --crown-room: 0.16;
   /* The deck shows up to 3 card edges of 4 px below it. */
   --deck-edges: 12px;
   /* How much of a face-down card shows above the card on it: a strip of 22% of the card height. */
@@ -75,8 +83,8 @@ html[data-restoring] * {
  *
  * The card width comes from the screen width: the grid fills the width minus the side margins (78 px at 356 px
  * and 4 columns). On a short and wide screen, the height sets the limit: the deck row, the slot row, and a column
- * of 5 cards (1 + 4 x --peek card heights) fit between the top bar and the hint bulb.
- * The card height is 4/3 of the width, and the picture is 78% of the width.
+ * of 5 cards (1 + 4 x --peek card heights) fit between the top bar and the bottom margin, each row with the
+ * --crown-room above it. The card height is 4/3 of the width, and the picture is 78% of the width.
  */
 .board {
   --card-w: min(
@@ -88,8 +96,8 @@ html[data-restoring] * {
     (
         100dvh - env(safe-area-inset-top) - var(--bottom-reserve) - var(--top-space) - var(--bottom-space) -
           var(--deck-edges) - 2 * var(--gap)
-      ) *
-      0.75 / (3 + 4 * var(--peek))
+      ) /
+      ((3 + 4 * var(--peek)) * 4 / 3 + 3 * var(--crown-room))
   );
   --card-h: calc(var(--card-w) * 4 / 3);
   /* 83 CSS px (3 columns) = 249 device px on an iPhone 12 (3x). The pictures are 256 px (research/content/pictures.py). */
@@ -113,6 +121,7 @@ html[data-restoring] * {
   grid-template-columns: subgrid;
   row-gap: var(--gap);
   align-items: start;
+  margin-top: calc(var(--card-w) * var(--crown-room));
 }
 
 /* A pile has no box of its own: the slot is the box. It is a stacking context for the card under it (.pile-under). */
@@ -157,33 +166,58 @@ html[data-restoring] * {
 }
 
 /*
- * The gold crown at the top right of a category card. A clip path cuts the crown from a gold box:
- * a band at the bottom and three points. Its size comes from the card width, so it fits each card size.
- * A card on the table has a crown element below its back. A pile face has no back, so its crown is a pseudo-element.
+ * The crown (src/ui/crown.tsx), centred on the top edge of a category card and of an empty slot, half outside the
+ * card. It is 45% of the card width. Its rim has the card colour, so the crown does not touch the gold frame.
+ * The crown of a card in a column can cover the face-down strips above it. A held card goes above it (.card.lifted).
  */
-.pile-face::after {
-  content: '';
-}
-
-.crown,
-.pile-face::after {
+.crown {
   position: absolute;
-  top: calc(var(--card-w) * 0.08);
-  right: calc(var(--card-w) * 0.08);
-  width: calc(var(--card-w) * 0.26);
-  height: calc(var(--card-w) * 0.2);
-  background: var(--gold);
-  clip-path: polygon(0% 100%, 0% 15%, 27% 52%, 50% 0%, 73% 52%, 100% 15%, 100% 100%);
+  top: calc(var(--card-w) * -0.1575);
+  right: 0;
+  left: 0;
+  display: block;
+  width: calc(var(--card-w) * 0.45);
+  height: calc(var(--card-w) * 0.315);
+  margin: 0 auto;
+  overflow: visible;
   pointer-events: none;
+  --crown-rim: var(--card);
+  --crown-fill: var(--gold);
+  --crown-stroke: var(--crown-line);
+  --crown-red: var(--crown-jewel);
 }
 
-/* The faint crown of an empty slot is larger and in the centre: the crown card goes on the crown place. */
-.pile.slot .pile-face::after {
-  inset: 0;
-  width: calc(var(--card-w) * 0.5);
-  height: calc(var(--card-w) * 0.38);
-  margin: auto;
-  background: var(--slot-crown);
+.crown-rim {
+  fill: var(--crown-rim);
+  stroke: var(--crown-rim);
+  stroke-width: 12;
+  stroke-linejoin: round;
+}
+
+.crown-gold {
+  fill: var(--crown-fill);
+  stroke: var(--crown-stroke);
+  stroke-width: 4;
+  stroke-linejoin: round;
+}
+
+.crown-jewel {
+  fill: var(--crown-red);
+  stroke: var(--crown-stroke);
+  stroke-width: 3;
+}
+
+/* The faint crown of an empty slot: the same shape in one lighter green, with no rim. */
+.pile.slot .crown {
+  --crown-rim: transparent;
+  --crown-fill: var(--slot-crown);
+  --crown-stroke: var(--slot-crown);
+  --crown-red: var(--slot-crown);
+}
+
+/* A face-down category card shows no crown. The crown is partly outside the card, so the back cannot cover it. */
+.card[data-face='down'] .crown {
+  visibility: hidden;
 }
 
 /*
@@ -479,9 +513,9 @@ html[data-restoring] * {
 }
 
 /*
- * The top bar and the hint bulb (src/ui/top-bar.tsx, spec "Top bar and hint button"). They are fixed in the free
- * space that the board keeps: the top bar in --top-space and the bulb in --bottom-space, inside the safe area.
- * They are below a lifted card (1000), the parade (1500), and the demo hand (1550).
+ * The top bar (src/ui/top-bar.tsx, spec "Top bar and hint button"). It is fixed in the free space that the board
+ * keeps at the top (--top-space), inside the safe area. It is below a lifted card (1000), the parade (1500), and the
+ * demo hand (1550).
  */
 .top-bar {
   position: fixed;
@@ -515,8 +549,7 @@ html[data-restoring] * {
   transform: scale(0.92);
 }
 
-.home-button svg,
-.hint-bulb svg {
+.home-button svg {
   width: 70%;
   height: 70%;
   fill: none;
@@ -538,35 +571,4 @@ html[data-restoring] * {
     sans-serif;
   font-variant-numeric: tabular-nums;
   text-shadow: 0 2px 0 rgb(0 0 0 / 0.2);
-}
-
-/* The hint bulb: a blue rounded square with a white rim and a white bulb, at the centre of --bottom-space. */
-.hint-bulb {
-  --bulb: 60px;
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: calc(var(--bottom-reserve) + (var(--bottom-space) - var(--bulb)) / 2);
-  z-index: 1;
-  display: grid;
-  place-items: center;
-  width: var(--bulb);
-  height: var(--bulb);
-  margin: 0 auto;
-  padding: 0;
-  border: 3px solid #fff;
-  border-radius: 16px;
-  background: linear-gradient(#5a8bf2, #3f6fe0);
-  box-shadow:
-    0 4px 0 #2c55b8,
-    0 8px 14px rgb(0 0 0 / 0.25);
-  touch-action: none;
-  cursor: pointer;
-}
-
-.hint-bulb:active {
-  transform: translateY(3px);
-  box-shadow:
-    0 1px 0 #2c55b8,
-    0 4px 8px rgb(0 0 0 / 0.25);
 }

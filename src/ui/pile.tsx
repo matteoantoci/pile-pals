@@ -1,4 +1,5 @@
 import { createEffect, For, on, Show } from 'solid-js';
+import { Crown } from './crown';
 import { canceled, facePose, RESTING, settle, stop } from './motion';
 import { stillUrl } from './pictures';
 import type { Pile, PileProgress } from '../model';
@@ -62,6 +63,8 @@ export const PileView = (props: { readonly pile: Pile; readonly progress: PilePr
         )}
       </Show>
       <div class="pile-face">
+        {/* The crown of the category card, or the faint crown of an empty slot, in the same place. */}
+        <Crown />
         <Show when={props.pile.picture}>{(picture) => <img src={stillUrl(picture())} alt="" />}</Show>
         <Show when={props.progress}>
           {(progress) => (

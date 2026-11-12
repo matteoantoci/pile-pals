@@ -1,8 +1,10 @@
 // The screen check of the smoke run (scripts/smoke.ts), spec "Board layout" and Testing Decisions. On the screen of
-// the smallest phone, every card, slot, the deck, the home button, and the hint bulb of a level is inside the screen,
-// and the board is one grid. The run also taps the hint bulb and the home button (spec, "Top bar and hint button").
+// the smallest phone, every card, slot, crown, the deck, and the home button of a level is inside the screen, and the
+// board is one grid. The board has no hint bulb: the run waits for the hint hop of the coach, and it taps home.
+// The checks of the crowns and of the hint hop are in scripts/smoke-board.ts (ticket 08).
 
 import { runnerImport } from 'vite';
+import { crownCheck, heldOverCrown, hopCheck } from './smoke-board.ts';
 import type { GameState, hintFor, snapshot, start } from '../src/model/index.ts';
 import type { Browser, Page } from 'puppeteer-core';
 
@@ -14,8 +16,8 @@ const LEVELS = [1, 11, 16, 30];
 const SEEDS = 50;
 /** The deal that was below the bottom edge of the old board. */
 const OVERFLOW = { level: 20, seed: 12345 };
-/** The buttons of the board: the home button and the hint bulb. */
-const BUTTONS = '.board .home-button, .board .hint-bulb';
+/** The buttons of the board: the home button only. */
+const BUTTONS = '.board .home-button';
 
 type Deal = { readonly level: number; readonly seed: number };
 
@@ -55,14 +57,16 @@ const fullestDeal = (level: number): Deal => {
   return { level, seed: seeds.reduce((best, seed) => (groups(seed) > groups(best) ? seed : best)) };
 };
 
+type Places = { places: number; buttons: number; bulbs: number; crowns: number; piles: number; outside: string[] };
 /**
- * The number of cards, slots, decks, and buttons on the board, the number of buttons, and the classes of the ones
- * that are not inside the screen.
+ * The number of cards, slots, crowns, decks, and buttons on the board, the number of each kind that the check needs,
+ * and the classes of the ones that are not inside the screen.
  */
-const offScreen = (page: Page): Promise<{ places: number; buttons: number; outside: string[] }> =>
+const offScreen = (page: Page): Promise<Places> =>
   page.evaluate(
     (screen, buttons) => {
-      const places = [...document.querySelectorAll(`.board .card, .board .pile-face, .board .deck, ${buttons}`)];
+      const all = `.board .card, .board .pile-face, .board .crown, .board .deck, ${buttons}`;
+      const places = [...document.querySelectorAll(all)];
       const outside = places.filter((el) => {
         const box = el.getBoundingClientRect();
         return box.left < 0 || box.top < 0 || box.right > screen.width || box.bottom > screen.height;
@@ -70,7 +74,10 @@ const offScreen = (page: Page): Promise<{ places: number; buttons: number; outsi
       return {
         places: places.length,
         buttons: document.querySelectorAll(buttons).length,
-        outside: outside.map((el) => el.className),
+        bulbs: document.querySelectorAll('.hint-bulb').length,
+        crowns: document.querySelectorAll('.board .crown').length,
+        piles: document.querySelectorAll('.board .pile').length,
+        outside: outside.map((el) => el.getAttribute('class') ?? el.tagName),
       };
     },
     PHONE,
@@ -110,22 +117,17 @@ const table = (page: Page): Promise<string> =>
 
 type Level = { readonly page: Page; readonly state: GameState; readonly name: string };
 
-/** A tap on the bulb hops the card of the hint, or the deck. */
-const bulbCheck = async ({ check }: Run, { page, state, name }: Level): Promise<void> => {
-  const move = model.hintFor(state);
-  const target = move?.type === 'tapDeck' ? '.board .deck' : `.board [data-card="${move?.cardId ?? ''}"] .card-face`;
-  const tapped = await tap(page, '.board .hint-bulb');
-  await wait(150);
-  // The hop is a running animation on the element of the hint.
-  const hopped = await page.evaluate(
-    (selector) =>
-      document
-        .querySelector(selector)
-        ?.getAnimations()
-        .some((animation) => animation.playState === 'running') === true,
-    target
+/** Every place of the board is inside the screen, the crowns are on the top edges, and the board is one grid. */
+const boardCheck = async ({ check }: Run, { page, name }: Level): Promise<void> => {
+  const { places, buttons, bulbs, crowns, piles, outside } = await offScreen(page);
+  check(
+    `${name}: all inside the screen`,
+    places > 0 && buttons === 1 && crowns >= piles && outside.length === 0,
+    `${String(places)} places, ${String(crowns)} crowns, outside: ${outside.join(', ') || 'none'}`
   );
-  check(`${name}: the bulb hops the hint`, tapped && move !== undefined && hopped, target);
+  check(`${name}: no hint bulb`, bulbs === 0);
+  await crownCheck({ page, name, check });
+  check(`${name}: slots and columns on one grid, the deck at the top right`, await onGrid(page));
 };
 
 /** Home goes to the title scene, and the go button opens the same level with the same table. */
@@ -163,18 +165,14 @@ const screenCheck = async (run: Run, deal: Deal): Promise<void> => {
     );
     await page.goto(url, { waitUntil: 'networkidle2' });
     await page.waitForSelector('.board .pile-face');
-    const { places, buttons, outside } = await offScreen(page);
     const name = `level ${String(deal.level)} (seed ${String(deal.seed)})`;
-    check(
-      `${name}: all inside the screen`,
-      places > 0 && buttons === 2 && outside.length === 0,
-      `${String(places)} places, ${String(buttons)} buttons, outside: ${outside.join(', ') || 'none'}`
-    );
-    check(`${name}: slots and columns on one grid, the deck at the top right`, await onGrid(page));
+    await boardCheck(run, { page, state, name });
     // A restored level can show the go button of the sound gate over the board.
     await tap(page, '.sound-gate .go-button');
-    await wait(300);
-    await bulbCheck(run, { page, state, name });
+    const move = model.hintFor(state);
+    const hint = move?.type === 'tapDeck' ? '.board .deck' : `.board [data-card="${move?.cardId ?? ''}"] .card-face`;
+    await hopCheck({ page, name, check }, hint);
+    check(`${name}: a held card is above the crowns`, await heldOverCrown(page));
     await homeCheck(run, { page, state, name });
   } finally {
     await context.close();
