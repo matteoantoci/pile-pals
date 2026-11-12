@@ -1,6 +1,6 @@
 // The coach of the board: the demo hand and the hint hop (spec, user stories 24 to 29).
 // The model chooses the demo and the hint move. The coach owns the time: the idle time, the hops, the hand.
-// The first touch of the Child stops a demo or a hop at once.
+// The first touch of the Child stops a demo or a hop at once. The hint bulb (src/ui/top-bar.tsx) calls `hint`.
 
 import { demoFor, hintFor, sawDemo } from '../../model';
 import { hop } from './hop';
@@ -28,6 +28,8 @@ export type CoachGame = {
 export type Coach = {
   /** The board is at rest: a level starts, or a move is done. A new demo shows, else the idle time starts. */
   readonly rest: () => void;
+  /** The hint bulb: hops the card or the deck of the hint now, and starts the time with no action again. */
+  readonly hint: () => void;
   /** Stops the demo, the hops, and the timer (the page goes hidden). `rest` starts them again. */
   readonly pause: () => void;
   /** Removes the coach from the page. */
@@ -82,12 +84,12 @@ const listen = (touched: () => void, released: () => void): (() => void) => {
   };
 };
 
-/** Starts the coach of one board. Call `rest` when the board is ready, and `stop` when the board goes. */
-export const startCoach = (game: CoachGame): Coach => {
-  const stage = stageOf();
-  let hops = 0;
+/** The help with no action. `hint` shows the next step of the cycle. `reset` starts the count of hops again. */
+type Idle = { readonly hint: () => void; readonly reset: () => void };
 
-  // With no action: a hop, a hop, then the hand, and again.
+// With no action: a hop, a hop, then the hand, and again.
+const idleOf = (game: CoachGame, stage: Stage): Idle => {
+  let hops = 0;
   const hint = (): void => {
     const move = hintFor(game.current());
     if (!move) {
@@ -102,6 +104,19 @@ export const startCoach = (game: CoachGame): Coach => {
     hops = 0;
     stage.show(move, 1, () => stage.later(IDLE_MS, hint));
   };
+  return {
+    hint,
+    reset: () => {
+      hops = 0;
+    },
+  };
+};
+
+/** Starts the coach of one board. Call `rest` when the board is ready, and `stop` when the board goes. */
+export const startCoach = (game: CoachGame): Coach => {
+  const stage = stageOf();
+  const idle = idleOf(game, stage);
+  const { hint } = idle;
 
   const demo = (): void => {
     const state = game.current();
@@ -116,7 +131,7 @@ export const startCoach = (game: CoachGame): Coach => {
 
   const pause = (): void => {
     stage.clear();
-    hops = 0;
+    idle.reset();
   };
 
   // A touch is an action: it stops the hand and the hops. The idle time starts again when the finger goes up.
@@ -131,10 +146,20 @@ export const startCoach = (game: CoachGame): Coach => {
     stage.later(DEMO_DELAY_MS, demo);
   };
 
+  // The bulb costs nothing: each tap hops the hint, and the hops and the hand of the idle time start again.
+  const hintNow = (): void => {
+    pause();
+    const move = hintFor(game.current());
+    if (move) {
+      hop(move);
+    }
+    stage.later(IDLE_MS, hint);
+  };
+
   const stop = (): void => {
     pause();
     unlisten();
   };
 
-  return { rest, pause, stop };
+  return { rest, hint: hintNow, pause, stop };
 };
