@@ -1,5 +1,5 @@
 import { createSignal, Index, onCleanup, onMount, Show } from 'solid-js';
-import { apply, dropCard, isFinished, openCards, pileProgress, placeAnchor, tapDeck } from '../model';
+import { apply, dropCard, isFinished, MAX_COLUMNS, openCards, pileProgress, placeAnchor, tapDeck } from '../model';
 import { watchLifecycle } from '../shell/lifecycle';
 import { saveGame } from '../shell/save';
 import { checkForUpdate } from '../shell/update';
@@ -20,20 +20,19 @@ import type { Accessor, JSX } from 'solid-js';
 // The board draws the state and shows the events. It contains no game rule.
 // The drag code owns the transform of each card. No JSX binding writes `transform` or `style` on `.card`.
 
-/** The drop targets: the centre of each pile face. The model decides if the pile accepts the card. */
+/**
+ * The drop targets: the centre of each pile box. The pile face rests at a smaller scale from its bottom edge, so the
+ * centre of the face box is lower than the place of a card on the pile. The model decides if the pile accepts the card.
+ */
 const pileTargets = (): readonly Target[] =>
   [...document.querySelectorAll<HTMLElement>('[data-pile]')].flatMap((pile) => {
-    const face = pile.querySelector('.pile-face');
     const id = pile.dataset['pile'];
-    if (!face || id === undefined) {
+    if (id === undefined) {
       return [];
     }
-    const box = face.getBoundingClientRect();
+    const box = pile.getBoundingClientRect();
     return [{ id, at: { x: box.left + box.width / 2, y: box.top + box.height / 2 } }];
   });
-
-/** The most columns of the board grid. The grid has one column for each slot and for each column of the table. */
-const MAX_COLUMNS = 4;
 
 /** The action of a drop: a category card goes on a slot, and a picture card goes on a pile. The model decides. */
 const dropAction = (state: GameState, cardId: CardId, pileId: PileId): Action =>

@@ -3,6 +3,8 @@
 // no part of the top bar. A face-down card shows no crown, and a held card goes over the crowns. The board has no hint
 // bulb: with no action, the coach hops the hint.
 
+import { centre, wait } from './smoke-page.ts';
+import type { Point } from './smoke-page.ts';
 import type { Page } from 'puppeteer-core';
 
 /** The time with no action before the coach hops the hint (src/ui/coach/index.ts). */
@@ -10,7 +12,6 @@ const IDLE_MS = 5000;
 /** The smallest space between a crown and the top bar, in CSS px. */
 const CROWN_GAP = 8;
 
-type Point = { readonly x: number; readonly y: number };
 /** The page of a level, the name of the level, and the way to report a check. */
 type Probe = {
   readonly page: Page;
@@ -28,18 +29,6 @@ type Crown = {
   readonly face: Box;
 };
 type Crowns = { readonly crowns: Crown[]; readonly pictures: Box[]; readonly bar: Box[] };
-
-const wait = (ms: number): Promise<void> => {
-  const { promise, resolve } = Promise.withResolvers<void>();
-  setTimeout(resolve, ms);
-  return promise;
-};
-
-/** The centre of the element, or undefined when the element is not on the page. */
-const centre = async (page: Page, selector: string): Promise<Point | undefined> => {
-  const box = await (await page.$(selector))?.boundingBox();
-  return box ? { x: box.x + box.width / 2, y: box.y + box.height / 2 } : undefined;
-};
 
 /** True when the two boxes are nearer than `space`. */
 const meet = ([left, top, right, bottom]: Box, [left2, top2, right2, bottom2]: Box, space: number): boolean =>
@@ -137,22 +126,41 @@ const heldAt = (page: Page, point: Point): Promise<boolean> =>
     return held !== null && held !== undefined;
   }, point);
 
+/** The top card of the first column: the card that the finger holds over the crowns. */
+const HELD = '.table .stack:first-child .card-place:last-child .card';
+/** The longest wait for a card to move after a move of the finger (ms). */
+const MOVE_TIMEOUT_MS = 2000;
+
+/**
+ * Moves the finger, and waits until the transform of the held card changes: the drag writes it at each move of the
+ * finger. Chrome sends a touch move to the page with the next frame, so a fixed wait can read the card before it moves.
+ */
+const moveHeld = async (page: Page, to: Point): Promise<void> => {
+  const before = await page.$eval(HELD, (el) => (el instanceof HTMLElement ? el.style.transform : ''));
+  await page.touchscreen.touchMove(to.x, to.y);
+  await page
+    .waitForFunction(
+      (selector, old) => document.querySelector<HTMLElement>(selector)?.style.transform !== old,
+      { polling: 'raf', timeout: MOVE_TIMEOUT_MS },
+      HELD,
+      before
+    )
+    .catch(() => undefined);
+};
+
 /**
  * True when a held card goes over the crowns: the finger holds the top card of the first column over the crown of the
  * first slot, and then puts it back.
  */
 export const heldOverCrown = async (page: Page): Promise<boolean> => {
-  const from = await centre(page, '.table .stack:first-child .card-place:last-child .card');
+  const from = await centre(page, HELD);
   const to = await centre(page, '.board .pile .crown');
   if (!from || !to) {
     return false;
   }
-  const half = { x: (from.x + to.x) / 2, y: (from.y + to.y) / 2 };
   await page.touchscreen.touchStart(from.x, from.y);
-  await page.touchscreen.touchMove(half.x, half.y);
-  await wait(30);
-  await page.touchscreen.touchMove(to.x, to.y);
-  await wait(30);
+  await moveHeld(page, { x: (from.x + to.x) / 2, y: (from.y + to.y) / 2 });
+  await moveHeld(page, to);
   const over = await heldAt(page, to);
   await page.touchscreen.touchMove(from.x, from.y);
   await page.touchscreen.touchEnd();

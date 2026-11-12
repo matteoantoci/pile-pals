@@ -15,12 +15,13 @@ const IN: KeyframeAnimationOptions = { duration: 140, easing: 'cubic-bezier(0, 0
 const rest = (face: HTMLElement): void => face.style.setProperty('transform', RESTING);
 
 /**
- * Turns a face-down card face-up. `showFace` swaps the picture at the edge-on frame.
- * The returned promise ends when the face is at rest again, also when an animation is canceled.
+ * Turns a card over: a face-down card face-up, or (in the first demo, src/ui/coach) face-down again. `swap` changes
+ * the side at the edge-on frame. The returned promise ends when the face is at rest again, also when an animation is
+ * canceled.
  */
-export const flip = (face: HTMLElement, showFace: () => void): Promise<void> => {
+export const flip = (face: HTMLElement, swap: () => void): Promise<void> => {
   const secondHalf = (): Promise<void> => {
-    showFace();
+    swap();
     return settle(face, [{ transform: edge(-90) }, { transform: edge(0) }], IN).finished.then(
       () => rest(face),
       canceled

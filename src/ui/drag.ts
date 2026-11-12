@@ -21,10 +21,18 @@ export type Hooks = {
   readonly landed: () => void;
 };
 
-/** The magnet pulls the card when its centre is this near (px) to the centre of a target. */
-const MAGNET_PX = 120;
+/**
+ * The magnet pulls the card when its centre is nearer to the centre of a target than this part of the card height.
+ * The first card row of the table is near the slot row: the home place of a card in that row is about 1.1 card
+ * heights below the centre of the slot above it. So a card that the finger lifts and moves a little goes back home,
+ * and a card that the finger lets go over a pile still snaps.
+ */
+const MAGNET_HEIGHTS = 0.8;
 /** At the target centre, the magnet moves the card half of the way to the target. */
 const MAX_PULL = 0.5;
+
+/** The targets that the drag read at `pointerdown`, and the magnet distance (px) for the size of the card. */
+type Magnet = { readonly targets: readonly Target[]; readonly reach: number };
 
 type Piece = { readonly card: HTMLElement; readonly parts: CardParts };
 type Near = { readonly target: Target; readonly distance: number };
@@ -49,20 +57,20 @@ export const cancelDrag = (): void => {
 };
 
 /** Finds the nearest target within the magnet distance of `center`. */
-const nearest = (targets: readonly Target[], center: Vec): Near | undefined =>
+const nearest = ({ targets, reach }: Magnet, center: Vec): Near | undefined =>
   targets
     .map((target) => ({ target, distance: Math.hypot(target.at.x - center.x, target.at.y - center.y) }))
-    .filter((near) => near.distance <= MAGNET_PX)
+    .filter((near) => near.distance <= reach)
     .reduce<Near | undefined>((best, near) => (best && best.distance <= near.distance ? best : near), undefined);
 
 /** Gives the drawn translate. Near a target, the card moves part of the way from the finger to the target. */
-const pulled = (home: Vec, targets: readonly Target[], raw: Vec): Vec => {
+const pulled = (home: Vec, magnet: Magnet, raw: Vec): Vec => {
   const center = { x: home.x + raw.x, y: home.y + raw.y };
-  const near = nearest(targets, center);
+  const near = nearest(magnet, center);
   if (!near) {
     return raw;
   }
-  const pull = MAX_PULL * (1 - near.distance / MAGNET_PX);
+  const pull = MAX_PULL * (1 - near.distance / magnet.reach);
   return { x: raw.x + (near.target.at.x - center.x) * pull, y: raw.y + (near.target.at.y - center.y) * pull };
 };
 
@@ -94,13 +102,13 @@ const snap = (piece: Piece, move: { from: Vec; to: Vec; velocity: Vec }, landed:
   Promise.all([spring.animation.finished, land(piece.parts, spring.crossing)]).then(landed, landed);
 };
 
-/** The end of a hold, and the targets that the drag read at `pointerdown`. */
-type LetGo = HoldEnd & { readonly targets: readonly Target[] };
+/** The end of a hold, and the magnet that the drag read at `pointerdown`. */
+type LetGo = HoldEnd & { readonly magnet: Magnet };
 
 /** Picks the move after a release: no target in reach, a wrong drop, or a snap. */
 const release = (piece: Piece, letGo: LetGo, hooks: Hooks): void => {
-  const { hold, raw, at, velocity, targets } = letGo;
-  const near = nearest(targets, { x: hold.home.x + raw.x, y: hold.home.y + raw.y });
+  const { hold, raw, at, velocity, magnet } = letGo;
+  const near = nearest(magnet, { x: hold.home.x + raw.x, y: hold.home.y + raw.y });
   if (!near) {
     goHome(piece, at, velocity);
     return;
@@ -116,21 +124,22 @@ const release = (piece: Piece, letGo: LetGo, hooks: Hooks): void => {
 /** Makes the card draggable with one finger. */
 export const draggable = (card: HTMLElement, hooks: Hooks): void => {
   const piece = { card, parts: partsOf(card) };
-  let targets: readonly Target[] = [];
+  let magnet: Magnet = { targets: [], reach: 0 };
   const holder: Holder = pointerHold(card, {
     start: () => {
       lift(piece.parts);
-      targets = hooks.targets();
+      // The card box has the card height: the transform of the face does not change it.
+      magnet = { targets: hooks.targets(), reach: MAGNET_HEIGHTS * card.offsetHeight };
       active = { piece, holder };
     },
-    draw: (hold, raw) => pulled(hold.home, targets, raw),
+    draw: (hold, raw) => pulled(hold.home, magnet, raw),
     end: (end) => {
       // The drag ended, so the shell has nothing to cancel.
       if (active?.piece === piece) {
         active = undefined;
       }
       if (end.letGo) {
-        release(piece, { ...end, targets }, hooks);
+        release(piece, { ...end, magnet }, hooks);
         return;
       }
       goHome(piece, end.at, ORIGIN);

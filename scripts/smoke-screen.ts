@@ -3,52 +3,20 @@
 // board is one grid. The board has no hint bulb: the run waits for the hint hop of the coach, and it taps home.
 // The checks of the crowns and of the hint hop are in scripts/smoke-board.ts (ticket 08).
 
-import { runnerImport } from 'vite';
 import { crownCheck, heldOverCrown, hopCheck } from './smoke-board.ts';
-import type { GameState, hintFor, snapshot, start } from '../src/model/index.ts';
-import type { Browser, Page } from 'puppeteer-core';
+import { model, openLevel, PHONE, SEEDS } from './smoke-level.ts';
+import { tap, wait } from './smoke-page.ts';
+import type { Run } from './smoke-level.ts';
+import type { Page } from 'puppeteer-core';
 
-/** The smallest phone screen of the spec, in CSS px. */
-const PHONE = { width: 356, height: 764 };
-/** The levels of the check (spec, Testing Decisions). */
+/** The levels of the check (spec, Testing Decisions). The check uses the deal with the most groups of SEEDS seeds. */
 const LEVELS = [1, 11, 16, 30];
-/** The check looks at these seeds and uses the one with the most groups, because it has the most cards. */
-const SEEDS = 50;
 /** The deal that was below the bottom edge of the old board. */
 const OVERFLOW = { level: 20, seed: 12345 };
 /** The buttons of the board: the home button only. */
 const BUTTONS = '.board .home-button';
 
 type Deal = { readonly level: number; readonly seed: number };
-
-/** The browser, the address of the app, and the way to report a check. */
-type Run = {
-  readonly browser: Browser;
-  readonly url: string;
-  readonly check: (name: string, pass: boolean, detail?: string) => void;
-};
-
-/** The game model, loaded from the source by Vite, so that the run can deal any level. */
-const { module: model } = await runnerImport<{
-  start: typeof start;
-  snapshot: typeof snapshot;
-  hintFor: typeof hintFor;
-}>('/src/model/index.ts');
-
-const wait = (ms: number): Promise<void> => {
-  const { promise, resolve } = Promise.withResolvers<void>();
-  setTimeout(resolve, ms);
-  return promise;
-};
-
-/** A touch tap on the centre of the element. Gives false when the element is not on the page. */
-const tap = async (page: Page, selector: string): Promise<boolean> => {
-  const box = await (await page.$(selector))?.boundingBox();
-  if (box) {
-    await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
-  }
-  return box !== undefined && box !== null;
-};
 
 /** The deal of the level with the most groups, and so with the most cards. */
 const fullestDeal = (level: number): Deal => {
@@ -57,7 +25,7 @@ const fullestDeal = (level: number): Deal => {
   return { level, seed: seeds.reduce((best, seed) => (groups(seed) > groups(best) ? seed : best)) };
 };
 
-type Places = { places: number; buttons: number; bulbs: number; crowns: number; piles: number; outside: string[] };
+type Places = { places: number; buttons: number; crowns: number; piles: number; outside: string[] };
 /**
  * The number of cards, slots, crowns, decks, and buttons on the board, the number of each kind that the check needs,
  * and the classes of the ones that are not inside the screen.
@@ -74,7 +42,6 @@ const offScreen = (page: Page): Promise<Places> =>
       return {
         places: places.length,
         buttons: document.querySelectorAll(buttons).length,
-        bulbs: document.querySelectorAll('.hint-bulb').length,
         crowns: document.querySelectorAll('.board .crown').length,
         piles: document.querySelectorAll('.board .pile').length,
         outside: outside.map((el) => el.getAttribute('class') ?? el.tagName),
@@ -115,17 +82,16 @@ const table = (page: Page): Promise<string> =>
     })
   );
 
-type Level = { readonly page: Page; readonly state: GameState; readonly name: string };
+type Level = { readonly page: Page; readonly name: string };
 
 /** Every place of the board is inside the screen, the crowns are on the top edges, and the board is one grid. */
 const boardCheck = async ({ check }: Run, { page, name }: Level): Promise<void> => {
-  const { places, buttons, bulbs, crowns, piles, outside } = await offScreen(page);
+  const { places, buttons, crowns, piles, outside } = await offScreen(page);
   check(
     `${name}: all inside the screen`,
     places > 0 && buttons === 1 && crowns >= piles && outside.length === 0,
     `${String(places)} places, ${String(crowns)} crowns, outside: ${outside.join(', ') || 'none'}`
   );
-  check(`${name}: no hint bulb`, bulbs === 0);
   await crownCheck({ page, name, check });
   check(`${name}: slots and columns on one grid, the deck at the top right`, await onGrid(page));
 };
@@ -147,33 +113,21 @@ const homeCheck = async ({ check }: Run, { page, name }: Level): Promise<void> =
   check(`${name}: go opens the same level`, title && before === after, after.slice(0, 60));
 };
 
-/** Opens the saved deal on the phone screen, in a new browser context, and checks the places of the board. */
+/** Opens the saved deal on the phone screen and checks the places of the board. */
 const screenCheck = async (run: Run, deal: Deal): Promise<void> => {
-  const { browser, url, check } = run;
-  const context = await browser.createBrowserContext();
+  const { check } = run;
+  const state = model.start({ level: deal.level }, deal.seed);
+  const { context, page } = await openLevel(run, PHONE.width, state);
   try {
-    const page = await context.newPage();
-    await page.setViewport({ ...PHONE, isMobile: true, hasTouch: true, deviceScaleFactor: 2 });
-    // The save goes in before the app starts. A reload after it would save the old level over it.
-    // Every demo is seen, so that no demo hand moves a card.
-    const state = { ...model.start({ level: deal.level }, deal.seed), demos: ['first', 'deck', 'anchor'] as const };
-    await page.evaluateOnNewDocument(
-      (save) => {
-        localStorage.setItem('pile-pals:save', save);
-      },
-      JSON.stringify(model.snapshot(state))
-    );
-    await page.goto(url, { waitUntil: 'networkidle2' });
-    await page.waitForSelector('.board .pile-face');
     const name = `level ${String(deal.level)} (seed ${String(deal.seed)})`;
-    await boardCheck(run, { page, state, name });
+    await boardCheck(run, { page, name });
     // A restored level can show the go button of the sound gate over the board.
     await tap(page, '.sound-gate .go-button');
     const move = model.hintFor(state);
     const hint = move?.type === 'tapDeck' ? '.board .deck' : `.board [data-card="${move?.cardId ?? ''}"] .card-face`;
     await hopCheck({ page, name, check }, hint);
     check(`${name}: a held card is above the crowns`, await heldOverCrown(page));
-    await homeCheck(run, { page, state, name });
+    await homeCheck(run, { page, name });
   } finally {
     await context.close();
   }

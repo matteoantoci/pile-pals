@@ -4,6 +4,7 @@
 export { dropCard, openCards, placeAnchor, tapDeck } from './apply';
 export { catalog, palSize, pictureOf } from './catalog';
 export { apply, go, isFinished, placeSticker } from './game';
+export { MAX_COLUMNS } from './difficulty';
 export { demoFor, hintFor, sawDemo } from './demos';
 export type { Demo, Hint } from './demos';
 export { pileProgress } from './pile-progress';

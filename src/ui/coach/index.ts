@@ -2,12 +2,13 @@
 // The model chooses the demo and the hint move. The coach owns the time: the idle time, the hops, the hand.
 // The first touch of the Child stops a demo or a hop at once.
 
-import { demoFor, hintFor, sawDemo } from '../../model';
+import { apply, demoFor, hintFor, sawDemo } from '../../model';
 import { hop } from './hop';
 import { newRun } from './parts';
 import { showMove } from './show';
-import type { GameState, Hint } from '../../model';
+import type { GameState } from '../../model';
 import type { Run } from './parts';
+import type { Show } from './show';
 
 /** The time with no action before a hint (ms). */
 const IDLE_MS = 5000;
@@ -38,7 +39,7 @@ export type Coach = {
 type Stage = {
   readonly later: (ms: number, next: () => void) => void;
   /** Shows the move with the hand. `next` runs when the hand played to its end, not after a stop. */
-  readonly show: (move: Hint, rounds: number, next: () => void) => void;
+  readonly show: (show: Show, next: () => void) => void;
   readonly showing: () => boolean;
   readonly clear: () => void;
 };
@@ -56,10 +57,10 @@ const stageOf = (): Stage => {
     window.clearTimeout(timer);
     timer = window.setTimeout(next, ms);
   };
-  const show = (move: Hint, rounds: number, next: () => void): void => {
+  const show = (shown: Show, next: () => void): void => {
     const own = newRun();
     run = own;
-    showMove(own, move, rounds).then((played) => {
+    showMove(own, shown).then((played) => {
       if (played && run === own) {
         run = undefined;
         next();
@@ -100,7 +101,7 @@ const idleOf = (game: CoachGame, stage: Stage): Idle => {
       return;
     }
     hops = 0;
-    stage.show(move, 1, () => stage.later(IDLE_MS, hint));
+    stage.show({ move, rounds: 1, flipped: undefined }, () => stage.later(IDLE_MS, hint));
   };
   return {
     hint,
@@ -124,7 +125,13 @@ export const startCoach = (game: CoachGame): Coach => {
       return;
     }
     game.record(sawDemo(state, next.kind));
-    stage.show(next.move, next.kind === 'first' ? FIRST_ROUNDS : 1, () => stage.later(IDLE_MS, hint));
+    // The first demo ends with the flip of the card that its move uncovers (spec, user story 33).
+    const flipped =
+      next.kind === 'first'
+        ? apply(state, next.move).events.flatMap((event) => (event.type === 'flipped' ? [event.cardId] : []))[0]
+        : undefined;
+    const rounds = next.kind === 'first' ? FIRST_ROUNDS : 1;
+    stage.show({ move: next.move, rounds, flipped }, () => stage.later(IDLE_MS, hint));
   };
 
   const pause = (): void => {
