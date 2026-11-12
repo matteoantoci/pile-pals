@@ -11,6 +11,12 @@
   /* The back of a face-down card and of the deck: blue chevrons with a white edge. */
   --back: #1d8be7;
   --back-chevron: #43a7f7;
+  /* A category card: the gold frame and the gold crown. */
+  --gold: #f5b400;
+  --gold-line: 4px;
+  /* An empty slot: a dark green box in the table, with a faint crown in a lighter green. */
+  --slot: #027335;
+  --slot-crown: #0e9e54;
   /* The dark green edge of the logo cards on the title scene. */
   --pile-edge: #24583d;
   --bottom-reserve: max(env(safe-area-inset-bottom), 34px);
@@ -21,9 +27,6 @@
   /* The layout of the board. A smaller card size (below) changes these values too. */
   --board-gap: 32px;
   --gap: 16px;
-  --pile-side: 32px;
-  --pile-line: 4px;
-  --pile-pad: 12px;
   /* The size of a card picture on a pile. */
   --mini: 32px;
   /* How much of the card below shows above the top card of a stack. */
@@ -84,15 +87,13 @@ html[data-restoring] * {
   gap: var(--gap);
 }
 
+/* A pile has no box of its own: the slot is the box. The cards that landed on the pile show below it. */
 .pile {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  width: calc(var(--card-w) + var(--pile-side));
-  padding: var(--pile-pad) 0;
-  border: var(--pile-line) dashed rgb(255 255 255 / 0.5);
-  border-radius: 20px;
+  width: var(--card-w);
 }
 
 .pile-face,
@@ -111,21 +112,47 @@ html[data-restoring] * {
   height: var(--picture);
 }
 
+/* A category card on its slot has the face of a card: the grey bottom edge, and the gold frame below. */
 .pile-face {
-  background: #f4e9d2;
+  position: relative;
+  box-sizing: border-box;
+  border-bottom: 3px solid var(--card-edge);
+}
+
+/* An empty slot: a card-size dark green box, with no picture. It waits for a category card. */
+.pile.slot .pile-face {
+  border-bottom: none;
+  background: var(--slot);
 }
 
 /*
- * A category card has the colour of a pile face, so the Child sees that it goes on a slot.
- * An empty slot shows no picture: it waits for a category card.
+ * The gold crown at the top right of a category card. A clip path cuts the crown from a gold box:
+ * a band at the bottom and three points. Its size comes from the card width, so it fits each card size.
+ * A card on the table has a crown element below its back. A pile face has no back, so its crown is a pseudo-element.
  */
-.card.anchor .card-face {
-  background: #f4e9d2;
+.pile-face::after {
+  content: '';
 }
 
-.pile.slot .pile-face {
-  background: rgb(255 255 255 / 0.15);
-  box-shadow: inset 0 0 0 var(--pile-line) rgb(244 233 210 / 0.6);
+.crown,
+.pile-face::after {
+  position: absolute;
+  top: calc(var(--card-w) * 0.08);
+  right: calc(var(--card-w) * 0.08);
+  width: calc(var(--card-w) * 0.26);
+  height: calc(var(--card-w) * 0.2);
+  background: var(--gold);
+  clip-path: polygon(0% 100%, 0% 15%, 27% 52%, 50% 0%, 73% 52%, 100% 15%, 100% 100%);
+  pointer-events: none;
+}
+
+/* The faint crown of an empty slot is larger and in the centre: the crown card goes on the crown place. */
+.pile.slot .pile-face::after {
+  inset: 0;
+  width: calc(var(--card-w) * 0.5);
+  height: calc(var(--card-w) * 0.38);
+  margin: auto;
+  background: var(--slot-crown);
 }
 
 .pile-cards {
@@ -194,7 +221,6 @@ html[data-restoring] * {
   --card-h: 100px;
   --picture: 62px;
   --gap: 8px;
-  --pile-side: 16px;
   --mini: 28px;
 }
 
@@ -204,9 +230,6 @@ html[data-restoring] * {
   --picture: 52px;
   --board-gap: 16px;
   --gap: 8px;
-  --pile-side: 10px;
-  --pile-line: 3px;
-  --pile-pad: 8px;
   --mini: 24px;
 }
 
@@ -240,6 +263,21 @@ html[data-restoring] * {
   inset: 4px;
   border: 1.5px solid var(--card-line);
   border-radius: 10px;
+  pointer-events: none;
+}
+
+/*
+ * The gold frame of a category card, on the table, in the deck place, and on its slot. It takes the place of the
+ * cream line. On a face-down card, the back covers the frame and the crown, so the Child cannot see the card.
+ * An empty slot has no frame.
+ */
+.card.anchor .card-face::before,
+.pile:not(.slot) .pile-face::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: var(--gold-line) solid var(--gold);
+  border-radius: 14px;
   pointer-events: none;
 }
 

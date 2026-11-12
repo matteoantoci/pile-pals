@@ -41,6 +41,10 @@ const CardView = (props: {
     <div class="card-shadow" />
     <div class="card-face">
       <img class="card-front" src={stillUrl(props.card.picture)} alt="" />
+      {/* The crown of a category card. It comes before the back, so the back of a face-down card covers it. */}
+      <Show when={props.card.anchor}>
+        <div class="crown" />
+      </Show>
       <div class="card-back" />
     </div>
   </div>

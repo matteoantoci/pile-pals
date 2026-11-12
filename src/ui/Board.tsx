@@ -43,7 +43,7 @@ const sizeOf = (deal: GameState): string => {
   return deal.piles.length > 2 || places > 6 ? 'medium' : 'large';
 };
 
-/** A category pile: the anchor picture on its face, and the cards that landed on it. An empty slot has no picture. */
+/** A category pile: the category card on its slot, and the cards that landed on it. An empty slot has no picture. */
 const PileView = (props: { pile: Pile }): JSX.Element => (
   <div class="pile" classList={{ slot: props.pile.picture === null }} data-pile={props.pile.id}>
     <div class="pile-face">
