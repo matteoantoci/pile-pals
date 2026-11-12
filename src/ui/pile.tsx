@@ -1,5 +1,5 @@
 import { createEffect, For, on, Show } from 'solid-js';
-import { canceled, facePose, REST_SCALE, RESTING, settle, stop } from './motion';
+import { canceled, facePose, RESTING, settle, stop } from './motion';
 import { stillUrl } from './pictures';
 import type { Pile, PileProgress } from '../model';
 import type { JSX } from 'solid-js';
@@ -8,29 +8,22 @@ import type { JSX } from 'solid-js';
 // bottom, below the picture: one dot for each card of its group, and one full dot for each card on the pile. A card
 // that lands slides under the category card. Only WAAPI animates the pile, and only `transform` (src/ui/motion).
 
-/** How far a landed card slides down out of the category card before it goes under it: a part of the card height. */
-const TUCK_DEPTH = 0.35;
-const TUCK_OUT: KeyframeAnimationOptions = { duration: 180, easing: 'cubic-bezier(0.4, 0, 1, 1)' };
-const TUCK_BACK: KeyframeAnimationOptions = { duration: 260, easing: 'cubic-bezier(0, 0, 0.2, 1)' };
+/**
+ * The start pose of a landed card under the category card: the size of a lifted card face, a little higher. Its rim
+ * shows above and at the sides of the category card, never over the dots and never over the columns below.
+ */
+const TUCK_FROM = { y: -6, scale: 1 };
+const TUCK: KeyframeAnimationOptions = { duration: 300, easing: 'cubic-bezier(0, 0, 0.2, 1)' };
 /** A dot that fills grows and comes back to its size. */
 const POP: KeyframeAnimationOptions = { duration: 320, easing: 'cubic-bezier(0.2, 0.8, 0.3, 1.4)' };
 
 /**
- * The landed card slides down on top of the category card (`.over`), then it goes under it and slides back up.
- * During the slide (`.tucking`), the pile is above the columns. A new landing stops the slide before it and starts
- * again.
+ * The landed card goes under the category card: it is always below the category card, and it shrinks to the size
+ * and place of the category card. A new landing stops the slide before it and starts again.
  */
 const tuck = (under: HTMLElement): void => {
   stop(under);
-  const out = facePose({ y: under.offsetHeight * TUCK_DEPTH, scale: REST_SCALE });
-  under.classList.add('tucking', 'over');
-  settle(under, [{ transform: RESTING }, { transform: out }], TUCK_OUT)
-    .finished.then(() => {
-      under.classList.remove('over');
-      return settle(under, [{ transform: out }, { transform: RESTING }], TUCK_BACK).finished;
-    })
-    .then(() => under.classList.remove('tucking'))
-    .catch(canceled);
+  settle(under, [{ transform: facePose(TUCK_FROM) }, { transform: RESTING }], TUCK).finished.catch(canceled);
 };
 
 /**

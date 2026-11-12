@@ -115,9 +115,10 @@ html[data-restoring] * {
   align-items: start;
 }
 
-/* A pile has no box of its own: the slot is the box. */
+/* A pile has no box of its own: the slot is the box. It is a stacking context for the card under it (.pile-under). */
 .pile {
   position: relative;
+  isolation: isolate;
 }
 
 .pile-face,
@@ -186,21 +187,17 @@ html[data-restoring] * {
 }
 
 /*
- * The last card on the pile, under the category card. It is a card face at rest in the place of the pile face, so
- * the category card covers it. When a card lands, it slides down on top of the category card (`.over`), and then
- * back up under it (src/ui/pile.tsx). During the slide (`.tucking`), the pile is above the columns, so the card does
- * not go behind them.
+ * The last card on the pile, under the category card. It is a card face at rest in the place of the pile face. It
+ * is always below the category card, so a landed card never covers the dots: the pile is its own stacking context,
+ * and the landed card is at the bottom of it. When a card lands, it shrinks under the category card
+ * (src/ui/pile.tsx).
  */
 .pile > .pile-under {
   position: absolute;
   top: 0;
   left: 0;
+  z-index: -1;
   pointer-events: none;
-}
-
-.pile:has(> .pile-under.tucking),
-.pile > .pile-under.over {
-  z-index: 1;
 }
 
 /* A completed group left the table in its parade (src/ui/celebration/parade.ts). The category card stays. */
