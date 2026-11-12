@@ -2,8 +2,8 @@ import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import solid from 'vite-plugin-solid';
 
-// The table colour. Keep the same value in index.html and src/ui/styles.css.
-const TABLE = '#2F6F4E';
+// The top colour of the table. Keep the same value in index.html, scripts/shell/splash.py, and src/ui/styles.css.
+const TABLE = '#08813A';
 
 export default defineConfig({
   // GitHub Pages serves the app from https://<user>.github.io/pile-pals/.
