@@ -62,7 +62,7 @@ const ROWS: readonly Row[] = [
   { from: 9, groups: [4, 4], cards: 3, columns: 4, deck: 0, loose: 0 },
   { from: 11, groups: [2, 4], cards: 4, columns: 4, deck: 4, loose: 0 },
   { from: 13, groups: [2, 4], cards: 4, columns: 4, deck: 4, loose: 1 },
-  { from: 16, groups: [2, 4], cards: 5, columns: 4, deck: 6, loose: ALL },
+  { from: 16, groups: [2, 4], cards: 4, columns: 4, deck: 5, loose: ALL },
 ];
 
 const rowOf = (level: number): Row => {
