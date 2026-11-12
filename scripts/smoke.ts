@@ -6,8 +6,11 @@
 import { launch } from 'puppeteer-core';
 import { preview } from 'vite';
 import { recordAudio } from './smoke-audio.ts';
+import { nudgeChecks } from './smoke-nudge.ts';
+import { tap, wait } from './smoke-page.ts';
 import { screenChecks } from './smoke-screen.ts';
 import type { AudioRecord } from './smoke-audio.ts';
+import type { Point } from './smoke-page.ts';
 import type { Browser, Page } from 'puppeteer-core';
 
 const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
@@ -15,28 +18,6 @@ const PORT = 4179;
 const APP_URL = `http://127.0.0.1:${String(PORT)}/pile-pals/`;
 const DRAG_STEPS = 12;
 const MAX_DRAGS = 150;
-
-type Point = { readonly x: number; readonly y: number };
-
-const wait = (ms: number): Promise<void> => {
-  const { promise, resolve } = Promise.withResolvers<void>();
-  setTimeout(resolve, ms);
-  return promise;
-};
-
-const centre = async (page: Page, selector: string): Promise<Point | undefined> => {
-  const box = await (await page.$(selector))?.boundingBox();
-  return box ? { x: box.x + box.width / 2, y: box.y + box.height / 2 } : undefined;
-};
-
-/** A touch tap: on iOS only a tap starts the audio, so the run uses touch, not the mouse. */
-const tap = async (page: Page, selector: string): Promise<boolean> => {
-  const point = await centre(page, selector);
-  if (point) {
-    await page.touchscreen.tap(point.x, point.y);
-  }
-  return point !== undefined;
-};
 
 const shown = async (page: Page, selector: string): Promise<boolean> => (await page.$(selector)) !== null;
 
@@ -73,7 +54,7 @@ const readTable = (page: Page): Promise<{ cards: Point[]; piles: Point[] }> =>
       })
       .map(({ x, y }) => ({ x, y })),
     piles: [...document.querySelectorAll('.pile')]
-      .map((pile) => (pile.querySelector('.pile-face') ?? pile).getBoundingClientRect())
+      .map((pile) => pile.getBoundingClientRect())
       .map((rect) => ({ x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 })),
   }));
 
@@ -179,6 +160,7 @@ const runAll = async (browser: Browser): Promise<void> => {
   await backgroundReturn(page, audio);
   await levelEnd(page, audio);
   await screenChecks({ browser, url: APP_URL, check });
+  await nudgeChecks({ browser, url: APP_URL, check });
 };
 
 const server = await preview({ preview: { port: PORT, strictPort: true, host: '127.0.0.1' } });

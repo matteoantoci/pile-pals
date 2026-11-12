@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { apply, dropCard, openCards, pileProgress, placeAnchor, start } from './index';
+import { apply, dropCard, openCards, pileProgress, placeAnchor, start, tapDeck } from './index';
 import type { GameState } from './index';
 
 // The progress of a pile, which the dots of its category card show (spec, "Pile progress").
@@ -36,6 +36,21 @@ describe('pileProgress', () => {
 
     const done = end.piles.map((pile) => pileProgress(end, pile.id)?.done ?? 0);
     expect(done.reduce((sum, count) => sum + count, 0)).toBe(openCards(state).length);
+  });
+
+  it('counts the dealt card in the total, and as done after the Child drops it on its pile', () => {
+    // Level 11 has a deck, and a group has 4 cards (spec, "Difficulty table").
+    const state = apply(start({ level: 11 }, 1), tapDeck()).state;
+    const dealt = state.dealt;
+    const pile = state.piles.find((item) => item.group === dealt?.group);
+    if (!dealt || !pile) {
+      throw new Error('The tap on the deck gives no card of a pile.');
+    }
+
+    const dropped = apply(state, dropCard(dealt.id, pile.id)).state;
+
+    expect(pileProgress(state, pile.id)).toEqual({ done: 0, total: 4 });
+    expect(pileProgress(dropped, pile.id)).toEqual({ done: 1, total: 4 });
   });
 
   it('gives undefined for an empty slot and counts no category card after the Child places it', () => {

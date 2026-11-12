@@ -55,5 +55,8 @@ const TABLE: readonly Row[] = [
 /** The difficulty of the level. */
 export const difficultyOf = (level: number): Difficulty => TABLE.findLast((row) => row.from <= level) ?? FIRST;
 
-/** The most columns that a level has. A save of an older build can have more stacks (save.ts). */
+/**
+ * The most columns that a level has, and so the most columns of the board grid (Board.tsx). A save of an older build
+ * can have more stacks (save.ts).
+ */
 export const MAX_COLUMNS = Math.max(...TABLE.map((row) => row.columns));

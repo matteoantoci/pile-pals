@@ -8,12 +8,12 @@ Drag each picture card onto the pile where it belongs. 🐶🐱 go with the pets
 <p align="center">
   <img src="docs/images/title.png" alt="Title scene with hopping pals and a green go button" width="240">
   &nbsp;
-  <img src="docs/images/board.png" alt="A level with two piles and the demo hand" width="240">
+  <img src="docs/images/board.png" alt="Level 13 with the deck, three category cards, an empty slot, and columns of face-down cards" width="240">
   &nbsp;
   <img src="docs/images/stickers.png" alt="The sticker page after a level" width="240">
 </p>
 
-Pile Pals is a calm version of the adult game _Solitaire Associations: Words_, made for small hands. It has no text, no timer, no score, and no way to lose.
+Pile Pals is a calm version of the adult game _Solitaire Associations: Words_, made for small hands. It has no text except the level number, no timer, no score, and no way to lose.
 
 ## ✨ What the child gets
 
@@ -22,7 +22,7 @@ Pile Pals is a calm version of the adult game _Solitaire Associations: Words_, m
 - 🎉 **Celebrations.** A finished group walks off the table in a parade, and a finished level gives confetti and a fanfare.
 - 🌟 **A sticker book.** Each level gives a sticker. Gold stickers come later, and a full book makes all the pals dance.
 - 👋 **A demo hand.** It shows each new action one time. When the child waits, the right card gives a small hop.
-- 📈 **Levels that grow slowly.** Early levels have 2 piles and few cards. Later levels add face-down cards, a deck, and category cards that the child puts on empty slots.
+- 📈 **Levels that grow slowly.** Early levels have 2 piles and few cards, with face-down cards from level 1. Level 11 adds a deck, and level 13 adds category cards that the child puts on empty slots.
 - 🧩 **Many kinds of groups.** Kinds, colours, homes, things that go together, and how things move. Each level uses one kind only.
 
 ## 👪 For parents

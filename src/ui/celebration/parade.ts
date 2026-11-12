@@ -128,14 +128,15 @@ const walk = (piece: Piece): Promise<void> => {
 const walkGroup = (pile: Pile): Promise<void> => {
   const element = pileOf(pile.id);
   const host = boardOf();
-  // The group cards are under the category card, so the copies start on its face.
-  const place = element?.querySelector<HTMLElement>('.pile-face')?.getBoundingClientRect();
-  if (host === undefined || place === undefined) {
+  if (host === undefined || element === undefined) {
     return Promise.resolve();
   }
+  // The group cards are under the category card, so the copies start on it. A copy has the size of a card box: it
+  // starts on the pile box, because the pile face rests at a smaller scale from its bottom edge.
+  const place = element.getBoundingClientRect();
   const layer = layerOf(host);
   const pieces = pile.cards.map((card, index) => pieceOf(layer, card, { place, delay: index * STAGGER_MS }));
-  element?.classList.add('paraded');
+  element.classList.add('paraded');
   return Promise.all(pieces.map(walk)).then(() => undefined);
 };
 

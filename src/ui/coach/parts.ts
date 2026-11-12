@@ -10,6 +10,8 @@ export type Run = {
   readonly stop: () => void;
   /** Hides the card while its copy shows. `stop` shows it again. */
   readonly hide: (source: HTMLElement) => void;
+  /** Keeps a function that puts a card of the board back as it was. `stop` runs it. */
+  readonly onStop: (undo: () => void) => void;
 };
 
 /** The fingertip of the hand is at 20, 3 in the 48 by 64 box (coach.css puts it on the point of the transform). */
@@ -30,9 +32,12 @@ const HAND_HTML =
 export const cardOf = (cardId: string): HTMLElement | undefined =>
   document.querySelector<HTMLElement>(`[data-card="${CSS.escape(cardId)}"]`) ?? undefined;
 
-/** The face of a pile: the drop target of the card that goes on it. */
-export const pileFaceOf = (pileId: string): HTMLElement | undefined =>
-  document.querySelector<HTMLElement>(`[data-pile="${CSS.escape(pileId)}"] .pile-face`) ?? undefined;
+/**
+ * The pile box: the drop target of the card that goes on it. The pile face rests at a smaller scale from its bottom
+ * edge, so the centre of the face box is lower than the place of a card on the pile.
+ */
+export const pileOf = (pileId: string): HTMLElement | undefined =>
+  document.querySelector<HTMLElement>(`[data-pile="${CSS.escape(pileId)}"]`) ?? undefined;
 
 /** The deck that the Child taps. */
 export const deckOf = (): HTMLElement | undefined => document.querySelector<HTMLElement>('.deck') ?? undefined;
@@ -45,7 +50,8 @@ export const centreOf = (el: Element): Vec => {
 
 /**
  * A new run with its own layer inside the board, so the card sizes of the board apply to the copy.
- * `stop` stops the animations of the run, removes its elements, and shows the card again.
+ * `stop` stops the animations of the run, removes its elements, shows the card again, and puts back the cards that
+ * the run changed. A second `stop` puts back no card: the board can change a card after the first one.
  */
 export const newRun = (): Run => {
   const layer = document.createElement('div');
@@ -54,6 +60,7 @@ export const newRun = (): Run => {
   (document.querySelector('.board') ?? document.body).append(layer);
   let stopped = false;
   let hidden: HTMLElement | undefined;
+  let undos: readonly (() => void)[] = [];
   const stop = (): void => {
     stopped = true;
     for (const animation of layer.getAnimations({ subtree: true })) {
@@ -61,12 +68,20 @@ export const newRun = (): Run => {
     }
     layer.remove();
     hidden?.classList.remove('demo-source');
+    const now = undos;
+    undos = [];
+    for (const undo of now) {
+      undo();
+    }
   };
   const hide = (source: HTMLElement): void => {
     hidden = source;
     source.classList.add('demo-source');
   };
-  return { layer, stopped: () => stopped, stop, hide };
+  const onStop = (undo: () => void): void => {
+    undos = [...undos, undo];
+  };
+  return { layer, stopped: () => stopped, stop, hide, onStop };
 };
 
 /** The hand: `.demo-hand` moves with `translate3d`, and its body presses with a scale. */

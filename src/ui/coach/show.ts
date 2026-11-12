@@ -1,11 +1,18 @@
 // The rounds of the demo hand. Numbers: research/native-feel/motion.md, and a slow spring (1.2 s, no bounce).
 // Ticket 16 tunes the felt values on the iPhone. Change a value here only.
 
-import { canceled, facePose, land, lift, ORIGIN, settle, springTo, translate3d } from '../motion';
-import { cardOf, centreOf, copyOf, deckOf, handOf, pileFaceOf } from './parts';
-import type { Hint } from '../../model';
+import { flip } from '../flip';
+import { canceled, facePose, land, lift, ORIGIN, RESTING, settle, springTo, stop, translate3d } from '../motion';
+import { cardOf, centreOf, copyOf, deckOf, handOf, pileOf } from './parts';
+import type { CardId, Hint } from '../../model';
 import type { CardParts, Spring, Vec } from '../motion';
 import type { Run } from './parts';
+
+/**
+ * What the hand shows: the move, the number of rounds, and the face-down card that the move uncovers. Only the first
+ * demo gives that card: each of its rounds ends with the flip of the card, and the card then turns back face-down.
+ */
+export type Show = { readonly move: Hint; readonly rounds: number; readonly flipped: CardId | undefined };
 
 /** The slow move of the hand and the card. */
 const DEMO_SPRING: Spring = { duration: 1.2, bounce: 0 };
@@ -71,8 +78,28 @@ const partsOf = (card: HTMLElement): CardParts | undefined => {
   return face && shadow ? { face, shadow } : undefined;
 };
 
-/** The copy goes from the card to the target with the hand on it, lands, and then goes back with no hand. */
-const carry = async (run: Run, hand: Hand, move: { readonly source: HTMLElement; readonly to: Vec }): Promise<void> => {
+/** The face-down card that the move of the demo uncovers: the card element and its face. */
+type Below = { readonly card: HTMLElement; readonly face: HTMLElement };
+
+/** One drag of the copy: the card, the place of the target, and the face-down card that the move uncovers. */
+type Carry = { readonly source: HTMLElement; readonly to: Vec; readonly below: Below | undefined };
+
+/**
+ * Turns the card below to the side, with the flip of the board (src/ui/flip.ts). After a stop, the flip does not
+ * change the side: `stop` puts the card back face-down.
+ */
+const turn = (run: Run, below: Below, side: 'up' | 'down'): Promise<void> =>
+  flip(below.face, () => {
+    if (!run.stopped()) {
+      below.card.setAttribute('data-face', side);
+    }
+  });
+
+/**
+ * The copy goes from the card to the target with the hand on it, and lands. The card below turns face-up, and then
+ * turns face-down while the copy goes back with no hand.
+ */
+const carry = async (run: Run, hand: Hand, move: Carry): Promise<void> => {
   const copy = copyOf(run, move.source);
   const parts = copy && partsOf(copy);
   if (!copy || !parts) {
@@ -85,21 +112,25 @@ const carry = async (run: Run, hand: Hand, move: { readonly source: HTMLElement;
   await done(springTo(copy, { from: ORIGIN, to: offset, velocity: ORIGIN }, DEMO_SPRING).animation);
   land(parts, 0).catch(canceled);
   await press(hand, false);
+  if (move.below) {
+    await turn(run, move.below, 'up');
+  }
   await pause(run, HOLD_MS);
   await Promise.all([
     fadeOut(hand.hand),
     done(springTo(copy, { from: offset, to: ORIGIN, velocity: ORIGIN }, BACK_SPRING).animation),
+    move.below && turn(run, move.below, 'down'),
   ]);
   copy.remove();
   move.source.classList.remove('demo-source');
 };
 
 /** One drag round: the hand presses the card and moves it slowly to its pile. */
-const dragRound = async (run: Run, source: HTMLElement, target: HTMLElement): Promise<void> => {
+const dragRound = async (run: Run, target: HTMLElement, move: Omit<Carry, 'to'>): Promise<void> => {
   const hand = handOf(run);
-  await comeIn(hand, centreOf(source));
+  await comeIn(hand, centreOf(move.source));
   await press(hand, true);
-  await carry(run, hand, { source, to: centreOf(target) });
+  await carry(run, hand, { ...move, to: centreOf(target) });
   hand.hand.remove();
 };
 
@@ -124,15 +155,31 @@ const tapRound = async (run: Run, deck: HTMLElement): Promise<void> => {
   hand.hand.remove();
 };
 
+/** The face-down card that the move uncovers, or undefined. `stop` of the run puts it back face-down at rest. */
+const belowOf = (run: Run, cardId: CardId | undefined): Below | undefined => {
+  const card = cardId === undefined ? undefined : cardOf(cardId);
+  const face = card?.querySelector<HTMLElement>('.card-face');
+  if (!card || !face) {
+    return undefined;
+  }
+  run.onStop(() => {
+    stop(face);
+    face.style.setProperty('transform', RESTING);
+    card.setAttribute('data-face', 'down');
+  });
+  return { card, face };
+};
+
 /** The round of the move, or undefined when its elements are not on the screen. */
-const roundOf = (run: Run, move: Hint): Round | undefined => {
+const roundOf = (run: Run, { move, flipped }: Show): Round | undefined => {
   if (move.type === 'tapDeck') {
     const deck = deckOf();
     return deck && (() => tapRound(run, deck));
   }
   const source = cardOf(move.cardId);
-  const target = pileFaceOf(move.type === 'dropCard' ? move.pileId : move.slotId);
-  return source && target && (() => dragRound(run, source, target));
+  const target = pileOf(move.type === 'dropCard' ? move.pileId : move.slotId);
+  const below = belowOf(run, flipped);
+  return source && target && (() => dragRound(run, target, { source, below }));
 };
 
 const repeat = async (run: Run, round: Round, rounds: number): Promise<void> => {
@@ -147,9 +194,9 @@ const repeat = async (run: Run, round: Round, rounds: number): Promise<void> => 
  * Shows the move with the hand, `rounds` times. Resolves true when the demo played to its end, and false when
  * it stopped (the Child touched the screen). At the end, the run has no element on the screen.
  */
-export const showMove = (run: Run, move: Hint, rounds: number): Promise<boolean> => {
-  const round = roundOf(run, move);
-  const played = round ? repeat(run, round, rounds) : Promise.resolve();
+export const showMove = (run: Run, show: Show): Promise<boolean> => {
+  const round = roundOf(run, show);
+  const played = round ? repeat(run, round, show.rounds) : Promise.resolve();
   return played
     .then(
       () => !run.stopped(),
