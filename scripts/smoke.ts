@@ -6,11 +6,13 @@
 import { launch } from 'puppeteer-core';
 import { preview } from 'vite';
 import { recordAudio } from './smoke-audio.ts';
+import { screenChecks } from './smoke-screen.ts';
 import type { AudioRecord } from './smoke-audio.ts';
 import type { Browser, Page } from 'puppeteer-core';
 
 const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const PORT = 4179;
+const APP_URL = `http://127.0.0.1:${String(PORT)}/pile-pals/`;
 const DRAG_STEPS = 12;
 const MAX_DRAGS = 150;
 
@@ -169,13 +171,14 @@ const levelEnd = async (page: Page, audio: AudioRecord): Promise<void> => {
 const runAll = async (browser: Browser): Promise<void> => {
   const page = await browser.newPage();
   await page.setViewport({ width: 390, height: 763, isMobile: true, hasTouch: true, deviceScaleFactor: 2 });
-  await page.goto(`http://127.0.0.1:${String(PORT)}/pile-pals/`, { waitUntil: 'networkidle2' });
+  await page.goto(APP_URL, { waitUntil: 'networkidle2' });
   const audio = await recordAudio(await page.createCDPSession());
   await emptyBook(page);
   await newGame(page, audio);
   await restoredBoard(page, audio);
   await backgroundReturn(page, audio);
   await levelEnd(page, audio);
+  await screenChecks({ browser, url: APP_URL, check });
 };
 
 const server = await preview({ preview: { port: PORT, strictPort: true, host: '127.0.0.1' } });

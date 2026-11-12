@@ -19,7 +19,10 @@ const makeLive = (card: HTMLElement, hooks: Hooks): void => {
   card.addEventListener('pointerdown', () => playSound('lift'));
 };
 
-/** One card. A face-down card shows the back of the card until the flip turns it over. */
+/**
+ * One card in its place. A face-down card shows the back of the card until the flip turns it over.
+ * The place does not move with the card: during a drag, it shows the soft yellow outline (styles.css).
+ */
 const CardView = (props: {
   readonly card: Card;
   readonly faceDown: boolean;
@@ -27,25 +30,27 @@ const CardView = (props: {
   readonly hooks: Hooks;
   readonly live: boolean;
 }): JSX.Element => (
-  <div
-    class="card"
-    classList={{ gone: props.gone, anchor: props.card.anchor }}
-    data-card={props.card.id}
-    ref={(el) => {
-      el.setAttribute('data-face', props.faceDown ? 'down' : 'up');
-      if (props.live) {
-        makeLive(el, props.hooks);
-      }
-    }}
-  >
-    <div class="card-shadow" />
-    <div class="card-face">
-      <img class="card-front" src={stillUrl(props.card.picture)} alt="" />
-      {/* The crown of a category card. It comes before the back, so the back of a face-down card covers it. */}
-      <Show when={props.card.anchor}>
-        <div class="crown" />
-      </Show>
-      <div class="card-back" />
+  <div class="card-place">
+    <div
+      class="card"
+      classList={{ gone: props.gone, anchor: props.card.anchor }}
+      data-card={props.card.id}
+      ref={(el) => {
+        el.setAttribute('data-face', props.faceDown ? 'down' : 'up');
+        if (props.live) {
+          makeLive(el, props.hooks);
+        }
+      }}
+    >
+      <div class="card-shadow" />
+      <div class="card-face">
+        <img class="card-front" src={stillUrl(props.card.picture)} alt="" />
+        {/* The crown of a category card. It comes before the back, so the back of a face-down card covers it. */}
+        <Show when={props.card.anchor}>
+          <div class="crown" />
+        </Show>
+        <div class="card-back" />
+      </div>
     </div>
   </div>
 );
@@ -71,40 +76,53 @@ const StackView = (props: {
   </div>
 );
 
-/** The deck and the card that it gave last. A tap on the deck gives the next card. */
-const DeckView = (props: {
-  readonly state: GameState;
+/** The deck shows one card edge below it for each card, up to this number, so that it looks thicker with more cards. */
+const MAX_EDGES = 3;
+
+/** True when the level has a deck place: a deck with cards, or the dealt card of a restored level with an empty deck. */
+const hasDeck = (deal: GameState): boolean => deal.deck.length > 0 || deal.dealt !== null;
+
+/**
+ * The deck row at the top of the board: the deck in the right grid column, and the card that it gave last to its
+ * left. A tap on the deck gives the next card. A level with no deck has no deck row.
+ */
+export const DeckView = (props: {
+  readonly initial: Accessor<GameState>;
+  readonly state: Accessor<GameState>;
   readonly hooksFor: (cardId: CardId) => Hooks;
   readonly onTap: () => void;
 }): JSX.Element => (
-  <div class="deck-place">
-    <div class="deck" classList={{ spent: props.state.deck.length === 0 }} onClick={props.onTap}>
-      <div class="card-back" />
-    </div>
-    {/* Keyed: each new dealt card gets its own element, so its drag hooks send its own id. */}
-    <Show when={props.state.dealt} keyed>
-      {(card) => <CardView card={card} faceDown={false} gone={false} hooks={props.hooksFor(card.id)} live={true} />}
-    </Show>
-  </div>
+  <Show when={hasDeck(props.initial())}>
+    <section class="deck-place">
+      <div
+        class="deck"
+        classList={{ spent: props.state().deck.length === 0 }}
+        data-edges={Math.min(MAX_EDGES, props.state().deck.length)}
+        onClick={props.onTap}
+      >
+        <div class="card-back" />
+      </div>
+      {/* Keyed: each new dealt card gets its own element, so its drag hooks send its own id. */}
+      <Show when={props.state().dealt} keyed>
+        {(card) => <CardView card={card} faceDown={false} gone={false} hooks={props.hooksFor(card.id)} live={true} />}
+      </Show>
+    </section>
+  </Show>
 );
 
-/** True when the level has a deck place: a deck with cards, or the dealt card of a restored level with an empty deck. */
-export const hasDeck = (deal: GameState): boolean => deal.deck.length > 0 || deal.dealt !== null;
-
-/** The table of the level: the stacks and the deck. `initial` is the state that the board started with. */
+/**
+ * The columns of the table, one in each grid column. `initial` is the state that the board started with.
+ * A column does not belong to the slot above it.
+ */
 export const TableView = (props: {
   readonly initial: Accessor<GameState>;
   readonly state: Accessor<GameState>;
   readonly hooksFor: (cardId: CardId) => Hooks;
-  readonly onTapDeck: () => void;
 }): JSX.Element => (
   <section class="table">
     <For each={props.initial().table}>
       {(stack) => <StackView stack={stack} state={props.state()} hooksFor={props.hooksFor} />}
     </For>
-    <Show when={hasDeck(props.initial())}>
-      <DeckView state={props.state()} hooksFor={props.hooksFor} onTap={props.onTapDeck} />
-    </Show>
   </section>
 );
 

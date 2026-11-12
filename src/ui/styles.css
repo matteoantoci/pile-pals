@@ -20,17 +20,18 @@
   /* The dark green edge of the logo cards on the title scene. */
   --pile-edge: #24583d;
   --bottom-reserve: max(env(safe-area-inset-bottom), 34px);
-  --card-w: 96px;
-  --card-h: 128px;
-  /* 80 CSS px = 240 device px on an iPhone 12 (3x). The pictures are 256 px (research/content/pictures.py). */
-  --picture: 80px;
-  /* The layout of the board. A smaller card size (below) changes these values too. */
-  --board-gap: 32px;
-  --gap: 16px;
+  /* The layout of the board (spec, "Board layout"). The card size comes from these values (see .board). */
+  --side: 10px;
+  --gap: 8px;
+  /* The free space above the deck row, for the top bar, and below the columns, for the hint bulb. */
+  --top-space: 56px;
+  --bottom-space: 80px;
+  /* The deck shows up to 3 card edges of 4 px below it. */
+  --deck-edges: 12px;
   /* The size of a card picture on a pile. */
-  --mini: 32px;
-  /* How much of the card below shows above the top card of a stack. */
-  --peek: 0.28;
+  --mini: 16px;
+  /* How much of a face-down card shows above the card on it: a strip of 22% of the card height. */
+  --peek: 0.22;
 }
 
 html {
@@ -69,31 +70,56 @@ html[data-restoring] * {
   animation: none !important;
 }
 
+/*
+ * One grid for the whole board (spec, "Board layout"). From top to bottom: the deck row, the slot row, and the
+ * columns of the table. Board.tsx sets --cols: the number of slots or of table columns, the larger one, at most 4.
+ * The rows use the columns of the board grid (subgrid), so slot i is above column i.
+ *
+ * The card width comes from the screen width: the grid fills the width minus the side margins (78 px at 356 px
+ * and 4 columns). On a short and wide screen, the height sets the limit: the deck row, the slot row, and a column
+ * of 5 cards (1 + 4 x --peek card heights) fit between the top bar and the hint bulb.
+ * The card height is 4/3 of the width, and the picture is 78% of the width.
+ */
 .board {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: var(--board-gap);
+  --card-w: min(
+    (
+        100vw - env(safe-area-inset-left) - env(safe-area-inset-right) - 2 * var(--side) - (var(--cols) - 1) *
+          var(--gap)
+      ) /
+      var(--cols),
+    (
+        100dvh - env(safe-area-inset-top) - var(--bottom-reserve) - var(--top-space) - var(--bottom-space) -
+          var(--deck-edges) - 2 * var(--gap)
+      ) *
+      0.75 / (3 + 4 * var(--peek))
+  );
+  --card-h: calc(var(--card-w) * 4 / 3);
+  /* 83 CSS px (3 columns) = 249 device px on an iPhone 12 (3x). The pictures are 256 px (research/content/pictures.py). */
+  --picture: calc(var(--card-w) * 0.78);
+
+  display: grid;
+  grid-template-columns: repeat(var(--cols), var(--card-w));
+  justify-content: center;
+  align-content: start;
+  gap: var(--gap);
   height: 100%;
-  padding: 24px 16px;
+  padding: var(--top-space) var(--side) var(--bottom-space);
   box-sizing: border-box;
 }
 
+.deck-place,
 .piles,
 .table {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--gap);
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: subgrid;
+  row-gap: var(--gap);
+  align-items: start;
 }
 
-/* A pile has no box of its own: the slot is the box. The cards that landed on the pile show below it. */
+/* A pile has no box of its own: the slot is the box. */
 .pile {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  width: var(--card-w);
+  position: relative;
 }
 
 .pile-face,
@@ -112,11 +138,17 @@ html[data-restoring] * {
   height: var(--picture);
 }
 
-/* A category card on its slot has the face of a card: the grey bottom edge, and the gold frame below. */
+/*
+ * A category card on its slot has the face of a card: the grey bottom edge, and the gold frame below.
+ * The face of a pile rests at the scale of a card face (0.926, see .card-face), so that a card on its slot and a card
+ * on the table have the same size. An empty slot has the same size too.
+ */
 .pile-face {
   position: relative;
   box-sizing: border-box;
   border-bottom: 3px solid var(--card-edge);
+  transform: scale(0.926);
+  transform-origin: 50% 100%;
 }
 
 /* An empty slot: a card-size dark green box, with no picture. It waits for a category card. */
@@ -155,11 +187,16 @@ html[data-restoring] * {
   background: var(--slot-crown);
 }
 
+/* The small pictures of the cards on the pile. They are on the bottom of the face, so the slot row keeps its height. */
 .pile-cards {
+  position: absolute;
+  right: 0;
+  bottom: calc(var(--card-h) * 0.06);
+  left: 0;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  min-height: 40px;
+  pointer-events: none;
 }
 
 .pile-card {
@@ -173,64 +210,107 @@ html[data-restoring] * {
 }
 
 /*
- * The stacks of the table. The cards of a stack share one place: the card below peeks above the card on top of it.
- * A card that left the table keeps its place (`.gone`), so the other cards do not move.
+ * The columns of the table. The cards of a column overlap: a strip of each face-down card shows above the card on
+ * it. A card that left the table keeps its place (`.gone`), so the other cards do not move.
  */
 .stack {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  width: var(--card-w);
 }
 
-.stack .card + .card {
+.stack > .card-place + .card-place {
   margin-top: calc(var(--card-h) * (var(--peek) - 1));
 }
 
-/* The deck and the face-up card that its last tap gave. */
+/*
+ * The place of a card does not move with the card. It takes no touch: the place of a card that left the column
+ * covers the card below it, and that card must still get the finger.
+ */
+.card-place {
+  position: relative;
+  pointer-events: none;
+}
+
+.card-place > .card {
+  pointer-events: auto;
+}
+
+/*
+ * The soft yellow outline at the place of a held card. It shows until the card lands (the card is then gone) or
+ * goes back (the drag then removes `.lifted`). It has the size and place of a card face at rest.
+ */
+.card-place:has(> .card.lifted:not(.gone))::before {
+  content: '';
+  position: absolute;
+  inset: 7.4% 3.7% 0;
+  box-sizing: border-box;
+  border: 2px solid rgb(255 226 102 / 0.9);
+  border-radius: 13px;
+  background: rgb(255 226 102 / 0.18);
+  box-shadow: 0 0 10px rgb(255 226 102 / 0.6);
+  pointer-events: none;
+}
+
+/*
+ * The deck row: the deck in the right grid column, and the face-up card that its last tap gave to its left.
+ * The space below the row holds the card edges of the deck.
+ */
 .deck-place {
-  display: flex;
-  gap: var(--gap);
-  align-items: flex-start;
+  margin-bottom: var(--deck-edges);
+}
+
+.deck-place .card-place {
+  grid-row: 1;
+  grid-column: -3;
 }
 
 .deck {
   position: relative;
-  width: var(--card-w);
+  grid-row: 1;
+  grid-column: -2;
   height: var(--card-h);
-  border-radius: 14px;
   touch-action: none;
-  /* The grey bottom edge of the top card, and a second card behind the deck, so that it looks like a pile. */
-  box-shadow:
-    0 3px 0 var(--card-edge),
-    4px 4px 0 #fff,
-    4px 7px 0 var(--card-edge);
-}
-
-.deck.spent {
-  box-shadow: none;
-  opacity: 0.35;
 }
 
 /*
- * Smaller cards for a level with more piles and cards. Board.tsx sets data-size from the dealt level.
- * On the iPhone 12 screen, "medium" fits 3 piles with 15 cards and "small" fits 4 piles with 20 cards.
+ * The top card of the deck has the size and place of a card face at rest. The hint hop animates the transform of
+ * .deck at scale 1, so the deck sets the size of its back and not a scale.
  */
-.board[data-size='medium'] {
-  --card-w: 76px;
-  --card-h: 100px;
-  --picture: 62px;
-  --gap: 8px;
-  --mini: 28px;
+.deck .card-back {
+  inset: 7.4% 3.7% 0;
 }
 
-.board[data-size='small'] {
-  --card-w: 64px;
-  --card-h: 84px;
-  --picture: 52px;
-  --board-gap: 16px;
-  --gap: 8px;
-  --mini: 24px;
+/* One card edge below the deck for each card, up to 3: a grey line, a white band, and a grey line. */
+.deck[data-edges='1'] .card-back {
+  box-shadow:
+    0 1px 0 var(--card-edge),
+    0 3px 0 #fff,
+    0 4px 0 var(--card-edge);
+}
+
+.deck[data-edges='2'] .card-back {
+  box-shadow:
+    0 1px 0 var(--card-edge),
+    0 3px 0 #fff,
+    0 4px 0 var(--card-edge),
+    0 7px 0 #fff,
+    0 8px 0 var(--card-edge);
+}
+
+.deck[data-edges='3'] .card-back {
+  box-shadow:
+    0 1px 0 var(--card-edge),
+    0 3px 0 #fff,
+    0 4px 0 var(--card-edge),
+    0 7px 0 #fff,
+    0 8px 0 var(--card-edge),
+    0 11px 0 #fff,
+    0 12px 0 var(--card-edge);
+}
+
+/* A spent deck: a faded empty place. A tap starts the deck again. */
+.deck.spent {
+  opacity: 0.35;
 }
 
 /*
