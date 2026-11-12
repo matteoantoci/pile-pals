@@ -13,8 +13,8 @@ import struct
 import zlib
 from pathlib import Path
 
-# The table colour. Keep the same value in index.html, vite.config.ts, and src/ui/styles.css.
-TABLE = (0x2F, 0x6F, 0x4E)
+# The top colour of the table. Keep the same value in index.html, vite.config.ts, and src/ui/styles.css.
+TABLE = (0x08, 0x81, 0x3A)
 OUT = Path(__file__).resolve().parents[2] / 'public' / 'splash'
 
 

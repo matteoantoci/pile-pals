@@ -1,7 +1,17 @@
 /* Shell rules from research/native-feel/shell.md. */
 :root {
-  --table: #2f6f4e;
-  /* The darker green of the card back and of the edge of the deck. */
+  /* The table: a vertical gradient. The top colour is also the page background and the theme colour of the app. */
+  --table-top: #08813a;
+  --table-bottom: #0e9e54;
+  --table: linear-gradient(var(--table-top), var(--table-bottom));
+  /* A picture card: the face, the thin cream inner line, and the light grey bottom edge. */
+  --card: #fffdf9;
+  --card-line: #efe3c8;
+  --card-edge: #d9d9d9;
+  /* The back of a face-down card and of the deck: blue chevrons with a white edge. */
+  --back: #1d8be7;
+  --back-chevron: #43a7f7;
+  /* The dark green edge of the logo cards on the title scene. */
   --pile-edge: #24583d;
   --bottom-reserve: max(env(safe-area-inset-bottom), 34px);
   --card-w: 96px;
@@ -21,7 +31,7 @@
 }
 
 html {
-  background: var(--table);
+  background: var(--table-top) var(--table);
   -webkit-text-size-adjust: 100%;
   touch-action: none;
   -webkit-user-select: none;
@@ -92,7 +102,7 @@ html[data-restoring] * {
   width: var(--card-w);
   height: var(--card-h);
   border-radius: 14px;
-  background: #fff;
+  background: var(--card);
 }
 
 .pile-face img,
@@ -163,8 +173,11 @@ html[data-restoring] * {
   height: var(--card-h);
   border-radius: 14px;
   touch-action: none;
-  /* A second card edge behind the deck makes it look like a pile. */
-  box-shadow: 4px 4px 0 var(--pile-edge);
+  /* The grey bottom edge of the top card, and a second card behind the deck, so that it looks like a pile. */
+  box-shadow:
+    0 3px 0 var(--card-edge),
+    4px 4px 0 #fff,
+    4px 7px 0 var(--card-edge);
 }
 
 .deck.spent {
@@ -209,10 +222,25 @@ html[data-restoring] * {
   transform: translate3d(0px, 0px, 0);
 }
 
+/*
+ * The face of a card has the grey bottom edge inside its box, so the edge does not change the card size.
+ * The cream inner line is a pseudo-element: the back of a face-down card comes later in the tree and covers it.
+ */
 .card-face {
   position: relative;
+  box-sizing: border-box;
+  border-bottom: 3px solid var(--card-edge);
   transform: translate(0px, 0px) rotate(0deg) scale(0.926, 0.926);
   transform-origin: 50% 100%;
+}
+
+.card-face::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1.5px solid var(--card-line);
+  border-radius: 10px;
+  pointer-events: none;
 }
 
 /* A static shadow. Only its opacity and transform animate. */
@@ -231,15 +259,27 @@ html[data-restoring] * {
   transition: none;
 }
 
-/* The back of a face-down card: the card below the top card of a stack, and the deck. */
+/*
+ * The back of a face-down card: the card below the top card of a stack, and the deck.
+ * Four triangle gradients make rows of chevrons (the zigzag pattern). The white border is the edge of the card.
+ */
 .card-back {
   position: absolute;
   inset: 0;
+  border: 3px solid #fff;
   border-radius: 14px;
-  background-color: var(--pile-edge);
-  background-image: radial-gradient(circle, #f4e9d2 1.5px, transparent 1.6px);
-  background-size: 12px 12px;
-  box-shadow: inset 0 0 0 5px #f4e9d2;
+  background-color: var(--back);
+  background-image:
+    linear-gradient(135deg, var(--back-chevron) 25%, transparent 25%),
+    linear-gradient(225deg, var(--back-chevron) 25%, transparent 25%),
+    linear-gradient(315deg, var(--back-chevron) 25%, transparent 25%),
+    linear-gradient(45deg, var(--back-chevron) 25%, transparent 25%);
+  background-position:
+    -7px 0,
+    -7px 0,
+    0 0,
+    0 0;
+  background-size: 14px 14px;
 }
 
 /* A face-down card shows its back only. `.card-front` is the picture of the card. */
