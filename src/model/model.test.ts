@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { apply, dropCard, openCards, start, tapDeck } from './index';
 import { playOut } from './test-player';
-import type { Card, GameEvent, GameState, Pile } from './index';
+import type { Card, GameState, Pile } from './index';
 
 const firstLevel = (): GameState => start({ level: 1 }, 1);
 
@@ -21,19 +21,6 @@ const pileFor = (state: GameState, card: Card, fits: boolean): Pile => {
   return pile;
 };
 
-/** The events of each drop, in order, and the state after the last drop. */
-type Play = { readonly drops: readonly (readonly GameEvent[])[]; readonly end: GameState };
-
-/** Drops the cards on their piles, one after the other. */
-const play = (state: GameState, cards: readonly Card[]): Play =>
-  cards.reduce<Play>(
-    ({ drops, end }, card) => {
-      const outcome = apply(end, dropCard(card.id, pileFor(end, card, true).id));
-      return { drops: [...drops, outcome.events], end: outcome.state };
-    },
-    { drops: [], end: state }
-  );
-
 describe('dropCard', () => {
   it('rejects a card on the wrong pile and keeps the same state', () => {
     const state = firstLevel();
@@ -46,31 +33,31 @@ describe('dropCard', () => {
     expect(result.state).toBe(state);
   });
 
-  it('snaps a card onto the correct pile', () => {
+  it('snaps a card onto the correct pile, and turns over the card below it', () => {
     const state = firstLevel();
     const card = firstCard(state);
     const right = pileFor(state, card, true);
+    const below = state.table.find((stack) => stack.cards.at(-1)?.id === card.id)?.cards.at(-2);
 
     const result = apply(state, dropCard(card.id, right.id));
 
-    expect(result.events).toEqual([{ type: 'snapped', cardId: card.id, pileId: right.id, noteIndex: 0 }]);
+    expect(result.events).toEqual([
+      { type: 'snapped', cardId: card.id, pileId: right.id, noteIndex: 0 },
+      { type: 'flipped', cardId: below?.id },
+    ]);
     expect(openCards(result.state).map((c) => c.id)).not.toContain(card.id);
     expect(result.state.piles.find((p) => p.id === right.id)?.cards.map((c) => c.id)).toEqual([card.id]);
   });
 
   it('gives the next card on the same pile the next note', () => {
     const state = firstLevel();
-    const card = firstCard(state);
-    const right = pileFor(state, card, true);
-    const next = openCards(state).find((c) => c.id !== card.id && c.group === card.group);
-    if (!next) {
-      throw new Error('The level has only one card in the group.');
-    }
+    const { events } = playOut(state);
 
-    const once = apply(state, dropCard(card.id, right.id));
-    const twice = apply(once.state, dropCard(next.id, right.id));
+    const notes = state.piles.map((pile) =>
+      events.flatMap((event) => (event.type === 'snapped' && event.pileId === pile.id ? [event.noteIndex] : []))
+    );
 
-    expect(twice.events).toEqual([{ type: 'snapped', cardId: next.id, pileId: right.id, noteIndex: 1 }]);
+    expect(notes).toEqual(state.piles.map(() => [0, 1, 2]));
   });
 
   it('rejects a card that is not on the table', () => {
@@ -155,20 +142,18 @@ describe('tapDeck', () => {
 describe('a full level', () => {
   it('gives groupComplete with the last card of a group, and not before', () => {
     const state = firstLevel();
-    const pile = state.piles[0];
-    const group = openCards(state).filter((card) => card.group === pile?.group);
+    const pileId = state.piles[0]?.id;
+    const { events } = playOut(state);
+    const ofPile = events.filter((event) => 'pileId' in event && event.pileId === pileId);
+    const complete = events.findIndex((event) => event.type === 'groupComplete' && event.pileId === pileId);
 
-    const { drops } = play(state, group);
-
-    expect(drops.map((events) => events.map((event) => event.type))).toEqual([
-      ['snapped'],
-      ['snapped'],
-      ['snapped', 'groupComplete'],
-    ]);
-    expect(drops.at(-1)).toEqual([
-      { type: 'snapped', cardId: group.at(-1)?.id, pileId: pile?.id, noteIndex: 2 },
-      { type: 'groupComplete', pileId: pile?.id },
-    ]);
+    expect(ofPile.map((event) => event.type)).toEqual(['snapped', 'snapped', 'snapped', 'groupComplete']);
+    // A flip can come between the last snap and groupComplete. No other event can.
+    expect(events.slice(0, complete).findLast((event) => event.type !== 'flipped')).toMatchObject({
+      type: 'snapped',
+      pileId,
+      noteIndex: 2,
+    });
   });
 
   it('gives levelComplete with the last card of the level, and not before, then the sticker', () => {

@@ -95,12 +95,17 @@ describe('the slots', () => {
     expect(wrong.map(describeLevel)).toEqual([]);
   });
 
-  it('never puts a category card face-down', () => {
-    const wrong = states.filter((state) =>
-      state.table.some((stack) => stack.cards.some((card) => card.anchor && card.faceDown))
+  it('can put a loose category card face-down in a column, on top of a column, or in the deck', () => {
+    const places = new Set(
+      later.flatMap((state) => [
+        ...state.table.flatMap((stack) =>
+          stack.cards.filter((card) => card.anchor).map((card) => (card.faceDown ? 'face-down' : 'top'))
+        ),
+        ...state.deck.filter((card) => card.anchor).map(() => 'deck'),
+      ])
     );
 
-    expect(wrong.map(describeLevel)).toEqual([]);
+    expect(places).toEqual(new Set(['face-down', 'top', 'deck']));
   });
 });
 
