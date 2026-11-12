@@ -10,7 +10,7 @@ import { cancelDrag } from './drag';
 import { stillUrl } from './pictures';
 import { createSoundGate } from './sound-gate';
 import { playEventSounds } from './sounds';
-import { hasDeck, raiseCard, TableView } from './table';
+import { DeckView, raiseCard, TableView } from './table';
 import type { Action, CardId, GameState, Outcome, Pile, PileId } from '../model';
 import type { Coach } from './coach';
 import type { Hooks, Target } from './drag';
@@ -31,17 +31,8 @@ const pileTargets = (): readonly Target[] =>
     return [{ id, at: { x: box.left + box.width / 2, y: box.top + box.height / 2 } }];
   });
 
-/**
- * The card size of the board. A level with more piles and places gets smaller cards, so that all fit on the screen.
- * A "place" is a stack of the table or the deck. The numbers keep the table within three rows of its size.
- */
-const sizeOf = (deal: GameState): string => {
-  const places = deal.table.length + (hasDeck(deal) ? 1 : 0);
-  if (deal.piles.length > 3 || places > 12) {
-    return 'small';
-  }
-  return deal.piles.length > 2 || places > 6 ? 'medium' : 'large';
-};
+/** The most columns of the board grid. The grid has one column for each slot and for each column of the table. */
+const MAX_COLUMNS = 4;
 
 /** A category pile: the category card on its slot, and the cards that landed on it. An empty slot has no picture. */
 const PileView = (props: { pile: Pile }): JSX.Element => (
@@ -198,14 +189,19 @@ export const Board = (props: {
     soundGate.start();
   });
 
-  // The table draws each dealt card in a fixed place. A card that left the table stays hidden in its place,
-  // so the other cards do not move under the finger.
+  // One grid for the whole board (styles.css): from top to bottom, the deck row, the slot row, and the columns.
+  // Slot i is above column i for the grid only. The table draws each dealt card in a fixed place. A card that left
+  // the table stays hidden in its place, so the other cards do not move under the finger.
   return (
-    <main class="board" data-size={sizeOf(initial())}>
+    <main
+      class="board"
+      style={{ '--cols': String(Math.min(MAX_COLUMNS, Math.max(initial().piles.length, initial().table.length))) }}
+    >
+      <DeckView initial={initial} state={state} hooksFor={hooksFor} onTap={onTapDeck} />
       <section class="piles">
         <For each={state().piles}>{(pile) => <PileView pile={pile} />}</For>
       </section>
-      <TableView initial={initial} state={state} hooksFor={hooksFor} onTapDeck={onTapDeck} />
+      <TableView initial={initial} state={state} hooksFor={hooksFor} />
       <Show when={reward()}>
         <RewardPage book={state().book} act={act} done={props.onTitle} />
       </Show>

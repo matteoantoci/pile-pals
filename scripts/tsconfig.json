@@ -5,5 +5,5 @@
     "types": [],
     "allowImportingTsExtensions": true
   },
-  "include": ["smoke.ts", "smoke-audio.ts"]
+  "include": ["smoke.ts", "smoke-audio.ts", "smoke-screen.ts"]
 }
