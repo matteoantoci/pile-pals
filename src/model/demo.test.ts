@@ -8,6 +8,7 @@ import {
   openCards,
   placeAnchor,
   restore,
+  SAVE_VERSION,
   sawDemo,
   snapshot,
   start,
@@ -39,13 +40,36 @@ const cardCanMove = (state: GameState): boolean =>
     )
   );
 
+/** A demo that the Child saw, and the level where it showed. */
+type Seen = { readonly kind: DemoKind; readonly level: number };
+
+/**
+ * Plays the level with the hint moves, as a Child that follows the hand. Before each move, a new demo shows and the
+ * Child sees it. Gives the state at the end and the demos that showed on the way.
+ */
+const playWithDemos = (state: GameState, shown: readonly Seen[], step = 0): [GameState, readonly Seen[]] => {
+  const demo = demoFor(state);
+  if (demo) {
+    return playWithDemos(sawDemo(state, demo.kind), [...shown, { kind: demo.kind, level: state.level }], step);
+  }
+  const hint = step < 200 ? hintFor(state) : undefined;
+  return hint ? playWithDemos(apply(state, hint).state, shown, step + 1) : [state, shown];
+};
+
+/** Plays the game from level 1 to `last` with one seed, and gives the demos that showed on the way. */
+const journey = (seed: number, last: number): readonly Seen[] =>
+  Array.from({ length: last - 1 }).reduce<[GameState, readonly Seen[]]>(
+    ([state, shown]) => playWithDemos(apply(state, go()).state, shown),
+    playWithDemos(start({ level: 1 }, seed), [])
+  )[1];
+
 describe('the first demo', () => {
-  it('shows the first card of level 1 going to its pile', () => {
+  it('shows the first card of level 1 going to its pile, and the card below it turning over', () => {
     SEEDS.forEach((seed) => {
       const state = start({ level: 1 }, seed);
       expect(demoFor(state)?.kind).toBe('first');
       expect(demoFor(state)?.move.type).toBe('dropCard');
-      expect(demoEvents(state)[0]).toBe('snapped');
+      expect(demoEvents(state)).toEqual(['snapped', 'flipped']);
     });
   });
 
@@ -57,24 +81,26 @@ describe('the first demo', () => {
 });
 
 describe('the demos of new actions', () => {
-  it('shows a face-down card first: the card on top of it goes to its pile, and it turns over', () => {
+  it('shows each demo one time on the way from level 1: first at level 1, deck at level 11, anchor at level 13', () => {
     SEEDS.forEach((seed) => {
-      const state = seen(start({ level: 11 }, seed), ['first']);
-      expect(demoFor(state)?.kind).toBe('faceDown');
-      expect(demoEvents(state)).toEqual(['snapped', 'flipped']);
+      expect(journey(seed, 15)).toEqual([
+        { kind: 'first', level: 1 },
+        { kind: 'deck', level: 11 },
+        { kind: 'anchor', level: 13 },
+      ]);
     });
   });
 
-  it('shows the deck after the face-down card: the hand taps the deck', () => {
+  it('shows the deck after the first demo: the hand taps the deck', () => {
     SEEDS.forEach((seed) => {
-      const state = seen(start({ level: 11 }, seed), ['first', 'faceDown']);
+      const state = seen(start({ level: 11 }, seed), ['first']);
       expect(demoFor(state)?.kind).toBe('deck');
       expect(demoEvents(state)).toEqual(['dealt']);
     });
   });
 
   it('shows a category card going on an empty slot when the Child can pick one up', () => {
-    const states = SEEDS.map((seed) => seen(start({ level: 13 }, seed), ['first', 'faceDown']));
+    const states = SEEDS.map((seed) => seen(start({ level: 13 }, seed), ['first', 'deck']));
     const withAnchor = states.filter((state) => openCards(state).some((card) => card.anchor));
     expect(withAnchor.length).toBeGreaterThan(0);
     withAnchor.forEach((state) => {
@@ -84,7 +110,7 @@ describe('the demos of new actions', () => {
   });
 
   it('shows no demo when the Child saw all of them', () => {
-    const all: readonly DemoKind[] = ['first', 'faceDown', 'anchor', 'deck'];
+    const all: readonly DemoKind[] = ['first', 'deck', 'anchor'];
     SEEDS.flatMap((seed) => LEVELS.map((level) => seen(start({ level }, seed), all))).forEach((state) => {
       expect(demoFor(state)).toBeUndefined();
     });
@@ -115,10 +141,18 @@ describe('the seen demos', () => {
   });
 
   it('are in the save data, so a demo does not show again after a launch', () => {
-    const state = seen(start({ level: 11 }, 5), ['first', 'faceDown']);
+    const state = seen(start({ level: 11 }, 5), ['first', 'deck']);
     const result = restore(JSON.parse(JSON.stringify(snapshot(state))));
-    expect(result.ok && result.state.demos).toEqual(['first', 'faceDown']);
-    expect(result.ok && demoFor(result.state)?.kind).toBe('deck');
+    expect(result.ok && result.state.demos).toEqual(['first', 'deck']);
+    expect(result.ok && demoFor(result.state)).toBeUndefined();
+  });
+
+  it('drop the flag of the old face-down demo from a save, and keep the other flags', () => {
+    const state = start({ level: 11 }, 5);
+    const save = { ...snapshot(state), state: { ...state, demos: ['first', 'faceDown'] } };
+    const result = restore(JSON.parse(JSON.stringify(save)));
+    expect(result).toEqual({ ok: true, state: { ...state, demos: ['first'] } });
+    expect(SAVE_VERSION).toBe(4);
   });
 
   it('must be in the save data: a save with no demo flags is refused', () => {

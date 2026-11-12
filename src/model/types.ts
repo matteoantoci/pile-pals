@@ -77,10 +77,10 @@ export type Book = {
 
 /**
  * The demos of the hand, in the order that they show when two new actions come in the same level. Each kind shows
- * one action one time: `first` the first drop of the game, `faceDown` the drop that uncovers a face-down card,
- * `anchor` a category card that goes on an empty slot, and `deck` a tap on the deck.
+ * one action one time: `first` the first drop of the game (in level 1 it uncovers a face-down card, so it ends with
+ * a flip), `deck` a tap on the deck, and `anchor` a category card that goes on an empty slot.
  */
-export const DEMO_KINDS = ['first', 'faceDown', 'anchor', 'deck'] as const;
+export const DEMO_KINDS = ['first', 'deck', 'anchor'] as const;
 
 export type DemoKind = (typeof DEMO_KINDS)[number];
 

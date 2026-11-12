@@ -3,14 +3,13 @@ import { apply, dropCard, openCards, placeAnchor, start, tapDeck } from './index
 import { playOut } from './test-player';
 import type { Card, GameState, Stack, TableCard } from './index';
 
-// The face-down cards, the stacks, and the deck (spec, Module 2). The tests use the public interface only.
+// The columns, the face-down cards, and the deck (spec, Module 2, and the original-look spec, "Difficulty table"
+// and "Generator"). The tests use the public interface only.
 
 const SEEDS = Array.from({ length: 25 }, (_, i) => 104_729 * i + 3);
 const LEVELS = Array.from({ length: 30 }, (_, i) => i + 1);
 
 const states = SEEDS.flatMap((seed) => LEVELS.map((level) => start({ level }, seed)));
-const early = states.filter((state) => state.level <= 10);
-const later = states.filter((state) => state.level > 10);
 
 const tableCards = (state: GameState): readonly TableCard[] => state.table.flatMap((stack) => stack.cards);
 
@@ -42,27 +41,107 @@ const topOf = (stack: Stack): TableCard => {
 const describeLevel = (state: GameState): string =>
   `level ${String(state.level)} seed ${String(state.seed)}: ${state.piles.map((p) => p.group).join(', ')}`;
 
-describe('the difficulty of the face-down cards and the deck', () => {
-  it('gives no face-down card and no deck to levels 1 to 10', () => {
-    const wrong = early.filter(
-      (state) => tableCards(state).some((card) => card.faceDown) || state.deck.length > 0 || state.dealt !== null
-    );
+/** All category cards of the level start loose. */
+const ALL = 'all';
 
-    expect(wrong.map(describeLevel)).toEqual([]);
+/** A row of the difficulty table of the original-look spec. It applies from its `from` level to the next row. */
+type Row = {
+  readonly from: number;
+  readonly groups: readonly [number, number];
+  readonly cards: number;
+  readonly columns: number;
+  readonly deck: number;
+  readonly loose: number | typeof ALL;
+};
+
+const ROWS: readonly Row[] = [
+  { from: 1, groups: [2, 2], cards: 3, columns: 3, deck: 0, loose: 0 },
+  { from: 3, groups: [2, 2], cards: 4, columns: 4, deck: 0, loose: 0 },
+  { from: 5, groups: [3, 3], cards: 3, columns: 3, deck: 0, loose: 0 },
+  { from: 7, groups: [3, 3], cards: 4, columns: 4, deck: 0, loose: 0 },
+  { from: 9, groups: [4, 4], cards: 3, columns: 4, deck: 0, loose: 0 },
+  { from: 11, groups: [2, 4], cards: 4, columns: 4, deck: 4, loose: 0 },
+  { from: 13, groups: [2, 4], cards: 4, columns: 4, deck: 4, loose: 1 },
+  { from: 16, groups: [2, 4], cards: 5, columns: 4, deck: 6, loose: ALL },
+];
+
+const rowOf = (level: number): Row => {
+  const row = ROWS.findLast((item) => item.from <= level);
+  if (!row) {
+    throw new Error(`The table has no row for level ${String(level)}.`);
+  }
+  return row;
+};
+
+/** The cards for each group of the level, in the deck and on the table. No category card. */
+const cardsPerGroup = (state: GameState): readonly number[] => {
+  const pictures = [...tableCards(state), ...state.deck].filter((card) => !card.anchor);
+  return [...new Set(pictures.map((card) => card.group))].map(
+    (group) => pictures.filter((card) => card.group === group).length
+  );
+};
+
+/** One check of a level against its row: the problem, or an empty string when the level matches. */
+type Check = (state: GameState, row: Row) => string;
+
+const CHECKS: readonly Check[] = [
+  (state, row) => (state.table.length === row.columns ? '' : `${String(state.table.length)} columns`),
+  (state) => {
+    const depths = state.table.map((stack) => stack.cards.length);
+    return Math.min(...depths) >= 1 && Math.max(...depths) - Math.min(...depths) <= 1 ? '' : `depths ${depths.join()}`;
+  },
+  (state) =>
+    state.table.every((stack) => stack.cards.every((card, i) => card.faceDown === i < stack.cards.length - 1))
+      ? ''
+      : 'a face-up card under the top card, or a face-down top card',
+  (state, row) => (state.deck.length === row.deck && state.dealt === null ? '' : `deck ${String(state.deck.length)}`),
+  (state, row) => {
+    const loose = [...tableCards(state), ...state.deck].filter((card) => card.anchor).length;
+    return loose === (row.loose === ALL ? state.piles.length : row.loose) ? '' : `${String(loose)} loose`;
+  },
+  (state, row) =>
+    state.piles.length >= row.groups[0] && state.piles.length <= row.groups[1]
+      ? ''
+      : `${String(state.piles.length)} piles`,
+  (state, row) => {
+    const counts = cardsPerGroup(state);
+    return counts.length === state.piles.length && counts.every((count) => count === row.cards)
+      ? ''
+      : `cards ${counts.join()}`;
+  },
+];
+
+/** The ways in which the level does not match its row. An empty list means that the level matches. */
+const mismatches = (state: GameState): readonly string[] =>
+  CHECKS.map((check) => check(state, rowOf(state.level))).filter((problem) => problem !== '');
+
+describe('the difficulty of the columns, the face-down cards, and the deck', () => {
+  it('deals each level as its row of the difficulty table', () => {
+    const wrong = states
+      .map((state) => ({ state, problems: mismatches(state) }))
+      .filter(({ problems }) => problems.length > 0)
+      .map(({ state, problems }) => `${describeLevel(state)}: ${problems.join('; ')}`);
+
+    expect(wrong).toEqual([]);
   });
 
-  it('gives face-down cards and a deck to the later levels', () => {
-    const wrong = later.filter((state) => !tableCards(state).some((card) => card.faceDown) || state.deck.length === 0);
+  it('gives face-down cards from level 1', () => {
+    const first = SEEDS.map((seed) => start({ level: 1 }, seed));
 
-    expect(wrong.map(describeLevel)).toEqual([]);
+    expect(first.filter((state) => !tableCards(state).some((card) => card.faceDown)).map(describeLevel)).toEqual([]);
   });
 
-  it('keeps only a face-down card below the top card of a stack', () => {
-    const wrong = states.filter((state) =>
-      state.table.some((stack) => stack.cards.slice(0, -1).some((card) => !card.faceDown))
-    );
+  it('lets each face-up top card of levels 1 to 12 go on a pile', () => {
+    const wrong = states
+      .filter((state) => state.level <= 12)
+      .flatMap((state) =>
+        state.table
+          .map((stack) => stack.cards.at(-1))
+          .filter((top) => !top || !state.piles.some((pile) => pile.group === top.group))
+          .map((top) => `${describeLevel(state)}: ${top?.id ?? 'an empty column'}`)
+      );
 
-    expect(wrong.map(describeLevel)).toEqual([]);
+    expect(wrong).toEqual([]);
   });
 });
 
@@ -101,10 +180,11 @@ describe('the flip', () => {
   });
 
   it('turns no card over when the stack has one card only', () => {
-    const state = start({ level: 11 }, 5);
-    const stack = state.table.find((item) => item.cards.length === 1);
-    if (!stack) {
-      throw new Error('The level has no stack with one card.');
+    // A level 11 with 2 groups has 4 cards on the table, one in each column.
+    const state = states.find((item) => item.level === 11 && item.piles.length === 2);
+    const stack = state?.table.find((item) => item.cards.length === 1);
+    if (!state || !stack) {
+      throw new Error('No level has a stack with one card.');
     }
     const top = topOf(stack);
 

@@ -12,16 +12,11 @@ export type Hint = LevelAction;
 export type Demo = { readonly kind: DemoKind; readonly move: Hint };
 
 /** The move that each demo shows in this state, or undefined when the state has no such move. */
-const SHOWS: Readonly<Record<DemoKind, (state: GameState, moves: readonly Hint[]) => Hint | undefined>> = {
-  first: (_state, moves) => moves.find((move) => move.type === 'dropCard'),
-  faceDown: (state, moves) => moves.find((move) => 'cardId' in move && coversFaceDown(state, move.cardId)),
-  anchor: (_state, moves) => moves.find((move) => move.type === 'placeAnchor'),
-  deck: (_state, moves) => moves.find((move) => move.type === 'tapDeck'),
+const SHOWS: Readonly<Record<DemoKind, (moves: readonly Hint[]) => Hint | undefined>> = {
+  first: (moves) => moves.find((move) => move.type === 'dropCard'),
+  deck: (moves) => moves.find((move) => move.type === 'tapDeck'),
+  anchor: (moves) => moves.find((move) => move.type === 'placeAnchor'),
 };
-
-/** True when the card is on top of a stack and a face-down card is under it, so its move turns that card over. */
-const coversFaceDown = (state: GameState, cardId: string): boolean =>
-  state.table.some((stack) => stack.cards.at(-1)?.id === cardId && stack.cards.some((card) => card.faceDown));
 
 /**
  * The demo to show now: the first demo that the Child did not see and that has a move in this state.
@@ -30,7 +25,7 @@ const coversFaceDown = (state: GameState, cardId: string): boolean =>
 export const demoFor = (state: GameState): Demo | undefined => {
   const moves = legalMoves(state);
   return DEMO_KINDS.filter((kind) => !state.demos.includes(kind))
-    .map((kind) => ({ kind, move: SHOWS[kind](state, moves) }))
+    .map((kind) => ({ kind, move: SHOWS[kind](moves) }))
     .find((demo): demo is Demo => demo.move !== undefined);
 };
 
