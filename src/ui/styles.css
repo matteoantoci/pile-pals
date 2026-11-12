@@ -452,3 +452,96 @@ html[data-restoring] * {
   place-items: center;
   background: rgb(0 0 0 / 0.2);
 }
+
+/*
+ * The top bar and the hint bulb (src/ui/top-bar.tsx, spec "Top bar and hint button"). They are fixed in the free
+ * space that the board keeps: the top bar in --top-space and the bulb in --bottom-space, inside the safe area.
+ * They are below a lifted card (1000), the parade (1500), and the demo hand (1550).
+ */
+.top-bar {
+  position: fixed;
+  top: env(safe-area-inset-top);
+  left: calc(env(safe-area-inset-left) + var(--side));
+  right: calc(env(safe-area-inset-right) + var(--side));
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  height: var(--top-space);
+  pointer-events: none;
+}
+
+/* The home button: a white outline house in a darker green rounded box. */
+.home-button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  border-radius: 12px;
+  background: var(--slot);
+  touch-action: none;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.home-button:active {
+  transform: scale(0.92);
+}
+
+.home-button svg,
+.hint-bulb svg {
+  width: 70%;
+  height: 70%;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The level number: the only text on the board, in a rounded bold font. */
+.level-number {
+  grid-column: 2;
+  color: #fff;
+  font:
+    800 30px / 1 ui-rounded,
+    'SF Pro Rounded',
+    'Arial Rounded MT Bold',
+    system-ui,
+    sans-serif;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 2px 0 rgb(0 0 0 / 0.2);
+}
+
+/* The hint bulb: a blue rounded square with a white rim and a white bulb, at the centre of --bottom-space. */
+.hint-bulb {
+  --bulb: 60px;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--bottom-reserve) + (var(--bottom-space) - var(--bulb)) / 2);
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: var(--bulb);
+  height: var(--bulb);
+  margin: 0 auto;
+  padding: 0;
+  border: 3px solid #fff;
+  border-radius: 16px;
+  background: linear-gradient(#5a8bf2, #3f6fe0);
+  box-shadow:
+    0 4px 0 #2c55b8,
+    0 8px 14px rgb(0 0 0 / 0.25);
+  touch-action: none;
+  cursor: pointer;
+}
+
+.hint-bulb:active {
+  transform: translateY(3px);
+  box-shadow:
+    0 1px 0 #2c55b8,
+    0 4px 8px rgb(0 0 0 / 0.25);
+}
