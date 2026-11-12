@@ -1,6 +1,9 @@
 // The save data of the game. All data is plain JSON, so localStorage and a save code can hold it.
 // The UI stores it after each resolved move (research/native-feel/shell.md §3).
 
+import { MAX_COLUMNS } from './difficulty';
+import { isFinished } from './game';
+import { start } from './start';
 import { DEMO_KINDS } from './types';
 import type { Book, Card, DemoKind, GameState, Pile, PlacedSticker, Position, Stack, TableCard } from './types';
 
@@ -170,6 +173,16 @@ const isSaveData = (value: {
 export const snapshot = (state: GameState): SaveData => ({ version: SAVE_VERSION, state });
 
 /**
+ * A level in progress of a build before the column deal can have up to 12 stacks, and the board grid has at most
+ * 4 columns. That level starts again: a new deal of the same level number and seed, with the same sticker book and
+ * seen demos. A level with at most 4 stacks, or a finished level (its sticker book page), stays as it is.
+ */
+const inGrid = (state: GameState): GameState =>
+  state.table.length > MAX_COLUMNS && !isFinished(state)
+    ? { ...start({ level: state.level }, state.seed), book: state.book, demos: state.demos }
+    : state;
+
+/**
  * Reads save data that comes from localStorage or from a save code. It never throws: a save that this build
  * cannot read gives a failure reason, and the UI starts a new game.
  */
@@ -183,5 +196,5 @@ export const restore = (save: unknown): RestoreResult => {
   if (!isSaveData(save)) {
     return { ok: false, reason: 'shape' };
   }
-  return { ok: true, state: { ...save.state, demos: save.state.demos.filter(isDemoKind) } };
+  return { ok: true, state: inGrid({ ...save.state, demos: save.state.demos.filter(isDemoKind) }) };
 };

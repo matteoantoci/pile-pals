@@ -6,6 +6,8 @@ export { catalog, palSize, pictureOf } from './catalog';
 export { apply, go, isFinished, placeSticker } from './game';
 export { demoFor, hintFor, sawDemo } from './demos';
 export type { Demo, Hint } from './demos';
+export { pileProgress } from './pile-progress';
+export type { PileProgress } from './pile-progress';
 export { restore, SAVE_VERSION, snapshot } from './save';
 export { start } from './start';
 export { PAGE_SIZE } from './stickers';

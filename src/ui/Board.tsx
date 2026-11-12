@@ -1,5 +1,5 @@
-import { createSignal, For, onCleanup, onMount, Show } from 'solid-js';
-import { apply, dropCard, isFinished, openCards, placeAnchor, tapDeck } from '../model';
+import { createSignal, Index, onCleanup, onMount, Show } from 'solid-js';
+import { apply, dropCard, isFinished, openCards, pileProgress, placeAnchor, tapDeck } from '../model';
 import { watchLifecycle } from '../shell/lifecycle';
 import { saveGame } from '../shell/save';
 import { checkForUpdate } from '../shell/update';
@@ -7,11 +7,11 @@ import { RewardPage } from './book';
 import { celebrateLevel, parade } from './celebration';
 import { startCoach } from './coach';
 import { cancelDrag } from './drag';
-import { stillUrl } from './pictures';
+import { PileView } from './pile';
 import { createSoundGate } from './sound-gate';
 import { playEventSounds } from './sounds';
 import { DeckView, raiseCard, TableView } from './table';
-import type { Action, CardId, GameState, Outcome, Pile, PileId } from '../model';
+import type { Action, CardId, GameState, Outcome, PileId } from '../model';
 import type { Coach } from './coach';
 import type { Hooks, Target } from './drag';
 import type { Accessor, JSX } from 'solid-js';
@@ -33,18 +33,6 @@ const pileTargets = (): readonly Target[] =>
 
 /** The most columns of the board grid. The grid has one column for each slot and for each column of the table. */
 const MAX_COLUMNS = 4;
-
-/** A category pile: the category card on its slot, and the cards that landed on it. An empty slot has no picture. */
-const PileView = (props: { pile: Pile }): JSX.Element => (
-  <div class="pile" classList={{ slot: props.pile.picture === null }} data-pile={props.pile.id}>
-    <div class="pile-face">
-      <Show when={props.pile.picture}>{(picture) => <img src={stillUrl(picture())} alt="" />}</Show>
-    </div>
-    <div class="pile-cards">
-      <For each={props.pile.cards}>{(card) => <img class="pile-card" src={stillUrl(card.picture)} alt="" />}</For>
-    </div>
-  </div>
-);
 
 /** The action of a drop: a category card goes on a slot, and a picture card goes on a pile. The model decides. */
 const dropAction = (state: GameState, cardId: CardId, pileId: PileId): Action =>
@@ -199,7 +187,10 @@ export const Board = (props: {
     >
       <DeckView initial={initial} state={state} hooksFor={hooksFor} onTap={onTapDeck} />
       <section class="piles">
-        <For each={state().piles}>{(pile) => <PileView pile={pile} />}</For>
+        {/* Index keeps the element of each pile, so a pile can animate the card that lands on it. */}
+        <Index each={state().piles}>
+          {(pile) => <PileView pile={pile()} progress={pileProgress(state(), pile().id)} />}
+        </Index>
       </section>
       <TableView initial={initial} state={state} hooksFor={hooksFor} />
       <Show when={reward()}>
