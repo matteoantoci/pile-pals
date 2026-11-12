@@ -64,16 +64,6 @@ const layerOf = (host: HTMLElement): HTMLElement => {
   return layer;
 };
 
-/** The places of the group cards on the pile, in the order of the pile. The pile face is the fallback. */
-const placesOf = (pile: HTMLElement): readonly DOMRect[] => {
-  const places = [...pile.querySelectorAll<HTMLElement>('.pile-card')].map((card) => card.getBoundingClientRect());
-  if (places.length > 0) {
-    return places;
-  }
-  const face = pile.querySelector<HTMLElement>('.pile-face');
-  return face === null ? [] : [face.getBoundingClientRect()];
-};
-
 /** Where one copy starts and when its walk starts. */
 type Seat = { readonly place: DOMRect; readonly delay: number };
 
@@ -138,15 +128,13 @@ const walk = (piece: Piece): Promise<void> => {
 const walkGroup = (pile: Pile): Promise<void> => {
   const element = pileOf(pile.id);
   const host = boardOf();
-  const places = element === undefined ? [] : placesOf(element);
-  const first = places[0];
-  if (host === undefined || first === undefined) {
+  // The group cards are under the category card, so the copies start on its face.
+  const place = element?.querySelector<HTMLElement>('.pile-face')?.getBoundingClientRect();
+  if (host === undefined || place === undefined) {
     return Promise.resolve();
   }
   const layer = layerOf(host);
-  const pieces = pile.cards.map((card, index) =>
-    pieceOf(layer, card, { place: places[index % places.length] ?? first, delay: index * STAGGER_MS })
-  );
+  const pieces = pile.cards.map((card, index) => pieceOf(layer, card, { place, delay: index * STAGGER_MS }));
   element?.classList.add('paraded');
   return Promise.all(pieces.map(walk)).then(() => undefined);
 };

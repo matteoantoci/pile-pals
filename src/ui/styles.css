@@ -28,8 +28,6 @@
   --bottom-space: 80px;
   /* The deck shows up to 3 card edges of 4 px below it. */
   --deck-edges: 12px;
-  /* The size of a card picture on a pile. */
-  --mini: 16px;
   /* How much of a face-down card shows above the card on it: a strip of 22% of the card height. */
   --peek: 0.22;
 }
@@ -117,9 +115,10 @@ html[data-restoring] * {
   align-items: start;
 }
 
-/* A pile has no box of its own: the slot is the box. */
+/* A pile has no box of its own: the slot is the box. It is a stacking context for the card under it (.pile-under). */
 .pile {
   position: relative;
+  isolation: isolate;
 }
 
 .pile-face,
@@ -187,26 +186,52 @@ html[data-restoring] * {
   background: var(--slot-crown);
 }
 
-/* The small pictures of the cards on the pile. They are on the bottom of the face, so the slot row keeps its height. */
-.pile-cards {
+/*
+ * The last card on the pile, under the category card. It is a card face at rest in the place of the pile face. It
+ * is always below the category card, so a landed card never covers the dots: the pile is its own stacking context,
+ * and the landed card is at the bottom of it. When a card lands, it shrinks under the category card
+ * (src/ui/pile.tsx).
+ */
+.pile > .pile-under {
   position: absolute;
-  right: 0;
-  bottom: calc(var(--card-h) * 0.06);
+  top: 0;
   left: 0;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  z-index: -1;
   pointer-events: none;
 }
 
-.pile-card {
-  width: var(--mini);
-  height: var(--mini);
+/* A completed group left the table in its parade (src/ui/celebration/parade.ts). The category card stays. */
+.pile.paraded .pile-under {
+  visibility: hidden;
 }
 
-/* A completed group left the table in its parade (src/ui/celebration/parade.ts). The pile face stays. */
-.pile.paraded .pile-card {
-  visibility: hidden;
+/*
+ * The progress of the pile in one centred row at the bottom of the category card, below the picture: one dot for
+ * each card of its group, and a full dot for each card on the pile. Their size comes from the card width. The
+ * picture ends 0.28 card widths above the bottom, so the dots (0.08 to 0.18) never cover it.
+ */
+.dots {
+  position: absolute;
+  right: 0;
+  bottom: calc(var(--card-w) * 0.08);
+  left: 0;
+  display: flex;
+  justify-content: center;
+  gap: calc(var(--card-w) * 0.03);
+  pointer-events: none;
+}
+
+.dot {
+  width: calc(var(--card-w) * 0.1);
+  height: calc(var(--card-w) * 0.1);
+  box-sizing: border-box;
+  border: 2px solid var(--gold);
+  border-radius: 50%;
+  background: var(--card);
+}
+
+.dot.full {
+  background: var(--gold);
 }
 
 /*

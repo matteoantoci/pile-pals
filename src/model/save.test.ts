@@ -175,3 +175,58 @@ describe('restore', () => {
     expect(restore(badBook)).toEqual({ ok: false, reason: 'shape' });
   });
 });
+
+/** The table of a build before the column deal: one stack for each card, so a level has up to 12 stacks. */
+const oldLayout = (state: GameState): GameState => ({
+  ...state,
+  table: state.table
+    .flatMap((stack) => stack.cards)
+    .map((card, index) => ({ id: `stack-${String(index)}`, cards: [{ ...card, faceDown: false }] })),
+});
+
+/** The first open card of the level on its pile. */
+const playOne = (state: GameState): GameState => {
+  const card = openCards(state)[0];
+  if (!card) {
+    throw new Error('The level has no card on the table.');
+  }
+  return apply(state, dropCard(card.id, pileFor(state, card, true).id)).state;
+};
+
+/** A level 2 with a sticker on the first page of the book. The Child saw the demos of the drag and the deck. */
+const carried = (): GameState => {
+  const first = playOut(start({ level: 1 }, 4)).end;
+  const second = apply(apply(first, placeSticker({ x: 0.2, y: 0.3 })).state, go()).state;
+  return { ...second, demos: ['first', 'deck'] };
+};
+
+describe('restore of a level with more than 4 stacks', () => {
+  it('deals the level again with the same level number and seed, and keeps the book and the seen demos', () => {
+    const { book, demos } = carried();
+    // Level 7 has 3 groups of 4 cards: 12 stacks of one card in the old layout, and 4 columns now.
+    const old = playOne(oldLayout({ ...start({ level: 7 }, 42), book, demos }));
+
+    const back = restored(JSON.parse(JSON.stringify(snapshot(old))) as unknown).state;
+
+    expect(old.table).toHaveLength(12);
+    expect(back).toEqual({ ...start({ level: 7 }, 42), book, demos });
+    expect(back.table).toHaveLength(4);
+    expect(back.book.pages[0]?.[0]?.at).toEqual({ x: 0.2, y: 0.3 });
+  });
+
+  it('restores a level with at most 4 stacks as it is', () => {
+    const { book, demos } = carried();
+    const played = playOne({ ...start({ level: 7 }, 42), book, demos });
+
+    expect(played.table).toHaveLength(4);
+    expect(restored(snapshot(played)).state).toEqual(played);
+  });
+
+  it('restores a finished level as it is, so its sticker book page shows', () => {
+    const finished = playOut(oldLayout(start({ level: 7 }, 42))).end;
+
+    expect(finished.table).toHaveLength(12);
+    expect(finished.book.award).not.toBeNull();
+    expect(restored(snapshot(finished)).state).toEqual(finished);
+  });
+});
