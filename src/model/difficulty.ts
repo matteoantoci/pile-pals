@@ -12,8 +12,11 @@ export type Difficulty = {
   readonly maxGroups: number;
   /** The cards for each group. The category card is not included. */
   readonly cards: number;
-  /** The cards that start face-down, under the top card of a stack. */
-  readonly faceDown: number;
+  /**
+   * The columns of the table. The cards that are not in the deck go over the columns as evenly as possible.
+   * Only the top card of each column is face-up, so the column depth comes from the card count.
+   */
+  readonly columns: number;
   /** The cards in the deck. The Child taps the deck for them. */
   readonly deck: number;
   /**
@@ -26,24 +29,25 @@ export type Difficulty = {
 /** A row applies from its `from` level until the next row starts. */
 type Row = Difficulty & { readonly from: number };
 
-const FIRST: Row = { from: 1, minGroups: 2, maxGroups: 2, cards: 3, faceDown: 0, deck: 0, looseAnchors: 0 };
+const FIRST: Row = { from: 1, minGroups: 2, maxGroups: 2, cards: 3, columns: 3, deck: 0, looseAnchors: 0 };
 
 /** All category cards of the level start loose. The level has at most 4 groups. */
 const ALL = 4;
 
 // Levels 1 to 10 grow one step each 2 levels: first more cards, then one more pile with 3 cards again.
-// From level 11, a level shows 2 to 4 piles, and the face-down cards and the deck make it harder.
+// Face-down cards start at level 1: a flip asks for no action, so level 1 still teaches one action only.
+// From level 11, a level shows 2 to 4 piles, and the deck makes it harder.
 // From level 13, the Child puts one category card on its slot, and from level 16 all category cards.
 // Each new action starts 2 levels after the one before, so the Child learns one action at a time.
 const TABLE: readonly Row[] = [
   FIRST,
-  { from: 3, minGroups: 2, maxGroups: 2, cards: 4, faceDown: 0, deck: 0, looseAnchors: 0 },
-  { from: 5, minGroups: 3, maxGroups: 3, cards: 3, faceDown: 0, deck: 0, looseAnchors: 0 },
-  { from: 7, minGroups: 3, maxGroups: 3, cards: 4, faceDown: 0, deck: 0, looseAnchors: 0 },
-  { from: 9, minGroups: 4, maxGroups: 4, cards: 3, faceDown: 0, deck: 0, looseAnchors: 0 },
-  { from: 11, minGroups: 2, maxGroups: 4, cards: 4, faceDown: 2, deck: 2, looseAnchors: 0 },
-  { from: 13, minGroups: 2, maxGroups: 4, cards: 4, faceDown: 2, deck: 2, looseAnchors: 1 },
-  { from: 16, minGroups: 2, maxGroups: 4, cards: 5, faceDown: 3, deck: 3, looseAnchors: ALL },
+  { from: 3, minGroups: 2, maxGroups: 2, cards: 4, columns: 4, deck: 0, looseAnchors: 0 },
+  { from: 5, minGroups: 3, maxGroups: 3, cards: 3, columns: 3, deck: 0, looseAnchors: 0 },
+  { from: 7, minGroups: 3, maxGroups: 3, cards: 4, columns: 4, deck: 0, looseAnchors: 0 },
+  { from: 9, minGroups: 4, maxGroups: 4, cards: 3, columns: 4, deck: 0, looseAnchors: 0 },
+  { from: 11, minGroups: 2, maxGroups: 4, cards: 4, columns: 4, deck: 4, looseAnchors: 0 },
+  { from: 13, minGroups: 2, maxGroups: 4, cards: 4, columns: 4, deck: 4, looseAnchors: 1 },
+  { from: 16, minGroups: 2, maxGroups: 4, cards: 5, columns: 4, deck: 6, looseAnchors: ALL },
 ];
 
 /** The difficulty of the level. */

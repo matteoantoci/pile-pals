@@ -122,21 +122,32 @@ const isBook = (value: unknown): value is Book =>
 
 const isDemoKind = (value: unknown): value is DemoKind => DEMO_KINDS.some((kind) => kind === value);
 
+/** The demo of the face-down card of an older build. A save can still list it, and `restore` drops it. */
+const OLD_DEMO = 'faceDown';
+
+/** A demo flag in a save: a demo kind of this build, or the old face-down demo. */
+type SavedDemo = DemoKind | typeof OLD_DEMO;
+
+const isSavedDemo = (value: unknown): value is SavedDemo => value === OLD_DEMO || isDemoKind(value);
+
+/** A state in a save. Its list of demos can hold the old face-down demo. */
+type SavedState = Omit<GameState, 'demos'> & { readonly demos: readonly SavedDemo[] };
+
 /** The fields that go with the Child from level to level: the sticker book and the demos that the Child saw. */
-const hasCarried = (value: unknown): value is Pick<GameState, 'book' | 'demos'> =>
+const hasCarried = (value: unknown): value is Pick<SavedState, 'book' | 'demos'> =>
   typeof value === 'object' &&
   value !== null &&
   'book' in value &&
   isBook(value.book) &&
   'demos' in value &&
   Array.isArray(value.demos) &&
-  value.demos.every(isDemoKind);
+  value.demos.every(isSavedDemo);
 
 /**
  * The checks of the fields of `GameState` that this build knows. A field of a later ticket passes
  * without a check; `restore` then keeps it in the state as it is.
  */
-const isState = (value: unknown): value is GameState =>
+const isState = (value: unknown): value is SavedState =>
   isLevelSeed(value) &&
   'table' in value &&
   Array.isArray(value.table) &&
@@ -151,7 +162,9 @@ const isState = (value: unknown): value is GameState =>
 const isVersioned = (value: unknown): value is { readonly version: number } =>
   typeof value === 'object' && value !== null && 'version' in value && typeof value.version === 'number';
 
-const isSaveData = (value: { readonly version: number }): value is SaveData => 'state' in value && isState(value.state);
+const isSaveData = (value: {
+  readonly version: number;
+}): value is { readonly version: number; readonly state: SavedState } => 'state' in value && isState(value.state);
 
 /** The save data of one state. */
 export const snapshot = (state: GameState): SaveData => ({ version: SAVE_VERSION, state });
@@ -170,5 +183,5 @@ export const restore = (save: unknown): RestoreResult => {
   if (!isSaveData(save)) {
     return { ok: false, reason: 'shape' };
   }
-  return { ok: true, state: save.state };
+  return { ok: true, state: { ...save.state, demos: save.state.demos.filter(isDemoKind) } };
 };

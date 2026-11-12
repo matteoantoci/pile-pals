@@ -7,7 +7,7 @@ import { EMPTY_BOOK } from './stickers';
 import type { CatalogCard, CatalogGroup } from './catalog';
 import type { Difficulty } from './difficulty';
 import type { Random } from './random';
-import type { Card, GameState, GroupId, Pile, PictureId, Stack } from './types';
+import type { Card, GameState, GroupId, Pile, PictureId, Stack, TableCard } from './types';
 
 // The level generator (spec, Module 2). It works in three steps:
 // 1. `difficultyOf` gives the size of the level.
@@ -135,15 +135,27 @@ const chooseSetup = (difficulty: Difficulty, random: Random, tries = 0): readonl
   return trySetup(difficulty, random) ?? chooseSetup(difficulty, random, tries + 1);
 };
 
+/** A card in a column. */
+const tableCard = ({ id, group, picture, anchor }: Card, faceDown: boolean): TableCard => ({
+  id,
+  group,
+  picture,
+  anchor,
+  faceDown,
+});
+
 /**
- * The stacks of the table: each stack has one face-up card on top, and a face-down card under it when one is left.
- * A face-down card turns over when the card on top of it moves away.
+ * The columns of the table. The cards go round the columns one at a time, so the depths differ by one card at most.
+ * Only the last card of a column is face-up. A face-down card turns over when the card on top of it moves away.
  */
-const stackUp = (open: readonly Card[], hidden: readonly Card[]): readonly Stack[] =>
-  open.map((card, index) => ({
-    id: `stack-${String(index)}`,
-    cards: [...(hidden[index] ? [{ ...hidden[index], faceDown: true }] : []), { ...card, faceDown: false }],
-  }));
+const columnsOf = (cards: readonly Card[], count: number): readonly Stack[] =>
+  Array.from({ length: count }, (_, column) => {
+    const own = cards.filter((_card, index) => index % count === column);
+    return {
+      id: `stack-${String(column)}`,
+      cards: own.map((card, index) => tableCard(card, index < own.length - 1)),
+    };
+  });
 
 /** A card of the level. The catalog picture id is also the card id: rule 4 makes it unique in the level. */
 const cardOf = (picture: PictureId, group: GroupId, anchor: boolean): Card => ({ id: picture, group, picture, anchor });
@@ -155,25 +167,23 @@ const pileOf = (plan: Plan, index: number, loose: ReadonlySet<Plan>): Pile =>
     : { id: plan.group.id, group: plan.group.id, picture: plan.anchor, cards: [] };
 
 /**
- * Puts the setup on the piles, the stacks, and the deck, in a random order. The loose category cards go on the table
- * or in the deck, never face-down, and each one has an empty slot.
+ * Puts the setup on the piles, the deck, and the columns, in a random order. The deck gets its cards first, and the
+ * columns get the other cards. A loose category card can be in a column, face-down, or in the deck. Each one has an
+ * empty slot. The dead-end check decides if the deal is fair.
  */
 const layOut = (plans: readonly Plan[], difficulty: Difficulty, random: Random): Deal => {
   const ordered = random.shuffle(plans);
-  // A level with no loose category card uses no random value here, so its deal does not change.
   const loose = new Set(difficulty.looseAnchors > 0 ? random.shuffle(ordered).slice(0, difficulty.looseAnchors) : []);
-  const cards = random.shuffle(
-    plans.flatMap(({ group, cards: groupCards }) => groupCards.map((card) => cardOf(card.id, group.id, false)))
-  );
-  const anchors = [...loose].map(({ group, anchor }) => cardOf(anchor, group.id, true));
-  // One face-down card for each stack, and always a face-up card on the table and in the deck.
-  const faceDown = Math.min(difficulty.faceDown, Math.max(0, cards.length - 2));
-  const open = anchors.length > 0 ? random.shuffle([...cards.slice(faceDown), ...anchors]) : cards.slice(faceDown);
-  const deckSize = Math.min(difficulty.deck, open.length - 1);
+  const cards = random.shuffle([
+    ...plans.flatMap(({ group, cards: groupCards }) => groupCards.map((card) => cardOf(card.id, group.id, false))),
+    ...[...loose].map(({ group, anchor }) => cardOf(anchor, group.id, true)),
+  ]);
+  // Each column gets at least one card, so the deck never takes the last card of the table.
+  const deckSize = Math.max(0, Math.min(difficulty.deck, cards.length - difficulty.columns));
   return {
     piles: ordered.map((plan, index) => pileOf(plan, index, loose)),
-    table: stackUp(open.slice(deckSize), cards.slice(0, faceDown)),
-    deck: open.slice(0, deckSize),
+    table: columnsOf(cards.slice(deckSize), difficulty.columns),
+    deck: cards.slice(0, deckSize),
     dealt: null,
   };
 };
