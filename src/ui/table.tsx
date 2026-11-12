@@ -1,5 +1,6 @@
 import { For, Show } from 'solid-js';
 import { playSound } from '../sound';
+import { Crown } from './crown';
 import { draggable } from './drag';
 import { flip } from './flip';
 import { canceled } from './motion';
@@ -45,9 +46,9 @@ const CardView = (props: {
       <div class="card-shadow" />
       <div class="card-face">
         <img class="card-front" src={stillUrl(props.card.picture)} alt="" />
-        {/* The crown of a category card. It comes before the back, so the back of a face-down card covers it. */}
+        {/* The crown of a category card is on the top edge, half outside the card. A face-down card hides it. */}
         <Show when={props.card.anchor}>
-          <div class="crown" />
+          <Crown />
         </Show>
         <div class="card-back" />
       </div>

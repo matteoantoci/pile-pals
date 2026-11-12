@@ -11,7 +11,7 @@ import { PileView } from './pile';
 import { createSoundGate } from './sound-gate';
 import { playEventSounds } from './sounds';
 import { DeckView, raiseCard, TableView } from './table';
-import { HintBulb, TopBar } from './top-bar';
+import { TopBar } from './top-bar';
 import type { Action, CardId, GameState, Outcome, PileId } from '../model';
 import type { Coach } from './coach';
 import type { Hooks, Target } from './drag';
@@ -195,7 +195,6 @@ export const Board = (props: {
         </Index>
       </section>
       <TableView initial={initial} state={state} hooksFor={hooksFor} />
-      <HintBulb onHint={coach.hint} />
       <Show when={reward()}>
         <RewardPage book={state().book} act={act} done={props.onTitle} />
       </Show>
