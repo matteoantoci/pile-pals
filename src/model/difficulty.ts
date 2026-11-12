@@ -39,6 +39,8 @@ const ALL = 4;
 // From level 11, a level shows 2 to 4 piles, and the deck makes it harder.
 // From level 13, the Child puts one category card on its slot, and from level 16 all category cards.
 // Each new action starts 2 levels after the one before, so the Child learns one action at a time.
+// Level 16 has 4 cards for each group and a deck of 5 cards (ticket 03). With 6 deck cards, the Child taps the deck
+// more than 6 times. With 5 cards for each group or with 4 deck cards, the generator rejects more deals.
 const TABLE: readonly Row[] = [
   FIRST,
   { from: 3, minGroups: 2, maxGroups: 2, cards: 4, columns: 4, deck: 0, looseAnchors: 0 },
@@ -47,7 +49,7 @@ const TABLE: readonly Row[] = [
   { from: 9, minGroups: 4, maxGroups: 4, cards: 3, columns: 4, deck: 0, looseAnchors: 0 },
   { from: 11, minGroups: 2, maxGroups: 4, cards: 4, columns: 4, deck: 4, looseAnchors: 0 },
   { from: 13, minGroups: 2, maxGroups: 4, cards: 4, columns: 4, deck: 4, looseAnchors: 1 },
-  { from: 16, minGroups: 2, maxGroups: 4, cards: 5, columns: 4, deck: 6, looseAnchors: ALL },
+  { from: 16, minGroups: 2, maxGroups: 4, cards: 4, columns: 4, deck: 5, looseAnchors: ALL },
 ];
 
 /** The difficulty of the level. */

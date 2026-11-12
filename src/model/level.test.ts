@@ -166,8 +166,8 @@ describe('the difficulty', () => {
     expect(tableCards(tenth).length).toBeGreaterThan(tableCards(first).length);
   });
 
-  it('gives later levels up to 5 cards for each group', () => {
-    expect(Math.max(...levels.flatMap(cardsPerGroup))).toBe(5);
+  it('gives later levels up to 4 cards for each group', () => {
+    expect(Math.max(...levels.flatMap(cardsPerGroup))).toBe(4);
   });
 
   it('starts each pile and each slot with no card on it', () => {
