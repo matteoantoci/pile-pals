@@ -63,6 +63,10 @@ body {
   inset: 0;
   box-sizing: border-box;
   padding: env(safe-area-inset-top) env(safe-area-inset-right) var(--bottom-reserve) env(safe-area-inset-left);
+  /* The same table as html. iOS 26 blurs the band below the status bar unless the full-width fixed box at the
+     top has an opaque background-color: WebKit reads the colour from the style, not from the pixels
+     (docs/research/native-feel/shell.md, "Top edge blur"). */
+  background: var(--table-top) var(--table);
 }
 
 img {

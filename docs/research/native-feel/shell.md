@@ -127,6 +127,14 @@ The same post gives the pattern used below: `padding-left: max(12px, env(safe-ar
 
 A native app can only *ask* to hide it: "The system takes your preference into account, but returning true is no guarantee that the indicator will be hidden." — [Apple, prefersHomeIndicatorAutoHidden](https://developer.apple.com/documentation/uikit/uiviewcontroller/prefershomeindicatorautohidden). I found no web equivalent (**unverified** that none exists). Treat the bottom strip as unusable for touch: an upward drag that starts on that strip is a system gesture (see section 5).
 
+### Top edge blur
+
+iOS 26 draws a blur over about the top 40 pt of a Home Screen web app, above the page. WebKit calls it the scroll edge effect or scroll pocket. No CSS property, meta tag, or manifest key turns it off. — [folio PR 994](https://github.com/mbryantms/folio/pull/994), [opencode PR 53297](https://github.com/anomalyco/opencode/pull/53297)
+
+WebKit hides the blur when a visible colour extension view exists at the top. It samples one point at the top centre, 4 px inside, and takes the nearest `position: fixed` or `sticky` box of at least 90 % width. It reads the colour from the computed `background-color`, not from the pixels. The mechanism works only when the status bar is not `black-translucent`. — [WebKit source notes, zenn.dev](https://zenn.dev/uakihir0/articles/260920-ios27-pwa-blur) (secondary, quotes the WebKit source)
+
+[MEASURED 2026-11-23, iPhone 12, iOS 26] The board showed the blur over the home button and the level number. `#app` is the fixed full-width box, and it had no background. The fix gives `#app` the same background as `html` (`src/ui/styles.css`). That the fix removes the blur is **unverified** until the device check.
+
 ## 3. Lifecycle: background, return, and invisible restore
 
 ### Is the page kept or reloaded?
