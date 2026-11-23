@@ -151,10 +151,14 @@ export const installAudio = (clips: readonly Clip[]): void => {
   document.addEventListener('pointerdown', unlockAudio, { capture: true, passive: true });
   document.addEventListener('pointerup', unlockAudio, { capture: true, passive: true });
   // This listener comes before the listener of the board, so the board sees the stale context.
+  // On hidden, suspend the context: the "playback" session lets iOS play on in the background. The return marks
+  // the context stale, and the next tap replaces it.
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') {
       markStale();
+      return;
     }
+    context?.suspend().catch(ignore);
   });
   // A page that comes back from the back-forward cache keeps its old context too.
   window.addEventListener('pageshow', (event) => {
