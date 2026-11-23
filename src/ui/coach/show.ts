@@ -1,4 +1,4 @@
-// The rounds of the demo hand. Numbers: research/native-feel/motion.md, and a slow spring (1.2 s, no bounce).
+// The rounds of the demo hand. Numbers: docs/research/native-feel/motion.md, and a slow spring (1.2 s, no bounce).
 // Ticket 16 tunes the felt values on the iPhone. Change a value here only.
 
 import { flip } from '../flip';

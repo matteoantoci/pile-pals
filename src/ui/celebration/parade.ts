@@ -7,7 +7,7 @@ import { wait } from './wait';
 import type { Card, Pile } from '../../model';
 import type { Frame } from '../motion';
 
-// The parade of a completed group (research/native-feel/motion.md, "Starting values for each moment").
+// The parade of a completed group (docs/research/native-feel/motion.md, "Starting values for each moment").
 // The cards of the group leave the pile and walk off the right edge of the screen. A card with an animated
 // twin plays its loop and its pal sound during the walk, in a slot of the animation limiter.
 // The parade cards are copies in a layer above the board. When the copies start, the pile hides its cards

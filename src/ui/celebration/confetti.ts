@@ -2,7 +2,7 @@ import confetti from 'canvas-confetti';
 import { canceled } from '../motion';
 import type { Options } from 'canvas-confetti';
 
-// The confetti of a completed level (research/native-feel/motion.md §6). The default cannon of
+// The confetti of a completed level (docs/research/native-feel/motion.md §6). The default cannon of
 // canvas-confetti makes one full-screen canvas above the board, in a worker, and takes no touch.
 // It plays no confetti when the Child asks for less motion.
 

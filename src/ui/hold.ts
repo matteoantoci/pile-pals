@@ -1,5 +1,5 @@
 // The hold of one finger on an element: the shared part of the card drag (./drag.ts) and the sticker drag
-// (./book/sticker-drag.ts). Rules from research/native-feel/motion.md:
+// (./book/sticker-drag.ts). Rules from docs/research/native-feel/motion.md:
 // - pointermove writes the transform directly. No requestAnimationFrame, no framework state.
 // - The element takes the pointer with setPointerCapture.
 // - The hold knows no target and no animation. The hooks of the caller decide what a move and a release do.

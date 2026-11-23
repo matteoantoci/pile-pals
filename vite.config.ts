@@ -24,7 +24,7 @@ export default defineConfig({
       },
       workbox: {
         // wav: the shipped sounds (public/sounds/). webp and avif: the card pictures and the animation
-        // loops of public/ (research/content/build_content.py). txt: their licence and credit files.
+        // loops of public/ (docs/research/content/build_content.py). txt: their licence and credit files.
         // Each file is below the default limit of 2 MiB (maximumFileSizeToCacheInBytes), so the precache
         // holds all of them.
         globPatterns: ['**/*.{js,css,html,svg,png,webp,avif,txt,webmanifest,wav}'],

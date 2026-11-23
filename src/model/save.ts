@@ -1,5 +1,5 @@
 // The save data of the game. All data is plain JSON, so localStorage and a save code can hold it.
-// The UI stores it after each resolved move (research/native-feel/shell.md §3).
+// The UI stores it after each resolved move (docs/research/native-feel/shell.md §3).
 
 import { MAX_COLUMNS } from './difficulty';
 import { isFinished } from './game';

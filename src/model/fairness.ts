@@ -2,7 +2,7 @@ import { catalog } from './catalog';
 import type { CatalogCard, CatalogGroup } from './catalog';
 import type { GroupId, PictureId } from './types';
 
-// The fairness rule of research/native-feel/content-model.md §5, read from the catalog.
+// The fairness rule of docs/research/native-feel/content-model.md §5, read from the catalog.
 // "Fits" = the picture is a member or a `maybe` of the group. A picture that is not a card (a heart) fits no group.
 
 const NONE: ReadonlySet<GroupId> = new Set();

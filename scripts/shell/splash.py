@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Writes the iOS startup images of the shell. Research: research/native-feel/shell.md, section 1.
+"""Writes the iOS startup images of the shell. Research: docs/research/native-feel/shell.md, section 1.
 
 The iPhone 12 screen is 390 x 844 pt at 3x, so the portrait image is 1170 x 2532 px and the landscape
 image is 2532 x 1170 px. iOS shows a startup image only as a real file, never as a data URL.

@@ -11,16 +11,16 @@ iOS run smoothly, what do they cost, and what exact approach should the build us
 **Settled before this research, not re-argued here.** The drag itself is solved and approved on
 the device: write the CSS `transform` directly inside `pointermove`, with `touch-action: none` and
 `setPointerCapture()`, at 59 Hz with no `getCoalescedEvents()`
-([web-input-latency.md](../../../smart-games/.scratch/minigame-collection/research/web-input-latency.md),
-[19-drag-feel-gate.md](../../../smart-games/.scratch/minigame-collection/issues/19-drag-feel-gate.md)).
+([web-input-latency.md](../../../../smart-games/.scratch/minigame-collection/research/web-input-latency.md),
+[19-drag-feel-gate.md](../../../../smart-games/.scratch/minigame-collection/issues/19-drag-feel-gate.md)).
 The gate's prototype kept the piece on its own layer with `will-change: transform` and
 `transform: translate3d(0,0,0)` (`smart-games/prototypes/drag-feel-gate/index.html`, lines 78–79).
 A library is rejected if it "takes ownership of the transform pipeline" of the dragged piece
-([21-stack-policy.md](../../../smart-games/.scratch/minigame-collection/issues/21-stack-policy.md)).
+([21-stack-policy.md](../../../../smart-games/.scratch/minigame-collection/issues/21-stack-policy.md)).
 No canvas framework moves the cards
-([2d-game-frameworks.md](../../../smart-games/.scratch/minigame-collection/research/2d-game-frameworks.md)).
+([2d-game-frameworks.md](../../../../smart-games/.scratch/minigame-collection/research/2d-game-frameworks.md)).
 The open ticket on what moves and sounds at each moment is
-[25-feedback-choreography.md](../../../smart-games/.scratch/minigame-collection/issues/25-feedback-choreography.md);
+[25-feedback-choreography.md](../../../../smart-games/.scratch/minigame-collection/issues/25-feedback-choreography.md);
 this file supplies its technical floor, not its taste calls.
 
 **How the WebKit claims are sourced.** Safari 26.6 ships WebKit build `20624.4.5` ("Released July
@@ -121,7 +121,7 @@ The conversion to Core Animation handles only cubic Béziers and the plain linea
 followed by "Make sure the platform layer didn't fallback to using software filter compositing
 instead." So `filter: drop-shadow()` and `box-shadow` both animate on the main thread with a
 repaint every frame. The smart-games art work already banned SVG filters for a WebKit rendering
-failure ([05-art-direction.md](../../../smart-games/.scratch/minigame-collection/issues/05-art-direction.md));
+failure ([05-art-direction.md](../../../../smart-games/.scratch/minigame-collection/issues/05-art-direction.md));
 this is a second, separate reason to keep filters out of anything that moves.
 
 ### Mixing properties in one animation

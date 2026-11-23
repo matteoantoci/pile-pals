@@ -8,7 +8,7 @@ This document answers five questions for the picture version of "Solitaire Assoc
 4. Which rule keeps a level fair when one picture fits several groups?
 5. How many fair levels does this give, and which pictures are missing?
 
-All counts below come from the scripts in `research/content/`, run on the real data (see [How to reproduce](#9-how-to-reproduce)). Anything without a source is marked **unverified**.
+All counts below come from the scripts in `docs/research/content/`, run on the real data (see [How to reproduce](#9-how-to-reproduce)). Anything without a source is marked **unverified**.
 
 ---
 
@@ -452,7 +452,7 @@ Two open points (**unverified**):
 
 ## 9. How to reproduce
 
-Everything is in `research/content/`:
+Everything is in `docs/research/content/`:
 
 | File | What it does |
 |---|---|
@@ -465,7 +465,7 @@ Everything is in `research/content/`:
 | `count_levels.py` | The fairness rule, level counts (`data/level_counts.json`, `.csv`) and example levels. |
 
 ```sh
-cd research/content
+cd docs/research/content
 ./fetch_sources.sh
 uv run build_content.py      # prints the counts in sections 2-4 and 8
 uv run contact_sheets.py     # optional

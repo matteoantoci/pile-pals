@@ -5,7 +5,7 @@ import { watchUpdates } from './shell/update';
 import { installSound, setSoundOn } from './sound';
 import { App } from './ui/App';
 
-// The save is synchronous, so the level is here before the first frame (research/native-feel/shell.md §3).
+// The save is synchronous, so the level is here before the first frame (docs/research/native-feel/shell.md §3).
 // A saved level comes back with no animation and skips the title scene. With no save, the title scene shows,
 // and its go button starts a new game.
 const saved = loadGame();

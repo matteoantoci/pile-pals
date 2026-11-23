@@ -1,4 +1,4 @@
-// The save in localStorage. Rules from research/native-feel/shell.md §3:
+// The save in localStorage. Rules from docs/research/native-feel/shell.md §3:
 // - Write after each resolved move, because a kill can come with no event.
 // - Save the state after the move, never the animation.
 // - A save that this build cannot read gives a new game, not an error.

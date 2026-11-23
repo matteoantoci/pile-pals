@@ -1,4 +1,4 @@
-// The drag of the new sticker on the book page. Rules from research/native-feel/motion.md, as in ../drag.ts:
+// The drag of the new sticker on the book page. Rules from docs/research/native-feel/motion.md, as in ../drag.ts:
 // pointermove writes the transform directly (../hold.ts), and all other motion goes through ../motion (WAAPI,
 // transform only). Different from a card: the sticker has no target. It stays at any place on the page where the
 // finger lets go.

@@ -2,7 +2,7 @@ import data from './catalog.json';
 import sizes from './pal-sizes.json';
 import type { GroupId, PictureId } from './types';
 
-// The content catalog. research/content/build_content.py writes catalog.json. Do not edit it by hand.
+// The content catalog. docs/research/content/build_content.py writes catalog.json. Do not edit it by hand.
 // The picture files are in public/. Their paths are relative to the base URL of the app.
 
 /** A still picture and, for a pal, its animation loop. */

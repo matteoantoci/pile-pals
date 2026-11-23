@@ -1,4 +1,4 @@
-// The flip of a card face. Rules from research/native-feel/motion.md §5:
+// The flip of a card face. Rules from docs/research/native-feel/motion.md §5:
 // - Two halves of a rotateY, with the swap of the picture at the edge-on frame. No `preserve-3d`,
 //   no `backface-visibility`: each half stays inside 90deg and the two WebKit bugs stay away.
 // - The same transform function list in each half. The face rests at `RESTING` at the end.

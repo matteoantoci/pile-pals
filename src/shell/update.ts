@@ -1,5 +1,5 @@
 // The service worker of the app. vite-plugin-pwa runs in prompt mode: a new version installs and waits.
-// The app accepts the update, not the Child: there is no prompt on the screen (research/native-feel/shell.md §4).
+// The app accepts the update, not the Child: there is no prompt on the screen (docs/research/native-feel/shell.md §4).
 // A waiting update must never reload the page in the middle of a level.
 
 import { registerSW } from 'virtual:pwa-register';

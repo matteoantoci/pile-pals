@@ -1,5 +1,5 @@
 // One AudioContext for the whole app (spec Module 8). The unlock and the heal follow
-// research/native-feel/shell.md, "Shell code". Files are decoded one time and played at their gain.
+// docs/research/native-feel/shell.md, "Shell code". Files are decoded one time and played at their gain.
 import type { Clip } from './levels';
 
 declare global {

@@ -1,4 +1,4 @@
-// Springs as sampled keyframes. Source: research/native-feel/motion.md, section 2 and "Recommendations".
+// Springs as sampled keyframes. Source: docs/research/native-feel/motion.md, section 2 and "Recommendations".
 // Safari 26 does not run `linear(…)` easing on Core Animation. Thus a spring is one keyframe for each
 // 60 Hz frame, played with `easing: 'linear'`. The start speed of the spring is the release speed of the finger.
 

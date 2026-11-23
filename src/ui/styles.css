@@ -1,4 +1,4 @@
-/* Shell rules from research/native-feel/shell.md. */
+/* Shell rules from docs/research/native-feel/shell.md. */
 :root {
   /* The table: a vertical gradient. The top colour is also the page background and the theme colour of the app. */
   --table-top: #08813a;
@@ -101,7 +101,7 @@ html[data-restoring] * {
       ((3 + 3 * var(--peek)) * 4 / 3 + 3 * var(--crown-room))
   );
   --card-h: calc(var(--card-w) * 4 / 3);
-  /* 83 CSS px (3 columns) = 249 device px on an iPhone 12 (3x). The pictures are 256 px (research/content/pictures.py). */
+  /* 83 CSS px (3 columns) = 249 device px on an iPhone 12 (3x). The pictures are 256 px (docs/research/content/pictures.py). */
   --picture: calc(var(--card-w) * 0.78);
 
   display: grid;

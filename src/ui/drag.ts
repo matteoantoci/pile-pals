@@ -1,4 +1,4 @@
-// The drag of one card. Rules from research/native-feel/motion.md:
+// The drag of one card. Rules from docs/research/native-feel/motion.md:
 // - pointermove writes the transform of `.card` directly (./hold.ts). No requestAnimationFrame, no framework state.
 // - The card has `touch-action: none` (styles.css) and takes the pointer with setPointerCapture.
 // - All other motion goes through ./motion: WAAPI on `transform` and `opacity` only.

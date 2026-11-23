@@ -3,7 +3,7 @@ import { catalog, pictureOf, start } from './index';
 import type { CatalogCard, CatalogGroup, GameState, GroupId, PictureId, TableCard } from './index';
 
 // The level generator, tested over many seeds and level numbers with the real catalog.
-// The rules come from the spec (Module 2) and from research/native-feel/content-model.md §5.
+// The rules come from the spec (Module 2) and from docs/research/native-feel/content-model.md §5.
 
 const SEEDS = Array.from({ length: 100 }, (_, i) => 7919 * i + 1);
 const LEVELS = Array.from({ length: 30 }, (_, i) => i + 1);

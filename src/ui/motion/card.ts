@@ -1,5 +1,5 @@
 // Effects on the face and the shadow of a card. The values are the starting values of
-// research/native-feel/motion.md, "Starting values for each moment". Ticket 16 tunes them on the iPhone.
+// docs/research/native-feel/motion.md, "Starting values for each moment". Ticket 16 tunes them on the iPhone.
 // The effects never touch `.card`: the drag and the springs own its transform.
 
 import { facePose, REST_SCALE, settle, stop } from './primitives';

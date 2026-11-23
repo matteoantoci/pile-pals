@@ -4,11 +4,11 @@ Researched 2026-11-09 for the kids' picture solitaire game. Target: iPhone 12 (n
 
 This game is **not** part of the smart-games collection, but that project already researched the same platform. Its findings are treated as prior work and are cited, not repeated:
 
-- [pwa-route.md](../../../smart-games/.scratch/minigame-collection/research/pwa-route.md): install, the storage exemption, offline, the audio unlock gesture, and the fact that orientation cannot be locked.
-- [web-input-latency.md](../../../smart-games/.scratch/minigame-collection/research/web-input-latency.md) and [19-drag-feel-gate.md](../../../smart-games/.scratch/minigame-collection/issues/19-drag-feel-gate.md): the drag recipe (`transform` written inside `pointermove`, `touch-action: none`, `setPointerCapture`, `-webkit-user-select: none`), already approved on this exact phone.
-- [code-synthesised-sfx.md](../../../smart-games/.scratch/minigame-collection/research/code-synthesised-sfx.md): ZzFX, one `AudioContext`, and respecting the silent switch.
-- [21-stack-policy.md](../../../smart-games/.scratch/minigame-collection/issues/21-stack-policy.md): vite-plugin-pwa with `autoUpdate`, `localStorage` plus an export code. This file does **not** assume Solid; all code below is framework-neutral TypeScript.
-- [20-responsive-layout.md](../../../smart-games/.scratch/minigame-collection/issues/20-responsive-layout.md) and the safe-area hazard in [map.md](../../../smart-games/.scratch/minigame-collection/map.md).
+- [pwa-route.md](../../../../smart-games/.scratch/minigame-collection/research/pwa-route.md): install, the storage exemption, offline, the audio unlock gesture, and the fact that orientation cannot be locked.
+- [web-input-latency.md](../../../../smart-games/.scratch/minigame-collection/research/web-input-latency.md) and [19-drag-feel-gate.md](../../../../smart-games/.scratch/minigame-collection/issues/19-drag-feel-gate.md): the drag recipe (`transform` written inside `pointermove`, `touch-action: none`, `setPointerCapture`, `-webkit-user-select: none`), already approved on this exact phone.
+- [code-synthesised-sfx.md](../../../../smart-games/.scratch/minigame-collection/research/code-synthesised-sfx.md): ZzFX, one `AudioContext`, and respecting the silent switch.
+- [21-stack-policy.md](../../../../smart-games/.scratch/minigame-collection/issues/21-stack-policy.md): vite-plugin-pwa with `autoUpdate`, `localStorage` plus an export code. This file does **not** assume Solid; all code below is framework-neutral TypeScript.
+- [20-responsive-layout.md](../../../../smart-games/.scratch/minigame-collection/issues/20-responsive-layout.md) and the safe-area hazard in [map.md](../../../../smart-games/.scratch/minigame-collection/map.md).
 
 Labels used below: **unverified** means no source sentence was found. **[INFERENCE]** means a conclusion I drew from cited facts, not something a source says.
 

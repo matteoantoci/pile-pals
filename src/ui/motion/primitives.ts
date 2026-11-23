@@ -1,4 +1,4 @@
-// Motion primitives. Rules from research/native-feel/motion.md, "Rules for every animation":
+// Motion primitives. Rules from docs/research/native-feel/motion.md, "Rules for every animation":
 // - Animate only `transform` and `opacity`, with WAAPI. No CSS transitions, no `linear(…)` with points, no `steps()`.
 // - Use the same transform function list in each keyframe of one animation.
 // - Give an explicit first and last keyframe.

@@ -42,7 +42,7 @@ from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-REPO = HERE.parent.parent
+REPO = HERE.parents[2]
 sys.path.insert(0, str(HERE))
 
 import colour  # noqa: E402
