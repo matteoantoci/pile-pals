@@ -2,16 +2,8 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "lib": ["es2024", "dom", "dom.iterable"],
-    "types": [],
+    "types": ["node"],
     "allowImportingTsExtensions": true
   },
-  "include": [
-    "smoke.ts",
-    "smoke-audio.ts",
-    "smoke-board.ts",
-    "smoke-level.ts",
-    "smoke-nudge.ts",
-    "smoke-page.ts",
-    "smoke-screen.ts"
-  ]
+  "include": ["smoke*.ts"]
 }

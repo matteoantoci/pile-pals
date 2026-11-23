@@ -23,12 +23,12 @@ type Hold = {
 /** The pointer handlers of the hold. A lift, a cancel, or a lost capture before HOLD_MS stops the hold. */
 const holdOf = (onHold: () => void): Hold => {
   let timer: number | undefined;
-  const stop = (): void => clearTimeout(timer);
+  const stop = (): void => window.clearTimeout(timer);
   onCleanup(stop);
   const down: Hold['down'] = (event) => {
     stop();
     event.currentTarget.setPointerCapture(event.pointerId);
-    timer = setTimeout(onHold, HOLD_MS);
+    timer = window.setTimeout(onHold, HOLD_MS);
   };
   return { down, stop };
 };

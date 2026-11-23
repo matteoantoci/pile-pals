@@ -1,21 +1,21 @@
 // Browser smoke run of the built app: `pnpm smoke`. It is a dev tool, not a test of the game model.
-// The `smoke` script in package.json runs `vite build` first, and this file serves dist/ with `vite preview`.
+// The `smoke` script in package.json runs `vite build` first, and scripts/smoke-preview.ts serves dist/.
 // Chromium cannot show the iOS audio rules (see docs/agents/ios-device.md), so a pass here does not prove the
 // iPhone behaviour. It uses the default install of Google Chrome on macOS.
 
 import { launch } from 'puppeteer-core';
-import { preview } from 'vite';
 import { recordAudio } from './smoke-audio.ts';
 import { nudgeChecks } from './smoke-nudge.ts';
+import { offlineChecks } from './smoke-offline.ts';
 import { tap, wait } from './smoke-page.ts';
+import { startPreview, stopPreview } from './smoke-preview.ts';
 import { screenChecks } from './smoke-screen.ts';
 import type { AudioRecord } from './smoke-audio.ts';
 import type { Point } from './smoke-page.ts';
+import type { Server } from './smoke-preview.ts';
 import type { Browser, Page } from 'puppeteer-core';
 
 const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
-const PORT = 4179;
-const APP_URL = `http://127.0.0.1:${String(PORT)}/pile-pals/`;
 const DRAG_STEPS = 12;
 const MAX_DRAGS = 150;
 
@@ -149,27 +149,36 @@ const levelEnd = async (page: Page, audio: AudioRecord): Promise<void> => {
   check('level end: sticker page', await shown(page, '.book'));
 };
 
-const runAll = async (browser: Browser): Promise<void> => {
+const runAll = async (browser: Browser, server: Server): Promise<void> => {
   const page = await browser.newPage();
   await page.setViewport({ width: 390, height: 763, isMobile: true, hasTouch: true, deviceScaleFactor: 2 });
-  await page.goto(APP_URL, { waitUntil: 'networkidle2' });
+  await page.goto(server.url, { waitUntil: 'networkidle2' });
   const audio = await recordAudio(await page.createCDPSession());
   await emptyBook(page);
   await newGame(page, audio);
   await restoredBoard(page, audio);
   await backgroundReturn(page, audio);
   await levelEnd(page, audio);
-  await screenChecks({ browser, url: APP_URL, check });
-  await nudgeChecks({ browser, url: APP_URL, check });
+  await screenChecks({ browser, url: server.url, check });
+  await nudgeChecks({ browser, url: server.url, check });
+  // Last: this step stops the preview server.
+  await offlineChecks(page, async () => stopPreview(server), check);
 };
 
-const server = await preview({ preview: { port: PORT, strictPort: true, host: '127.0.0.1' } });
-const browser = await launch({ executablePath: CHROME, headless: true });
+const smoke = async (server: Server): Promise<void> => {
+  const browser = await launch({ executablePath: CHROME, headless: true });
+  try {
+    await runAll(browser, server);
+  } finally {
+    await browser.close();
+  }
+};
+
+const server = await startPreview();
 try {
-  await runAll(browser);
+  await smoke(server);
 } finally {
-  await browser.close();
-  await server.close();
+  await stopPreview(server);
 }
 
 console.log(results.join('\n'));
