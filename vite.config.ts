@@ -38,7 +38,9 @@ export default defineConfig({
         // loops of public/ (docs/research/content/build_content.py). txt: their licence and credit files.
         // Each file is below the default limit of 2 MiB (maximumFileSizeToCacheInBytes), so the precache
         // holds all of them.
-        globPatterns: ['**/*.{js,css,html,svg,png,webp,avif,txt,webmanifest,wav}'],
+        // vite-plugin-pwa adds manifest.webmanifest to the precache itself. A glob match adds it a second time
+        // with another revision, and then Workbox refuses the whole precache list: the app does not start offline.
+        globPatterns: ['**/*.{js,css,html,svg,png,webp,avif,txt,wav}'],
       },
     }),
   ],
