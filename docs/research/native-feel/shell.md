@@ -133,7 +133,7 @@ iOS 26 draws a blur over about the top 40 pt of a Home Screen web app, above the
 
 WebKit hides the blur when a visible colour extension view exists at the top. It samples one point at the top centre, 4 px inside, and takes the nearest `position: fixed` or `sticky` box of at least 90 % width. It reads the colour from the computed `background-color`, not from the pixels. The mechanism works only when the status bar is not `black-translucent`. — [WebKit source notes, zenn.dev](https://zenn.dev/uakihir0/articles/260920-ios27-pwa-blur) (secondary, quotes the WebKit source)
 
-[MEASURED 2026-11-23, iPhone 12, iOS 26] The board showed the blur over the home button and the level number. `#app` is the fixed full-width box, and it had no background. The fix gives `#app` the same background as `html` (`src/ui/styles.css`). That the fix removes the blur is **unverified** until the device check.
+[MEASURED 2026-11-23, iPhone 12, iOS 26] The board showed the blur over the home button and the level number. `#app` is the fixed full-width box, and it had no background. The fix gives `#app` the same background as `html` (`src/ui/styles.css`). [MEASURED 2026-11-23, same iPhone] After the fix, the top of the board is sharp.
 
 ## 3. Lifecycle: background, return, and invisible restore
 
