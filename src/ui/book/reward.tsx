@@ -43,6 +43,8 @@ const NewSticker = (props: {
 }): JSX.Element => {
   const { picture, play } = playable(untrack(() => props.award));
   const host: { el?: HTMLElement } = {};
+  // Read at creation: the body runs inside render(), before main.tsx clears the flag in a frame.
+  const restoring = document.documentElement.dataset['restoring'] !== undefined;
   const drop = (center: Vec): boolean => {
     const page = props.page();
     const at = page ? placeOf(page, center) : undefined;
@@ -62,7 +64,7 @@ const NewSticker = (props: {
     }
     freeDraggable(el, drop);
     // No motion and no sound on the first frame of a restore.
-    if (document.documentElement.dataset['restoring'] === undefined) {
+    if (!restoring) {
       play(el);
     }
   });
