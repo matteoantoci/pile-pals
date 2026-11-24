@@ -2,7 +2,7 @@ import { createSignal, For } from 'solid-js';
 import { isParentAnswer, parentProblem } from '../../model';
 import { newSeed } from '../../shell/seed';
 import type { ParentProblem } from '../../model';
-import type { JSX } from 'solid-js';
+import type { JSX } from '@solidjs/web';
 
 // The parent check (spec Module 11): a multiplication problem and a digit pad over the title scene.
 // The right answer opens the parent area. A wrong answer closes the check. Each check shows a new problem.

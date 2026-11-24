@@ -1,4 +1,4 @@
-import { onMount } from 'solid-js';
+import { onSettled, untrack } from 'solid-js';
 import { go, placeSticker } from '../../model';
 import { GoButton } from '../go-button';
 import { PageView } from './page';
@@ -6,7 +6,7 @@ import { playable } from './sticker';
 import { flyTo, freeDraggable, putAt } from './sticker-drag';
 import type { Action, Book, Outcome, Position } from '../../model';
 import type { Vec } from '../motion';
-import type { JSX } from 'solid-js';
+import type { JSX } from '@solidjs/web';
 
 /** What the reward page needs from the board. */
 export type RewardProps = {
@@ -41,7 +41,7 @@ const NewSticker = (props: {
   readonly place: (at: Position) => void;
   readonly ref: (el: HTMLElement) => void;
 }): JSX.Element => {
-  const { picture, play } = playable(props.award);
+  const { picture, play } = playable(untrack(() => props.award));
   const host: { el?: HTMLElement } = {};
   const drop = (center: Vec): boolean => {
     const page = props.page();
@@ -51,7 +51,7 @@ const NewSticker = (props: {
     }
     return at !== undefined;
   };
-  onMount(() => {
+  onSettled(() => {
     const { el } = host;
     const page = props.page();
     if (!el || !page) {
@@ -68,8 +68,7 @@ const NewSticker = (props: {
   });
   return (
     <div
-      class="sticker new"
-      classList={{ gold: props.award.gold }}
+      class={['sticker new', { gold: props.award.gold }]}
       ref={(el) => {
         host.el = el;
         props.ref(el);
@@ -86,7 +85,7 @@ const NewSticker = (props: {
  * place by itself. When the book is complete, the stickers of the page dance and no new sticker shows.
  */
 export const RewardPage = (props: RewardProps): JSX.Element => {
-  const { pages, award } = props.book;
+  const { pages, award } = untrack(() => props.book);
   const parts: Parts = { going: false };
 
   const onGo = (): void => {

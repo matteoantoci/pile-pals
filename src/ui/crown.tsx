@@ -1,4 +1,4 @@
-import type { JSX } from 'solid-js';
+import type { JSX } from '@solidjs/web';
 
 // The crown of a category card and of an empty slot (ticket 08). It is a flat drawing, not the crown picture of the
 // catalog: rounded points with a ball on each point, a band with one red jewel, a gold fill, and a dark outline.

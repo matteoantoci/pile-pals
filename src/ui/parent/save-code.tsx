@@ -2,7 +2,7 @@ import { createSignal, Show } from 'solid-js';
 import { readSaveCode, saveCode, snapshot } from '../../model';
 import { loadGame, saveGame } from '../../shell/save';
 import type { RestoreFailure } from '../../model';
-import type { JSX } from 'solid-js';
+import type { JSX } from '@solidjs/web';
 
 // The export and the restore of the save code (spec user stories 52 and 53). The code holds the saved game of
 // localStorage, in the save format of this build (`snapshot`, `restore`).

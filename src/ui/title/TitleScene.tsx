@@ -1,10 +1,10 @@
-import { createSignal, onCleanup, onMount, Show } from 'solid-js';
+import { createSignal, onSettled, Show } from 'solid-js';
 import { checkForUpdate, openSafeWindow } from '../../shell/update';
 import { GoButton } from '../go-button';
 import { ParentCheck } from '../parent/ParentCheck';
 import { Logo } from './logo';
 import { runTitleLoop } from './loop';
-import type { JSX } from 'solid-js';
+import type { JSX } from '@solidjs/web';
 
 // The title scene (spec Module 10): the logo, the pals that hop and fall into 3 small piles, and the green
 // go button. The scene waits for the Child: nothing starts the level but the go button.
@@ -40,25 +40,27 @@ const onVisible = (): void => {
 };
 
 /** Keeps the safe window open until the first touch, and looks for a new version when the page shows again. */
-const watchSafePoint = (): void => {
+const watchSafePoint = (): (() => void) => {
   const closeSafeWindow = openSafeWindow();
   document.addEventListener('pointerdown', closeSafeWindow, { capture: true, once: true, passive: true });
   document.addEventListener('visibilitychange', onVisible);
-  onCleanup(() => {
+  return () => {
     closeSafeWindow();
     document.removeEventListener('pointerdown', closeSafeWindow, { capture: true });
     document.removeEventListener('visibilitychange', onVisible);
-  });
+  };
 };
 
 export const TitleScene = (props: TitleProps): JSX.Element => {
   let stage: HTMLElement | undefined;
   const [checking, setChecking] = createSignal(false);
-  onMount(() => {
-    watchSafePoint();
-    if (stage) {
-      onCleanup(runTitleLoop(stage));
-    }
+  onSettled(() => {
+    const stopSafePoint = watchSafePoint();
+    const stopLoop = stage ? runTitleLoop(stage) : undefined;
+    return () => {
+      stopSafePoint();
+      stopLoop?.();
+    };
   });
   return (
     <main class="title">

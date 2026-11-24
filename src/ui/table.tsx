@@ -7,7 +7,8 @@ import { canceled } from './motion';
 import { stillUrl } from './pictures';
 import type { Card, CardId, GameState, Stack } from '../model';
 import type { Hooks } from './drag';
-import type { Accessor, JSX } from 'solid-js';
+import type { JSX } from '@solidjs/web';
+import type { Accessor } from 'solid-js';
 
 // The table: the stacks of cards and the deck. It draws the dealt level and shows the state after each move.
 // The card elements of a level stay in their places, so a card never moves under the finger:
@@ -33,8 +34,7 @@ const CardView = (props: {
 }): JSX.Element => (
   <div class="card-place">
     <div
-      class="card"
-      classList={{ gone: props.gone, anchor: props.card.anchor }}
+      class={['card', { gone: props.gone, anchor: props.card.anchor }]}
       data-card={props.card.id}
       ref={(el) => {
         el.setAttribute('data-face', props.faceDown ? 'down' : 'up');
@@ -96,8 +96,7 @@ export const DeckView = (props: {
   <Show when={hasDeck(props.initial())}>
     <section class="deck-place">
       <div
-        class="deck"
-        classList={{ spent: props.state().deck.length === 0 }}
+        class={['deck', { spent: props.state().deck.length === 0 }]}
         data-edges={Math.min(MAX_EDGES, props.state().deck.length)}
         onClick={props.onTap}
       >

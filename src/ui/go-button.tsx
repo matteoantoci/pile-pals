@@ -1,4 +1,4 @@
-import type { JSX } from 'solid-js';
+import type { JSX } from '@solidjs/web';
 
 // The one "go" button of the game (spec user stories 32 and 42): a large green round button with a white arrow.
 // It has no text, because the Child cannot read. The title scene and the sticker book page use it.

@@ -1,4 +1,4 @@
-import { createSignal } from 'solid-js';
+import { createSignal, untrack } from 'solid-js';
 import { start } from '../model';
 import { loadGame, saveGame } from '../shell/save';
 import { newSeed } from '../shell/seed';
@@ -7,7 +7,7 @@ import { openBook } from './book';
 import { ParentArea } from './parent/ParentArea';
 import { TitleScene } from './title/TitleScene';
 import type { GameState } from '../model';
-import type { JSX } from 'solid-js';
+import type { JSX } from '@solidjs/web';
 
 // The screens of the app: the title scene, the level (spec: title scene -> level -> reward -> title scene), and
 // the parent area. The level screen ends with the sticker book page. A restored level skips the title scene
@@ -20,7 +20,7 @@ type Screen =
 
 /** `restored` is the saved level that main.tsx read before the first frame, or undefined. */
 export const App = (props: { readonly restored: GameState | undefined }): JSX.Element => {
-  const restored = props.restored;
+  const restored = untrack(() => props.restored);
   const [screen, setScreen] = createSignal<Screen>(
     restored ? { name: 'level', state: restored, restored: true } : { name: 'title' }
   );

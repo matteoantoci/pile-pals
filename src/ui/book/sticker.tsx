@@ -1,11 +1,11 @@
-import { createSignal, onMount } from 'solid-js';
+import { createSignal, onSettled, untrack } from 'solid-js';
 import { palSize } from '../../model';
 import { playPal } from '../../sound';
 import { animationLimiter, wait } from '../celebration';
 import { canceled, facePose, settle, stop } from '../motion';
 import { animationUrl, stillUrl } from '../pictures';
 import type { PlacedSticker, Sticker } from '../../model';
-import type { JSX } from 'solid-js';
+import type { JSX } from '@solidjs/web';
 
 /** How long a sticker plays its animation loop after a tap. */
 const PLAY_MS = 3000;
@@ -60,9 +60,9 @@ export const PlacedView = (props: {
   readonly sticker: PlacedSticker;
   readonly delay?: number | undefined;
 }): JSX.Element => {
-  const { picture, play } = playable(props.sticker);
+  const { picture, play } = playable(untrack(() => props.sticker));
   const host: { el?: HTMLElement } = {};
-  onMount(() => {
+  onSettled(() => {
     const { delay } = props;
     const { el } = host;
     if (delay !== undefined && el) {
@@ -71,8 +71,7 @@ export const PlacedView = (props: {
   });
   return (
     <div
-      class="sticker"
-      classList={{ gold: props.sticker.gold }}
+      class={['sticker', { gold: props.sticker.gold }]}
       style={{ left: `${String(props.sticker.at.x * 100)}%`, top: `${String(props.sticker.at.y * 100)}%` }}
       ref={(el) => {
         host.el = el;

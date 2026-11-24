@@ -2,7 +2,7 @@ import { For, Show } from 'solid-js';
 import { PAGE_SIZE } from '../../model';
 import { PlacedView } from './sticker';
 import type { PlacedSticker } from '../../model';
-import type { JSX } from 'solid-js';
+import type { JSX } from '@solidjs/web';
 
 /** The time between the start of two stickers of the dance. */
 const DANCE_STEP_MS = 300;

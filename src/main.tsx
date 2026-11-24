@@ -1,4 +1,4 @@
-import { render } from 'solid-js/web';
+import { render } from '@solidjs/web';
 import { loadGame } from './shell/save';
 import { loadSoundOn } from './shell/settings';
 import { watchUpdates } from './shell/update';

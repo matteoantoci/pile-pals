@@ -1,6 +1,6 @@
 import { For, Show } from 'solid-js';
 import credits from '../../credits.json';
-import type { JSX } from 'solid-js';
+import type { JSX } from '@solidjs/web';
 
 // The credits (spec user story 56, "Further Notes"). The list comes from src/credits.json, the file that the
 // credits test checks against each shipped picture, animation, and sound. The works with a licence that needs a

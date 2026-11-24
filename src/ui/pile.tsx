@@ -1,9 +1,9 @@
-import { createEffect, For, on, Show } from 'solid-js';
+import { createEffect, For, Show } from 'solid-js';
 import { Crown } from './crown';
 import { canceled, facePose, RESTING, settle, stop } from './motion';
 import { stillUrl } from './pictures';
 import type { Pile, PileProgress } from '../model';
-import type { JSX } from 'solid-js';
+import type { JSX } from '@solidjs/web';
 
 // A category pile (spec, "Pile progress"). The category card stays on top of its slot. It shows a row of dots at its
 // bottom, below the picture: one dot for each card of its group, and one full dot for each card on the pile. A card
@@ -35,26 +35,24 @@ export const PileView = (props: { readonly pile: Pile; readonly progress: PilePr
   let under: HTMLDivElement | undefined;
   let dots: HTMLDivElement | undefined;
   createEffect(
-    on(
-      () => props.pile.cards.length,
-      (count, before) => {
-        // The first run has no count before it: the pile shows its cards with no motion.
-        if (before === undefined || count <= before) {
-          return;
-        }
-        if (under) {
-          tuck(under);
-        }
-        // The dot of the new card fills: it grows and comes back to its size.
-        const dot = dots?.children.item(count - 1);
-        if (dot instanceof HTMLElement) {
-          settle(dot, [{ transform: 'scale(1.8)' }, { transform: 'scale(1)' }], POP).finished.catch(canceled);
-        }
+    () => props.pile.cards.length,
+    (count, before) => {
+      // The first run has no count before it: the pile shows its cards with no motion.
+      if (before === undefined || count <= before) {
+        return;
       }
-    )
+      if (under) {
+        tuck(under);
+      }
+      // The dot of the new card fills: it grows and comes back to its size.
+      const dot = dots?.children.item(count - 1);
+      if (dot instanceof HTMLElement) {
+        settle(dot, [{ transform: 'scale(1.8)' }, { transform: 'scale(1)' }], POP).finished.catch(canceled);
+      }
+    }
   );
   return (
-    <div class="pile" classList={{ slot: props.pile.picture === null }} data-pile={props.pile.id}>
+    <div class={['pile', { slot: props.pile.picture === null }]} data-pile={props.pile.id}>
       <Show when={props.pile.cards.at(-1)}>
         {(card) => (
           <div class="card-face pile-under" ref={(el) => (under = el)}>
@@ -70,7 +68,7 @@ export const PileView = (props: { readonly pile: Pile; readonly progress: PilePr
           {(progress) => (
             <div class="dots" ref={(el) => (dots = el)}>
               <For each={Array.from({ length: progress().total }, (_, index) => index)}>
-                {(index) => <span class="dot" classList={{ full: index < progress().done }} />}
+                {(index) => <span class={['dot', { full: index < progress().done }]} />}
               </For>
             </div>
           )}

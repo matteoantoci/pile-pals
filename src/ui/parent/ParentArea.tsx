@@ -4,7 +4,7 @@ import { storeSoundOn } from '../../shell/settings';
 import { isSoundOn, setSoundOn } from '../../sound';
 import { Credits } from './credits';
 import { ExportCode, RestoreCode } from './save-code';
-import type { JSX } from 'solid-js';
+import type { JSX } from '@solidjs/web';
 
 // The parent area (spec Module 11). English text is allowed here, because only an adult gets in.
 // Content: the sound switch, the export and the restore of the save code, the reset, and the credits.
@@ -21,7 +21,7 @@ const SoundSwitch = (): JSX.Element => {
   return (
     <section class="parent-section">
       <h2>Sound</h2>
-      <button type="button" class="parent-switch" role="switch" aria-checked={on()} onClick={flip}>
+      <button type="button" class="parent-switch" role="switch" aria-checked={on() ? 'true' : 'false'} onClick={flip}>
         Sound effects: {on() ? 'On' : 'Off'}
       </button>
     </section>

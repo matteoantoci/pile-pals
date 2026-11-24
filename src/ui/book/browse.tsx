@@ -1,9 +1,9 @@
-import { createSignal } from 'solid-js';
-import { render } from 'solid-js/web';
+import { render } from '@solidjs/web';
+import { createSignal, untrack } from 'solid-js';
 import { loadGame } from '../../shell/save';
 import { PageView } from './page';
 import type { PlacedSticker } from '../../model';
-import type { JSX } from 'solid-js';
+import type { JSX } from '@solidjs/web';
 
 type Pages = readonly (readonly PlacedSticker[])[];
 
@@ -17,8 +17,7 @@ const IconButton = (props: {
 }): JSX.Element => (
   <button
     type="button"
-    class={`page-button ${props.class}`}
-    classList={{ hidden: props.hidden === true }}
+    class={[`page-button ${props.class}`, { hidden: props.hidden === true }]}
     aria-label={props.label}
     onClick={() => props.onTap()}
   >
@@ -30,9 +29,10 @@ const IconButton = (props: {
 
 /** The old pages of the book, the newest page first. The arrows turn the pages; the cross closes the book. */
 const BookBrowser = (props: { readonly pages: Pages; readonly close: () => void }): JSX.Element => {
-  const last = props.pages.length - 1;
+  const pages = untrack(() => props.pages);
+  const last = pages.length - 1;
   const [index, setIndex] = createSignal(last);
-  const empty = props.pages.every((page) => page.length === 0);
+  const empty = pages.every((page) => page.length === 0);
   return (
     <div class="book browse">
       <PageView stickers={props.pages[index()] ?? []} empty={empty} />

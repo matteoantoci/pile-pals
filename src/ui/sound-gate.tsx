@@ -1,7 +1,7 @@
 import { createSignal, Show } from 'solid-js';
 import { audioNeedsTap, isSoundOn } from '../sound';
 import { GoButton } from './go-button';
-import type { JSX } from 'solid-js';
+import type { JSX } from '@solidjs/web';
 
 // iOS starts the sound only in a tap, and the end of a drag is not a tap. A board that shows with no tap before
 // it (a restore at launch, or a return from the background) is covered by the go button. Its tap starts the
@@ -32,8 +32,10 @@ export const createSoundGate = (askTap: boolean, onReady: () => void): SoundGate
   return {
     start,
     check: () => {
+      // Solid 2 shows a write on the next flush, so the go button state is not read back here.
       if (needsTap()) {
         setShown(true);
+        return;
       }
       start();
     },

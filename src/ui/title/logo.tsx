@@ -1,5 +1,5 @@
-import { onCleanup, onMount } from 'solid-js';
-import type { JSX } from 'solid-js';
+import { onCleanup, onSettled } from 'solid-js';
+import type { JSX } from '@solidjs/web';
 
 // The logo of the game (spec Module 10): a pile of cards with eyes, and no text.
 // The eyes blink one time in each loop. A 3-second hold on the logo opens the parent check (spec Module 11).
@@ -53,9 +53,9 @@ const Cards = (): JSX.Element => (
 export const Logo = (props: { readonly onHold: () => void }): JSX.Element => {
   const hold = holdOf(() => props.onHold());
   let eyes: SVGGElement | undefined;
-  onMount(() => {
+  onSettled(() => {
     const blink = eyes?.animate([...BLINK], { duration: BLINK_MS, iterations: Infinity, easing: 'linear' });
-    onCleanup(() => blink?.cancel());
+    return () => blink?.cancel();
   });
   return (
     <svg

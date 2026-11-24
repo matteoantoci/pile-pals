@@ -1,7 +1,7 @@
 import { saveGame } from '../shell/save';
 import { cancelDrag } from './drag';
 import type { GameState } from '../model';
-import type { JSX } from 'solid-js';
+import type { JSX } from '@solidjs/web';
 
 // The top bar of the board (spec, "Top bar and hint button"): the home button at the left and the level number at the
 // centre. The level number is the only text on the board. The board has no hint button: the coach hops the hint after

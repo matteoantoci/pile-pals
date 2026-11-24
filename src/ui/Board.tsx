@@ -1,4 +1,4 @@
-import { createSignal, Index, onCleanup, onMount, Show } from 'solid-js';
+import { createSignal, flush, For, onSettled, Show, untrack } from 'solid-js';
 import { apply, dropCard, isFinished, MAX_COLUMNS, openCards, pileProgress, placeAnchor, tapDeck } from '../model';
 import { watchLifecycle } from '../shell/lifecycle';
 import { saveGame } from '../shell/save';
@@ -15,7 +15,8 @@ import { TopBar } from './top-bar';
 import type { Action, CardId, GameState, Outcome, PileId } from '../model';
 import type { Coach } from './coach';
 import type { Hooks, Target } from './drag';
-import type { Accessor, JSX } from 'solid-js';
+import type { JSX } from '@solidjs/web';
+import type { Accessor } from 'solid-js';
 
 // The board draws the state and shows the events. It contains no game rule.
 // The drag code owns the transform of each card. No JSX binding writes `transform` or `style` on `.card`.
@@ -126,7 +127,11 @@ const playLevels = (first: GameState): Levels => {
   const game: Game = {
     current: () => model,
     move: (next) => (model = next),
-    show: () => setState(model),
+    // Solid 2 batches writes to the next microtask: flush draws the new card now, before the parade reads the screen.
+    show: () => {
+      setState(model);
+      flush();
+    },
     rest: coach.rest,
     showReward: () => setReward(true),
   };
@@ -156,9 +161,10 @@ export const Board = (props: {
   readonly askTap: boolean;
   readonly onTitle: () => void;
 }): JSX.Element => {
-  const { initial, state, reward, hooksFor, onTapDeck, act, current, coach } = playLevels(props.initial);
-  const soundGate = createSoundGate(props.askTap, coach.rest);
-  onMount(() => {
+  const { initial, state, reward, hooksFor, onTapDeck, act, current, coach } = playLevels(untrack(() => props.initial));
+  const askTap = untrack(() => props.askTap);
+  const soundGate = createSoundGate(askTap, coach.rest);
+  onSettled(() => {
     const stop = watchLifecycle({
       hidden: () => {
         coach.pause();
@@ -170,11 +176,11 @@ export const Board = (props: {
         soundGate.check();
       },
     });
-    onCleanup(() => {
+    soundGate.start();
+    return () => {
       stop();
       coach.stop();
-    });
-    soundGate.start();
+    };
   });
 
   // One grid for the whole board (styles.css): from top to bottom, the deck row, the slot row, and the columns.
@@ -188,10 +194,10 @@ export const Board = (props: {
       <TopBar level={state().level} current={current} onHome={props.onTitle} />
       <DeckView initial={initial} state={state} hooksFor={hooksFor} onTap={onTapDeck} />
       <section class="piles">
-        {/* Index keeps the element of each pile, so a pile can animate the card that lands on it. */}
-        <Index each={state().piles}>
+        {/* For keyed={false} keeps the element of each pile, so a pile can animate the card that lands on it. */}
+        <For each={state().piles} keyed={false}>
           {(pile) => <PileView pile={pile()} progress={pileProgress(state(), pile().id)} />}
-        </Index>
+        </For>
       </section>
       <TableView initial={initial} state={state} hooksFor={hooksFor} />
       <Show when={reward()}>
